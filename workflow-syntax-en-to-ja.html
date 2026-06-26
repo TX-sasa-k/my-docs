@@ -3,315 +3,755 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ワークフローの構文（英語版からの翻訳）</title>
+  <title>GitHub Actions ワークフロー構文リファレンス</title>
   <style>
-    body { font-family: sans-serif; max-width: 980px; margin: 2rem auto; padding: 0 1rem; line-height: 1.7; }
-    h1, h2, h3, h4 { border-bottom: 1px solid #ccc; padding-bottom: .3em; }
-    pre { background: #f6f8fa; padding: 1em; overflow-x: auto; border-radius: 6px; }
-    code { background: #f6f8fa; padding: .1em .3em; border-radius: 3px; }
-    pre code { background: none; padding: 0; }
-    table { border-collapse: collapse; width: 100%; margin: 1em 0; }
-    th, td { border: 1px solid #ccc; padding: .5em .8em; text-align: left; vertical-align: top; }
-    th { background: #f0f0f0; }
-    .note { background: #ddf; border-left: 4px solid #66f; padding: .6em 1em; margin: 1em 0; }
-    .warning { background: #ffd; border-left: 4px solid #fa0; padding: .6em 1em; margin: 1em 0; }
-    .src { color: #555; font-size: .9em; }
-    .toc a { display: inline-block; margin: .15em .8em .15em 0; }
+    :root { color-scheme: light; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", Helvetica, Arial, sans-serif; max-width: 1180px; margin: 2rem auto; padding: 0 1.25rem; line-height: 1.75; color: #24292f; }
+    h1, h2, h3, h4 { line-height: 1.35; margin-top: 2rem; }
+    h1 { border-bottom: 2px solid #d0d7de; padding-bottom: .45rem; }
+    h2 { border-bottom: 1px solid #d0d7de; padding-bottom: .35rem; }
+    h3 { border-bottom: 1px dashed #d8dee4; padding-bottom: .2rem; }
+    a { color: #0969da; }
+    code { font-family: ui-monospace, SFMono-Regular, SFMono, Consolas, "Liberation Mono", Menlo, monospace; background: #f6f8fa; border-radius: 6px; padding: .12em .35em; }
+    pre { background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 8px; padding: 1rem; overflow-x: auto; line-height: 1.45; }
+    pre code { background: transparent; padding: 0; border-radius: 0; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0 1.5rem; }
+    th, td { border: 1px solid #d0d7de; padding: .55rem .75rem; text-align: left; vertical-align: top; }
+    th { background: #f6f8fa; }
+    .note, .warning, .important { border-left: 4px solid; border-radius: 6px; padding: .8rem 1rem; margin: 1rem 0; }
+    .note { background: #ddf4ff; border-color: #54aeff; }
+    .warning { background: #fff8c5; border-color: #d4a72c; }
+    .important { background: #ffebe9; border-color: #ff8182; }
+    .src { color: #57606a; font-size: .95rem; }
+    .toc { background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 8px; padding: 1rem 1.25rem; }
+    .toc ol { margin-top: .4rem; }
+    .small { font-size: .92rem; color: #57606a; }
   </style>
 </head>
 <body>
-  <h1>ワークフローの構文 — GitHub Actions（日本語訳）</h1>
-  <p class="src">原文（英語版）: <a href="https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax">Workflow syntax for GitHub Actions</a><br>
-  日本語版: <a href="https://docs.github.com/ja/actions/reference/workflows-and-actions/workflow-syntax">ワークフローの構文</a></p>
-  <div class="note">本ドキュメントは、GitHub Actions の英語版「Workflow syntax」リファレンスの構成・見出し・本文を日本語に翻訳したものです。実装時の正確な仕様は必ず公式ドキュメントを参照してください。</div>
+  <h1>GitHub Actions ワークフロー構文リファレンス</h1>
+  <p class="src">参照元 URL: <a href="https://docs.github.com/ja/actions/reference/workflows-and-actions/workflow-syntax">https://docs.github.com/ja/actions/reference/workflows-and-actions/workflow-syntax</a></p>
+  <div class="important">
+    <strong>注意:</strong> この HTML は、GitHub Docs の「Workflow syntax for GitHub Actions / ワークフローの構文」を日本語で参照しやすい形に整理した非公式の HTML レンダリングです。最新かつ正確な仕様、イベントごとの制約、プランやランナーの提供状況は、必ず上記の公式 GitHub Docs を確認してください。
+  </div>
 
-  <h2 id="about">この記事について（About YAML syntax for workflows）</h2>
-  <p>ワークフローファイルは YAML 構文を使用し、ファイル拡張子は <code>.yml</code> または <code>.yaml</code> でなければなりません。YAML が初めての方は、「Learn YAML in Y minutes」を読むとよいでしょう。</p>
-  <p>ワークフローファイルは、リポジトリの <code>.github/workflows</code> ディレクトリに格納する必要があります。</p>
+  <nav class="toc" aria-label="目次">
+    <strong>目次</strong>
+    <ol>
+      <li><a href="#yaml-basics">YAML ワークフローの基本</a></li>
+      <li><a href="#top-level">トップレベルキー</a></li>
+      <li><a href="#on-detail"><code>on</code> トリガー構文の詳細</a></li>
+      <li><a href="#permissions-detail"><code>permissions</code></a></li>
+      <li><a href="#env-defaults"><code>env</code> と <code>defaults</code></a></li>
+      <li><a href="#concurrency-detail"><code>concurrency</code></a></li>
+      <li><a href="#jobs-detail"><code>jobs</code> と <code>jobs.&lt;job_id&gt;</code></a></li>
+      <li><a href="#steps-detail">ステップ構文</a></li>
+      <li><a href="#appendix">付録: 表と例</a></li>
+    </ol>
+  </nav>
 
-  <h2 id="name">name</h2>
-  <p>ワークフローの名前です。GitHub は、リポジトリの「Actions」タブにこの名前を表示します。<code>name</code> を省略した場合、GitHub はワークフローファイルのリポジトリルートからの相対パスを表示します。</p>
+  <h2 id="yaml-basics">1. YAML ワークフローの基本</h2>
+  <p>GitHub Actions のワークフローは YAML ファイルで定義します。ファイル拡張子は <code>.yml</code> または <code>.yaml</code> で、リポジトリ内の <code>.github/workflows</code> ディレクトリに配置します。このディレクトリにある各 YAML ファイルが 1 つのワークフローとして扱われます。</p>
+  <p>ワークフローは、イベントによってトリガーされ、1 つ以上のジョブを実行します。各ジョブはランナー上で実行され、ジョブ内には複数のステップを定義できます。ステップではシェルコマンドを実行したり、再利用可能なアクションを呼び出したりできます。</p>
+  <pre><code>name: CI
+run-name: CI for ${{ github.ref_name }} by @${{ github.actor }}
 
-  <h2 id="run-name">run-name</h2>
-  <p>ワークフローから生成される実行（run）の名前です。GitHub は、リポジトリの「Actions」タブにあるワークフロー実行の一覧に、この実行名を表示します。<code>run-name</code> を省略した場合、実行名はワークフロー実行をトリガーしたイベントに関連する情報に設定されます。</p>
-  <p>この値には式（expression）を含めることができ、<code>github</code> および <code>inputs</code> コンテキストを参照できます。</p>
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm test</code></pre>
+
+  <h2 id="top-level">2. トップレベルキー</h2>
+  <table>
+    <tr><th>キー</th><th>説明</th></tr>
+    <tr><td><code>name</code></td><td>ワークフロー名。Actions タブに表示されます。省略時はワークフローファイルの相対パスが表示されます。</td></tr>
+    <tr><td><code>run-name</code></td><td>各ワークフロー実行の表示名。<code>github</code> と <code>inputs</code> コンテキストを使った式を含められます。</td></tr>
+    <tr><td><code>on</code></td><td>ワークフローを起動するイベント、スケジュール、手動実行、再利用可能ワークフロー呼び出しを定義します。</td></tr>
+    <tr><td><code>permissions</code></td><td><code>GITHUB_TOKEN</code> の既定権限をワークフロー全体で設定します。ジョブ単位でも上書きできます。</td></tr>
+    <tr><td><code>env</code></td><td>ワークフロー内のすべてのジョブとステップで使える環境変数を定義します。</td></tr>
+    <tr><td><code>defaults</code></td><td>ワークフロー内のジョブに適用する既定値を定義します。主に <code>defaults.run</code> を使います。</td></tr>
+    <tr><td><code>concurrency</code></td><td>同じグループに属するワークフロー実行またはジョブの同時実行を制御します。</td></tr>
+    <tr><td><code>jobs</code></td><td>実行するジョブの集合を定義します。少なくとも 1 つのジョブが必要です。</td></tr>
+  </table>
+
+  <h3 id="name">2.1 <code>name</code></h3>
+  <p><code>name</code> はワークフローの名前です。リポジトリの Actions タブでワークフローを識別するために使われます。</p>
+  <pre><code>name: Deploy production</code></pre>
+
+  <h3 id="run-name">2.2 <code>run-name</code></h3>
+  <p><code>run-name</code> は、ワークフローから生成される個々の実行の名前です。式を含めることができ、実行者、入力値、ブランチ名などを表示名に反映できます。</p>
   <pre><code>run-name: Deploy to ${{ inputs.deploy_target }} by @${{ github.actor }}</code></pre>
 
-  <h2 id="on">on</h2>
-  <p>ワークフローを自動的にトリガーするには、<code>on</code> を使って、どのイベントでワークフローを実行できるかを定義します。</p>
-  <p>単一または複数のイベントの定義、スケジュールの設定、あるいは特定のファイル・タグ・ブランチの変更に限定した実行などが可能です。</p>
+  <h2 id="on-detail">3. <code>on</code> トリガー構文の詳細</h2>
+  <p><code>on</code> はワークフローを起動する条件を定義する必須級の中心キーです。単一イベント、複数イベント、イベントごとの設定、スケジュール、手動実行、再利用可能ワークフローとしての呼び出しを定義できます。</p>
 
-  <h3>単一イベントを使う</h3>
+  <h3 id="on-single">3.1 単一イベント</h3>
+  <p>単一のイベントだけで起動する場合は、イベント名を文字列で指定できます。</p>
   <pre><code>on: push</code></pre>
 
-  <h3>複数のイベントを使う</h3>
+  <h3 id="on-multiple">3.2 複数イベント</h3>
+  <p>複数イベントのいずれかで起動する場合は配列を使えます。いずれか 1 つのイベントが発生するとワークフローが起動します。</p>
   <pre><code>on: [push, fork]</code></pre>
-  <p>複数のイベントを指定した場合、いずれか1つが発生すればワークフローがトリガーされます。</p>
 
-  <h3>アクティビティタイプを使う</h3>
-  <p>一部のイベントには、ワークフローをいつ実行するかをより細かく制御するためのアクティビティタイプがあります。<code>on.&lt;event_name&gt;.types</code> でトリガーとなるアクティビティタイプを定義します。</p>
-  <pre><code>on:
-  label:
-    types:
-      - created</code></pre>
-
-  <h3>フィルターを使う</h3>
-  <p>一部のイベントにはフィルターがあります。たとえば <code>push</code> イベントでは、特定のブランチへのプッシュに限定して実行できます。</p>
+  <h3 id="on-map">3.3 イベント設定マップ</h3>
+  <p>イベントにフィルターやアクティビティタイプを設定する場合は、<code>on</code> 配下にイベント名をキーとして定義します。設定が必要なイベントと不要なイベントを混在させる場合、すべてをマップ形式で書きます。</p>
   <pre><code>on:
   push:
-    branches:
-      - main
-      - 'releases/**'</code></pre>
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize]
+  workflow_dispatch:</code></pre>
 
-  <h2 id="on-event-types">on.&lt;event_name&gt;.types</h2>
-  <p>ワークフロー実行をトリガーするアクティビティのタイプを定義します。大半の GitHub イベントは複数のアクティビティタイプによってトリガーされます。</p>
+  <h3 id="on-types">3.4 <code>on.&lt;event_name&gt;.types</code> アクティビティタイプ</h3>
+  <p>一部のイベントには、より細かなアクティビティタイプがあります。たとえば <code>pull_request</code> には <code>opened</code>、<code>synchronize</code>、<code>closed</code> などがあります。<code>types</code> を指定すると、指定したアクティビティタイプの発生時だけワークフローが実行されます。</p>
   <pre><code>on:
   label:
-    types: [created, edited]</code></pre>
+    types: [created, edited]
 
-  <h2 id="on-pull-request-branches">on.&lt;pull_request|pull_request_target&gt;.&lt;branches|branches-ignore&gt;</h2>
-  <p><code>pull_request</code> および <code>pull_request_target</code> イベントを使う場合、特定のブランチをターゲットとするプルリクエストのみで実行されるように設定できます。包含には <code>branches</code>、除外には <code>branches-ignore</code> を使います。</p>
+jobs:
+  respond:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "A label was created or edited"</code></pre>
+  <div class="note">複数のアクティビティタイプまたは複数イベントを指定すると、1 回のユーザー操作が複数のワークフロー実行を生成する場合があります。イベントとアクティビティタイプの組み合わせを明確にしてください。</div>
+
+  <h3 id="on-filters">3.5 イベントフィルター</h3>
+  <p>イベントによっては、ブランチ、タグ、パスなどでワークフローの実行対象を絞り込めます。フィルターを複数種類組み合わせた場合、基本的には両方の条件を満たす必要があります。</p>
+
+  <h3 id="on-pr-branches">3.6 <code>pull_request</code> / <code>pull_request_target</code> のブランチフィルター</h3>
+  <p><code>pull_request</code> と <code>pull_request_target</code> では、プルリクエストのベースブランチに対して <code>branches</code> または <code>branches-ignore</code> を使えます。同じイベントで <code>branches</code> と <code>branches-ignore</code> を同時に使うことはできません。包含と除外を同時に表したい場合は、<code>branches</code> に <code>!</code> で始まる否定パターンを含めます。</p>
   <pre><code>on:
   pull_request:
     branches:
       - main
-      - 'mona/octocat'
-      - 'releases/**'</code></pre>
+      - 'releases/**'
+      - '!releases/**-alpha'</code></pre>
 
-  <h2 id="on-push-branches-tags">on.push.&lt;branches|tags|branches-ignore|tags-ignore&gt;</h2>
-  <p><code>push</code> イベントを使う場合、特定のブランチまたはタグで実行されるように設定できます。</p>
+  <h3 id="on-push-branches-tags">3.7 <code>push</code> のブランチ・タグフィルター</h3>
+  <p><code>push</code> では <code>branches</code>、<code>branches-ignore</code>、<code>tags</code>、<code>tags-ignore</code> を使えます。ブランチのみ指定した場合、タグへの push では実行されません。タグのみ指定した場合、ブランチへの push では実行されません。どちらも指定しなければ、ブランチまたはタグへの push で実行されます。</p>
   <pre><code>on:
   push:
     branches:
       - main
       - 'releases/**'
     tags:
-      - v2
-      - v1.*</code></pre>
+      - v1.*
+      - v2.*</code></pre>
 
-  <h2 id="on-paths">on.&lt;push|pull_request|pull_request_target&gt;.&lt;paths|paths-ignore&gt;</h2>
-  <p>変更されたファイルパスに基づいて実行するよう設定できます。包含には <code>paths</code>、除外には <code>paths-ignore</code> を使います。</p>
+  <h3 id="pattern-order">3.8 <code>!</code> を使う包含・除外パターンと順序</h3>
+  <p><code>branches</code>、<code>tags</code>、<code>paths</code> では <code>!</code> で始まる否定パターンを含めることができます。パターンは上から順に評価され、後にあるパターンが前の結果を上書きします。否定パターンを使う場合、同じリスト内に少なくとも 1 つの肯定パターンも必要です。</p>
+  <pre><code>on:
+  push:
+    branches:
+      - 'releases/**'
+      - '!releases/**-alpha'
+      - 'releases/beta/mona'</code></pre>
+  <p>この例では <code>releases/**</code> を含め、<code>releases/**-alpha</code> を除外し、最後に <code>releases/beta/mona</code> を再度含めます。</p>
+
+  <h3 id="on-paths">3.9 パスフィルター <code>paths</code> / <code>paths-ignore</code></h3>
+  <p><code>push</code>、<code>pull_request</code>、<code>pull_request_target</code> では変更されたファイルパスで実行対象を絞り込めます。<code>paths</code> は一致した変更がある場合に実行し、<code>paths-ignore</code> は一致する変更だけの場合にスキップします。同じイベントで <code>paths</code> と <code>paths-ignore</code> を同時に使うことはできません。</p>
   <pre><code>on:
   push:
     paths:
-      - '**.js'</code></pre>
+      - 'src/**'
+      - '!src/docs/**'</code></pre>
+  <pre><code>on:
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'</code></pre>
+  <p>ブランチ・タグフィルターとパスフィルターを組み合わせると、両方の条件を満たす必要があります。たとえば <code>branches</code> と <code>paths</code> を指定した場合、対象ブランチへの変更で、かつ指定パスに一致する変更がある場合にのみ実行されます。</p>
+  <div class="warning">パスフィルターは Git 差分に基づいて評価されます。差分生成には制限があり、変更ファイル数が非常に多い場合や差分を生成できない場合は、ワークフローが常に実行されることがあります。逆に、パスフィルターでスキップされたワークフローは、関連するチェックが pending のまま残る場合があります。</div>
 
-  <h2 id="on-schedule">on.schedule</h2>
-  <p>POSIX cron 構文を使って、特定の時刻にワークフローを実行するようスケジュールできます。スケジュールされたワークフローは、デフォルトで UTC タイムゾーンで実行されます。</p>
-  <pre><code>┌───────────── 分 (0 - 59)
-│ ┌───────────── 時 (0 - 23)
-│ │ ┌───────────── 日 (1 - 31)
-│ │ │ ┌───────────── 月 (1 - 12 または JAN-DEC)
-│ │ │ │ ┌───────────── 曜日 (0 - 6 または SUN-SAT)
-│ │ │ │ │
-* * * * *</code></pre>
+  <h3 id="on-schedule">3.10 <code>schedule</code> と POSIX cron</h3>
+  <p><code>schedule</code> は POSIX cron 構文でワークフローを定期実行します。スケジュールは UTC で評価され、最短間隔は通常 5 分です。スケジュールされたワークフローは、リポジトリの既定ブランチの最新コミットで実行されます。</p>
+  <table>
+    <tr><th>位置</th><th>フィールド</th><th>値</th><th>例</th></tr>
+    <tr><td>1</td><td>分</td><td><code>0-59</code></td><td><code>30</code></td></tr>
+    <tr><td>2</td><td>時</td><td><code>0-23</code></td><td><code>5</code></td></tr>
+    <tr><td>3</td><td>日</td><td><code>1-31</code></td><td><code>*</code></td></tr>
+    <tr><td>4</td><td>月</td><td><code>1-12</code> または <code>JAN-DEC</code></td><td><code>*</code></td></tr>
+    <tr><td>5</td><td>曜日</td><td><code>0-6</code> または <code>SUN-SAT</code></td><td><code>1,3</code></td></tr>
+  </table>
   <pre><code>on:
   schedule:
     - cron: '30 5 * * 1,3'
-    - cron: '30 5,17 * * 2,4'</code></pre>
+    - cron: '30 5,17 * * 2,4'
 
-  <h2 id="permissions">permissions</h2>
-  <p><code>GITHUB_TOKEN</code> に付与する権限を変更するには <code>permissions</code> を使います。ワークフロー全体、または個々のジョブに対して設定できます。指定できる値は <code>read</code>、<code>write</code>、<code>none</code> です。</p>
+jobs:
+  scheduled:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "This job runs on a schedule"</code></pre>
+
+  <h3 id="workflow-dispatch">3.11 <code>workflow_dispatch</code> と入力</h3>
+  <p><code>workflow_dispatch</code> を使うと、Actions タブ、GitHub CLI、REST API などから手動でワークフローを実行できます。<code>inputs</code> で入力値を定義できます。入力値は <code>inputs</code> コンテキストから参照できます。</p>
+  <p>代表的な入力タイプには <code>boolean</code>、<code>choice</code>、<code>number</code>、<code>environment</code>、<code>string</code> があります。<code>choice</code> では <code>options</code> を定義します。</p>
+  <pre><code>on:
+  workflow_dispatch:
+    inputs:
+      deploy_target:
+        description: 'デプロイ先環境'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      dry_run:
+        description: '実行内容だけ確認する'
+        required: false
+        default: true
+        type: boolean
+      retries:
+        description: '再試行回数'
+        required: false
+        default: 1
+        type: number
+
+run-name: Deploy ${{ inputs.deploy_target }} by @${{ github.actor }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "target=${{ inputs.deploy_target }}, dry_run=${{ inputs.dry_run }}"</code></pre>
+
+  <h3 id="workflow-call">3.12 <code>workflow_call</code> 再利用可能ワークフロー</h3>
+  <p><code>workflow_call</code> を定義したワークフローは、他のワークフローからジョブとして呼び出せる再利用可能ワークフローになります。呼び出される側は入力、出力、シークレットを宣言できます。呼び出す側は <code>jobs.&lt;job_id&gt;.uses</code> を使います。</p>
+  <h4>呼び出される側</h4>
+  <pre><code>name: Reusable build
+
+on:
+  workflow_call:
+    inputs:
+      config-path:
+        description: '設定ファイルのパス'
+        required: true
+        type: string
+      run-tests:
+        required: false
+        default: true
+        type: boolean
+    secrets:
+      token:
+        required: true
+    outputs:
+      artifact-name:
+        description: '生成したアーティファクト名'
+        value: ${{ jobs.build.outputs.artifact-name }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-name: ${{ steps.meta.outputs.name }}
+    steps:
+      - id: meta
+        run: echo "name=my-artifact" &gt;&gt; "$GITHUB_OUTPUT"</code></pre>
+  <h4>呼び出す側</h4>
+  <pre><code>jobs:
+  call-build:
+    uses: octo-org/example-repo/.github/workflows/reusable-build.yml@main
+    with:
+      config-path: .github/build.yml
+      run-tests: true
+    secrets:
+      token: ${{ secrets.BUILD_TOKEN }}</code></pre>
+  <p><code>secrets: inherit</code> を使うと、呼び出し元ワークフローで利用可能なシークレットを呼び出し先へ継承できます。ただし組織・リポジトリの境界、セキュリティ要件、最小権限の原則を確認してください。</p>
+
+  <h2 id="permissions-detail">4. <code>permissions</code></h2>
+  <p><code>permissions</code> は <code>GITHUB_TOKEN</code> に付与される権限を制御します。ワークフロー全体のトップレベル、またはジョブ単位の <code>jobs.&lt;job_id&gt;.permissions</code> で指定できます。いずれかの権限を明示すると、明示されていない権限は通常 <code>none</code> になります。</p>
   <pre><code>permissions:
-  actions: read
-  contents: write
-  issues: write</code></pre>
-  <pre><code># すべて読み取り専用
+  contents: read
+  issues: write
+  pull-requests: write</code></pre>
+  <pre><code># すべての利用可能な権限を読み取りにする
 permissions: read-all
-# すべての権限を無効化
+
+# すべての利用可能な権限を書き込みにする
+permissions: write-all
+
+# すべての権限を無効化する
 permissions: {}</code></pre>
+  <table>
+    <tr><th>権限</th><th>用途</th><th>代表的な値</th></tr>
+    <tr><td><code>actions</code></td><td>ワークフロー実行や Actions 関連操作。例: 実行のキャンセル。</td><td><code>read</code> / <code>write</code> / <code>none</code></td></tr>
+    <tr><td><code>artifact-metadata</code></td><td>ビルドアーティファクトのメタデータ操作。</td><td><code>read</code> / <code>write</code> / <code>none</code></td></tr>
+    <tr><td><code>attestations</code></td><td>アーティファクト attestations の生成や参照。</td><td><code>read</code> / <code>write</code> / <code>none</code></td></tr>
+    <tr><td><code>checks</code></td><td>チェックラン、チェックスイートの操作。</td><td><code>read</code> / <code>write</code> / <code>none</code></td></tr>
+    <tr><td><code>code-quality</code></td><td>コード品質関連データのアップロードなど。</td><td><code>read</code> / <code>write</code> / <code>none</code></td></tr>
+    <tr><td><code>contents</code></td><td>リポジトリ内容。例: checkout、コミット一覧、リリース作成。</td><td><code>read</code> / <code>write</code> / <code>none</code></td></tr>
+    <tr><td><code>deployments</code></td><td>デプロイメントの作成や更新。</td><td><code>read</code> / <code>write</code> / <code>none</code></td></tr>
+    <tr><td><code>discussions</code></td><td>GitHub Discussions の操作。</td><td><code>read</code> / <code>write</code> / <code>none</code></td></tr>
+    <tr><td><code>id-token</code></td><td>OpenID Connect (OIDC) トークンの取得。クラウド認証でよく使います。</td><td><code>write</code> / <code>none</code></td></tr>
+    <tr><td><code>issues</code></td><td>Issue の作成、コメント、ラベル操作など。</td><td><code>read</code> / <code>write</code> / <code>none</code></td></tr>
+    <tr><td><code>models</code></td><td>GitHub Models の推論 API 利用。</td><td><code>read</code> / <code>none</code></td></tr>
+    <tr><td><code>packages</code></td><td>GitHub Packages の読み取り・公開。</td><td><code>read</code> / <code>write</code> / <code>none</code></td></tr>
+    <tr><td><code>pages</code></td><td>GitHub Pages のビルドやデプロイ。</td><td><code>read</code> / <code>write</code> / <code>none</code></td></tr>
+    <tr><td><code>pull-requests</code></td><td>Pull request のコメント、ラベル、レビュー関連操作。</td><td><code>read</code> / <code>write</code> / <code>none</code></td></tr>
+    <tr><td><code>security-events</code></td><td>コードスキャンアラートなどセキュリティイベント。</td><td><code>read</code> / <code>write</code> / <code>none</code></td></tr>
+    <tr><td><code>statuses</code></td><td>コミットステータスの読み書き。</td><td><code>read</code> / <code>write</code> / <code>none</code></td></tr>
+    <tr><td><code>vulnerability-alerts</code></td><td>Dependabot アラートの読み取り。</td><td><code>read</code> / <code>none</code></td></tr>
+  </table>
+  <div class="warning">フォークされたリポジトリからのワークフローでは、通常、書き込み権限を付与できません。管理者が pull request からのワークフローへ書き込みトークンを送る設定を有効にしている場合など、例外があります。</div>
+  <h3>最小権限の例</h3>
+  <pre><code>name: Stale issue management
 
-  <h2 id="env">env</h2>
-  <p>ワークフロー内のステップで利用できる環境変数のマップです。ジョブ単位（<code>jobs.&lt;job_id&gt;.env</code>）やステップ単位（<code>jobs.&lt;job_id&gt;.steps[*].env</code>）でも設定できます。</p>
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+permissions: {}
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/stale@v10</code></pre>
+
+  <h2 id="env-defaults">5. <code>env</code> と <code>defaults</code></h2>
+  <h3 id="env">5.1 <code>env</code></h3>
+  <p><code>env</code> は環境変数のマップです。トップレベル、ジョブレベル、ステップレベルで定義できます。より狭いスコープの値が、より広いスコープの同名変数を上書きします。トップレベルの <code>env</code> はワークフロー内のすべてのジョブに適用されます。</p>
   <pre><code>env:
-  SERVER: production</code></pre>
+  SERVER: production
+  NODE_ENV: test
 
-  <h2 id="defaults">defaults</h2>
-  <p>ワークフロー内のすべてのジョブに適用されるデフォルト設定のマップです。ジョブ単位（<code>jobs.&lt;job_id&gt;.defaults</code>）でも設定できます。</p>
+jobs:
+  example:
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: development
+    steps:
+      - name: Print env
+        env:
+          NODE_ENV: step-value
+        run: echo "$NODE_ENV on $SERVER"</code></pre>
 
-  <h3 id="defaults-run">defaults.run</h3>
-  <p>すべての <code>run</code> ステップに対するデフォルトの <code>shell</code> と <code>working-directory</code> を設定します。</p>
+  <h3 id="defaults">5.2 <code>defaults</code> と <code>defaults.run</code></h3>
+  <p><code>defaults</code> は、ワークフローまたはジョブ内のすべての <code>run</code> ステップに適用する既定値を設定します。主なキーは <code>shell</code> と <code>working-directory</code> です。ジョブレベルの既定値はワークフローレベルの既定値を上書きします。</p>
   <pre><code>defaults:
   run:
     shell: bash
-    working-directory: ./scripts</code></pre>
+    working-directory: ./scripts
 
-  <h2 id="concurrency">concurrency</h2>
-  <p>同じ並行実行グループを使うワークフロー実行・ジョブを、一度に1つだけに制限します。<code>cancel-in-progress: true</code> を指定すると、進行中の実行をキャンセルします。</p>
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./build-scripts
+    steps:
+      - run: ./build.sh</code></pre>
+
+  <h2 id="concurrency-detail">6. <code>concurrency</code></h2>
+  <p><code>concurrency</code> は、同じ並行実行グループに属するワークフロー実行またはジョブが同時に複数走らないよう制御します。トップレベルとジョブレベルの両方で使用できます。</p>
+  <p><code>group</code> は並行実行グループ名です。<code>cancel-in-progress</code> を <code>true</code> にすると、同じグループで進行中の実行をキャンセルして新しい実行を優先できます。<code>cancel-in-progress</code> には式も使えます。</p>
+  <div class="note">グループ名は大文字小文字を区別しません。たとえば <code>prod</code> と <code>Prod</code> は同じグループとして扱われます。また、同じグループ内で待機中の実行の順序は保証されません。</div>
   <pre><code>concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true</code></pre>
-
-  <h2 id="jobs">jobs</h2>
-  <p>ワークフロー実行は、1つ以上の <code>jobs</code> から構成されます。ジョブはデフォルトで並行に実行されます。順番に実行するには <code>jobs.&lt;job_id&gt;.needs</code> で依存関係を定義します。</p>
-
-  <h2 id="job-id">jobs.&lt;job_id&gt;</h2>
-  <p>各ジョブに一意の ID を付けます。<code>job_id</code> は文字列で、英字または <code>_</code> で始め、英数字・<code>-</code>・<code>_</code> のみを含められます。</p>
-
-  <h3 id="job-id-name">jobs.&lt;job_id&gt;.name</h3>
-  <p>GitHub の UI に表示されるジョブ名です。</p>
-
-  <h2 id="job-id-permissions">jobs.&lt;job_id&gt;.permissions</h2>
-  <p>特定のジョブに対して <code>GITHUB_TOKEN</code> の権限を設定します。書式はトップレベルの <code>permissions</code> と同じです。</p>
-
-  <h2 id="job-id-needs">jobs.&lt;job_id&gt;.needs</h2>
-  <p>そのジョブの実行前に正常完了している必要がある他のジョブを指定します。</p>
   <pre><code>jobs:
-  job1:
+  deploy:
     runs-on: ubuntu-latest
-  job2:
-    needs: job1
-    runs-on: ubuntu-latest
-  job3:
-    needs: [job1, job2]
+    concurrency:
+      group: deploy-${{ inputs.environment }}
+      cancel-in-progress: ${{ inputs.environment != 'production' }}
+    steps:
+      - run: ./deploy.sh</code></pre>
+  <p>トップレベルでは一般に <code>github</code>、<code>inputs</code>、<code>vars</code> など、ジョブレベルでは <code>github</code>、<code>inputs</code>、<code>vars</code>、<code>needs</code>、<code>strategy</code>、<code>matrix</code> などのコンテキストが利用できます。利用可能なコンテキストはキーごとに異なるため、公式のコンテキスト可用性表を確認してください。</p>
+
+  <h2 id="jobs-detail">7. <code>jobs</code> と <code>jobs.&lt;job_id&gt;</code></h2>
+  <p><code>jobs</code> はワークフロー実行で実行するジョブのマップです。各ジョブには一意の <code>job_id</code> を付けます。<code>job_id</code> は英字または <code>_</code> で始め、英数字、<code>-</code>、<code>_</code> を含められます。</p>
+
+  <h3 id="job-name">7.1 <code>jobs.&lt;job_id&gt;.name</code></h3>
+  <p>GitHub UI に表示されるジョブ名です。省略時は <code>job_id</code> が表示名として使われます。</p>
+  <pre><code>jobs:
+  test:
+    name: Test on Node.js
     runs-on: ubuntu-latest</code></pre>
 
-  <h2 id="job-id-if">jobs.&lt;job_id&gt;.if</h2>
-  <p>条件が満たされた場合にのみジョブを実行します。式では <code>${{ }}</code> を省略できます。</p>
+  <h3 id="job-permissions">7.2 <code>jobs.&lt;job_id&gt;.permissions</code></h3>
+  <p>特定のジョブだけ <code>GITHUB_TOKEN</code> の権限を変更します。トップレベルの <code>permissions</code> よりもジョブ単位の設定がそのジョブに適用されます。</p>
 
-  <h2 id="job-id-runs-on">jobs.&lt;job_id&gt;.runs-on</h2>
-  <p>ジョブを実行するランナーの種類を指定します（必須）。GitHub ホストランナー、大規模ランナー、セルフホストランナーを指定できます。</p>
+  <h3 id="job-needs">7.3 <code>jobs.&lt;job_id&gt;.needs</code></h3>
+  <p>ジョブの依存関係を定義します。依存先ジョブが成功してから実行されます。依存先が失敗またはスキップされた場合、通常そのジョブもスキップされます。失敗やスキップにかかわらず実行したい場合は <code>always()</code> を <code>if</code> で使います。</p>
+  <pre><code>jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: make build
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - run: make test
+
+  summarize:
+    if: ${{ always() }}
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "summarize results"</code></pre>
+
+  <h3 id="job-if">7.4 <code>jobs.&lt;job_id&gt;.if</code></h3>
+  <p>条件が真の場合だけジョブを実行します。<code>if</code> では通常 <code>${{ }}</code> を省略できますが、式が <code>!</code> で始まる場合は YAML の予約記法と衝突するため、<code>${{ }}</code> で囲むか引用符・括弧でエスケープしてください。</p>
+  <pre><code>jobs:
+  production-deploy:
+    if: github.repository == 'octo-org/octo-repo-prod'
+    runs-on: ubuntu-latest
+    steps:
+      - run: ./deploy.sh</code></pre>
+  <pre><code>jobs:
+  not-for-tags:
+    if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "not a tag"</code></pre>
+
+  <h3 id="job-runs-on">7.5 <code>jobs.&lt;job_id&gt;.runs-on</code></h3>
+  <p><code>runs-on</code> はジョブを実行するランナーを指定する必須キーです。GitHub ホストランナー、大規模ランナー、セルフホストランナーを指定できます。値には単一文字列、式を含む文字列、配列、または <code>group</code> / <code>labels</code> を含むマップを使えます。</p>
   <pre><code>runs-on: ubuntu-latest</code></pre>
-  <pre><code>runs-on: [self-hosted, linux, x64]</code></pre>
+  <pre><code>runs-on: [self-hosted, linux, x64, gpu]</code></pre>
+  <pre><code>on:
+  workflow_dispatch:
+    inputs:
+      chosen-os:
+        required: true
+        type: choice
+        options: [Ubuntu, macOS]
 
-  <h2 id="job-id-environment">jobs.&lt;job_id&gt;.environment</h2>
-  <p>ジョブが参照するデプロイ環境を指定します。環境には保護ルールや環境固有のシークレットを設定できます。</p>
+jobs:
+  test:
+    runs-on: [self-hosted, "${{ inputs.chosen-os }}"]
+    steps:
+      - run: echo "Hello"</code></pre>
+  <pre><code>jobs:
+  group-runner:
+    runs-on:
+      group: ubuntu-runners
+      labels: ubuntu-20.04-16core
+    steps:
+      - run: echo "runner group"</code></pre>
+  <table>
+    <tr><th>分類</th><th>例</th><th>説明</th></tr>
+    <tr><td>GitHub ホスト Linux</td><td><code>ubuntu-latest</code>, <code>ubuntu-24.04</code>, <code>ubuntu-22.04</code></td><td>GitHub が管理する Linux ランナー。</td></tr>
+    <tr><td>GitHub ホスト Windows</td><td><code>windows-latest</code>, <code>windows-2025</code>, <code>windows-2022</code></td><td>GitHub が管理する Windows ランナー。</td></tr>
+    <tr><td>GitHub ホスト macOS</td><td><code>macos-latest</code>, <code>macos-14</code>, <code>macos-15</code></td><td>GitHub が管理する macOS ランナー。</td></tr>
+    <tr><td>セルフホスト</td><td><code>self-hosted</code> と任意ラベル</td><td>自分で登録したランナー。配列内のすべてのラベルに一致する必要があります。</td></tr>
+    <tr><td>ランナーグループ</td><td><code>group</code> と <code>labels</code></td><td>Organization または Enterprise のランナーグループを対象にできます。</td></tr>
+  </table>
+
+  <h3 id="job-environment">7.6 <code>jobs.&lt;job_id&gt;.environment</code></h3>
+  <p>ジョブが参照するデプロイ環境を指定します。環境には保護ルール、レビュー、待機時間、環境固有のシークレットや変数を設定できます。文字列または <code>name</code> と <code>url</code> のマップで指定できます。</p>
+  <pre><code>environment: production</code></pre>
   <pre><code>environment:
   name: production
   url: https://example.com</code></pre>
 
-  <h2 id="job-id-concurrency">jobs.&lt;job_id&gt;.concurrency</h2>
-  <p>ジョブ単位で並行実行を制御します。書式はトップレベルの <code>concurrency</code> と同じです。</p>
+  <h3 id="job-concurrency">7.7 <code>jobs.&lt;job_id&gt;.concurrency</code></h3>
+  <p>ジョブ単位で並行実行を制御します。デプロイジョブや環境別ジョブの競合防止に有効です。</p>
 
-  <h2 id="job-id-outputs">jobs.&lt;job_id&gt;.outputs</h2>
-  <p>あるジョブの出力を作成し、依存する後続ジョブから利用できるようにします。</p>
+  <h3 id="job-outputs">7.8 <code>jobs.&lt;job_id&gt;.outputs</code></h3>
+  <p>ジョブの出力を定義し、<code>needs</code> コンテキストを通して後続ジョブから参照できます。値は通常、ステップ出力からマッピングします。</p>
   <pre><code>jobs:
-  job1:
+  build:
     runs-on: ubuntu-latest
     outputs:
-      output1: ${{ steps.step1.outputs.test }}
+      image: ${{ steps.meta.outputs.image }}
     steps:
-      - id: step1
-        run: echo "test=hello" &gt;&gt; "$GITHUB_OUTPUT"</code></pre>
-  <div class="warning"><strong>警告：</strong>ジョブの出力はテキストとして扱われ、シークレットを含めるとログにマスクされません。機微な値の受け渡しには使用しないでください。</div>
+      - id: meta
+        run: echo "image=ghcr.io/octo/app:sha" &gt;&gt; "$GITHUB_OUTPUT"
 
-  <h2 id="job-id-env">jobs.&lt;job_id&gt;.env</h2>
-  <p>そのジョブ内のすべてのステップで利用できる環境変数のマップです。</p>
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Deploy ${{ needs.build.outputs.image }}"</code></pre>
+  <div class="warning">ジョブ出力はテキストとして扱われます。シークレットや機微情報をジョブ出力として渡さないでください。</div>
 
-  <h2 id="job-id-defaults">jobs.&lt;job_id&gt;.defaults</h2>
-  <p>そのジョブ内のすべてのステップに適用されるデフォルト設定のマップです。</p>
+  <h3 id="job-env-defaults-steps-timeout">7.9 <code>env</code> / <code>defaults</code> / <code>steps</code> / <code>timeout-minutes</code></h3>
+  <p><code>jobs.&lt;job_id&gt;.env</code> はジョブ内のすべてのステップに適用される環境変数です。<code>jobs.&lt;job_id&gt;.defaults</code> はジョブ内の <code>run</code> ステップの既定値です。<code>jobs.&lt;job_id&gt;.steps</code> はジョブ内のタスク列です。<code>jobs.&lt;job_id&gt;.timeout-minutes</code> はジョブ全体の最大実行時間で、既定は 360 分です。</p>
 
-  <h2 id="job-id-steps">jobs.&lt;job_id&gt;.steps</h2>
-  <p>ジョブには、<code>steps</code> と呼ばれる一連のタスクを含められます。各ステップはコマンドの実行、セットアップ作業、またはアクションの実行を行います。</p>
+  <h3 id="job-strategy">7.10 <code>jobs.&lt;job_id&gt;.strategy</code> と matrix</h3>
+  <p><code>strategy</code> はマトリックスビルドを定義します。<code>matrix</code> に複数の軸を指定すると、組み合わせごとにジョブが作られます。<code>include</code> で組み合わせや追加プロパティを加え、<code>exclude</code> で特定の組み合わせを除外できます。</p>
+  <pre><code>jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      max-parallel: 3
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [18, 20, 22]
+        include:
+          - os: ubuntu-latest
+            node: 22
+            experimental: true
+        exclude:
+          - os: windows-latest
+            node: 18
+    continue-on-error: ${{ matrix.experimental == true }}
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test</code></pre>
+  <table>
+    <tr><th>キー</th><th>説明</th></tr>
+    <tr><td><code>matrix</code></td><td>ジョブを展開する軸と値の集合。</td></tr>
+    <tr><td><code>include</code></td><td>既存の組み合わせに値を追加、または新しい組み合わせを追加。</td></tr>
+    <tr><td><code>exclude</code></td><td>マトリックスから特定の組み合わせを除外。</td></tr>
+    <tr><td><code>fail-fast</code></td><td>既定は <code>true</code>。1 つのマトリックスジョブが失敗したとき、進行中または待機中の関連ジョブをキャンセルするか制御。</td></tr>
+    <tr><td><code>max-parallel</code></td><td>同時に実行するマトリックスジョブ数の上限。</td></tr>
+  </table>
 
-  <h3 id="steps-id">jobs.&lt;job_id&gt;.steps[*].id</h3>
-  <p>ステップの一意の識別子です。コンテキストからステップを参照する際に使います。</p>
+  <h3 id="job-continue-on-error">7.11 <code>jobs.&lt;job_id&gt;.continue-on-error</code></h3>
+  <p><code>true</code> の場合、そのジョブが失敗してもワークフロー実行全体を失敗として扱わず続行できます。マトリックスの実験的構成などでよく使います。</p>
 
-  <h3 id="steps-if">jobs.&lt;job_id&gt;.steps[*].if</h3>
-  <p>条件が満たされた場合にのみステップを実行します。<code>success()</code>、<code>always()</code>、<code>failure()</code>、<code>cancelled()</code> などのステータス関数と併用できます。</p>
+  <h3 id="job-container">7.12 <code>jobs.&lt;job_id&gt;.container</code></h3>
+  <p><code>container</code> を指定すると、ジョブのステップを Docker コンテナ内で実行します。Linux ランナーで利用します。文字列でイメージ名を指定するか、<code>image</code>、<code>credentials</code>、<code>env</code>、<code>ports</code>、<code>volumes</code>、<code>options</code> を含むマップを指定できます。</p>
+  <pre><code>jobs:
+  node:
+    runs-on: ubuntu-latest
+    container:
+      image: node:20-bookworm
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.github_token }}
+      env:
+        NODE_ENV: development
+      ports:
+        - 80
+      volumes:
+        - my_docker_volume:/volume_mount
+        - /data/my_data
+        - /source/directory:/destination/directory
+      options: --cpus 1
+    steps:
+      - run: node --version</code></pre>
 
-  <h3 id="steps-name">jobs.&lt;job_id&gt;.steps[*].name</h3>
-  <p>GitHub の UI に表示されるステップ名です。</p>
+  <h3 id="job-services">7.13 <code>jobs.&lt;job_id&gt;.services</code></h3>
+  <p><code>services</code> は、ジョブで利用するデータベースやキャッシュなどのサービスコンテナを定義します。サービスごとに <code>image</code>、<code>credentials</code>、<code>env</code>、<code>ports</code>、<code>volumes</code>、<code>options</code> を指定できます。</p>
+  <pre><code>jobs:
+  integration-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: &gt;-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+    steps:
+      - run: npm run test:integration</code></pre>
 
-  <h3 id="steps-uses">jobs.&lt;job_id&gt;.steps[*].uses</h3>
-  <p>そのステップの一部として実行するアクションを選択します。アクションは再利用可能なコードの単位です。バージョンを固定して使うことを強く推奨します。</p>
+  <h3 id="job-uses-with-secrets">7.14 再利用可能ワークフローのジョブ: <code>uses</code> / <code>with</code> / <code>secrets</code></h3>
+  <p>ジョブは通常 <code>runs-on</code> と <code>steps</code> を持ちますが、再利用可能ワークフローを呼び出すジョブでは <code>jobs.&lt;job_id&gt;.uses</code> を使います。この形式では、呼び出し先ワークフローへの入力は <code>with</code>、シークレットは <code>secrets</code> で渡します。</p>
+  <pre><code>jobs:
+  call-workflow:
+    uses: octo-org/example-repo/.github/workflows/deploy.yml@v1
+    with:
+      environment: production
+    secrets:
+      token: ${{ secrets.DEPLOY_TOKEN }}</code></pre>
+  <pre><code>jobs:
+  call-workflow-inherit:
+    uses: octo-org/example-repo/.github/workflows/deploy.yml@main
+    secrets: inherit</code></pre>
+
+  <h2 id="steps-detail">8. ステップ構文</h2>
+  <p><code>jobs.&lt;job_id&gt;.steps</code> は、ジョブ内で順番に実行するステップの配列です。ステップは、アクションを実行する <code>uses</code> ステップか、シェルコマンドを実行する <code>run</code> ステップのいずれかを中心に構成します。</p>
+
+  <h3 id="step-id">8.1 <code>id</code></h3>
+  <p>ステップの一意識別子です。後続ステップやジョブ出力から <code>steps.&lt;id&gt;.outputs</code> のように参照できます。</p>
+
+  <h3 id="step-if">8.2 <code>if</code></h3>
+  <p>ステップを条件付きで実行します。ジョブの <code>if</code> と同様、式やステータス関数を使えます。</p>
   <pre><code>steps:
-  - uses: actions/checkout@v4
-  - uses: ./.github/actions/my-action
-  - uses: docker://alpine:3.18</code></pre>
-  <div class="warning"><strong>セキュリティ：</strong>サードパーティ製アクションは、可変タグではなく完全な commit SHA に固定すると安全性が高まります。</div>
+  - name: Run only on main
+    if: github.ref == 'refs/heads/main'
+    run: echo "main branch"
+  - name: Always upload logs
+    if: ${{ always() }}
+    run: ./upload-logs.sh</code></pre>
 
-  <h3 id="steps-run">jobs.&lt;job_id&gt;.steps[*].run</h3>
-  <p>オペレーティングシステムのシェルを使ってコマンドラインプログラムを実行します。</p>
+  <h3 id="step-name">8.3 <code>name</code></h3>
+  <p>GitHub UI に表示されるステップ名です。省略してもステップは実行されますが、ログを読みやすくするため設定が推奨されます。</p>
+
+  <h3 id="step-uses">8.4 <code>uses</code></h3>
+  <p>アクションを実行します。リポジトリアクション、同一リポジトリ内のローカルアクション、Docker Hub などの Docker コンテナアクションを指定できます。セキュリティ上、サードパーティアクションはタグよりも完全なコミット SHA で固定すると安全性が高まります。</p>
   <pre><code>steps:
-  - run: |
-      echo "1行目"
-      echo "2行目"</code></pre>
+  - name: Checkout
+    uses: actions/checkout@v4
 
-  <h3 id="steps-working-directory">jobs.&lt;job_id&gt;.steps[*].working-directory</h3>
-  <p><code>run</code> コマンドの作業ディレクトリを指定します。</p>
+  - name: Local action
+    uses: ./.github/actions/my-action
 
-  <h3 id="steps-shell">jobs.&lt;job_id&gt;.steps[*].shell</h3>
-  <p>コマンドを実行するシェルを上書き指定します（<code>bash</code>、<code>pwsh</code>、<code>python</code>、<code>sh</code>、<code>cmd</code>、<code>powershell</code> など）。</p>
+  - name: Docker action
+    uses: docker://alpine:3.18</code></pre>
 
-  <h3 id="steps-with">jobs.&lt;job_id&gt;.steps[*].with</h3>
-  <p><code>uses</code> で指定したアクションへ渡す入力パラメーターのマップです。</p>
+  <h3 id="step-run">8.5 <code>run</code></h3>
+  <p>ランナーまたはジョブコンテナ上のシェルでコマンドを実行します。複数行コマンドには YAML のブロック構文を使います。</p>
+  <pre><code>steps:
+  - name: Install and test
+    run: |
+      npm ci
+      npm test</code></pre>
+
+  <h3 id="step-working-directory">8.6 <code>working-directory</code></h3>
+  <p><code>run</code> コマンドを実行する作業ディレクトリをステップ単位で指定します。<code>defaults.run.working-directory</code> よりもステップ単位の指定が優先されます。</p>
+  <pre><code>steps:
+  - run: npm test
+    working-directory: ./frontend</code></pre>
+
+  <h3 id="step-shell">8.7 <code>shell</code></h3>
+  <p><code>run</code> コマンドを実行するシェルを指定します。プラットフォームごとに既定シェルが異なります。</p>
+  <table>
+    <tr><th>指定</th><th>主な対象</th><th>説明</th></tr>
+    <tr><td><code>bash</code></td><td>Linux / macOS / Windows</td><td>Bash を使用。Windows では Git for Windows の bash が使われます。</td></tr>
+    <tr><td><code>sh</code></td><td>Linux / macOS</td><td>POSIX shell。</td></tr>
+    <tr><td><code>pwsh</code></td><td>Linux / macOS / Windows</td><td>PowerShell Core。</td></tr>
+    <tr><td><code>powershell</code></td><td>Windows</td><td>Windows PowerShell。</td></tr>
+    <tr><td><code>cmd</code></td><td>Windows</td><td>Windows コマンドプロンプト。</td></tr>
+    <tr><td><code>python</code></td><td>利用可能なランナー</td><td>Python スクリプトとして実行。</td></tr>
+  </table>
+  <pre><code>steps:
+  - run: Get-ChildItem Env:
+    shell: pwsh</code></pre>
+
+  <h3 id="step-with">8.8 <code>with</code>、<code>with.args</code>、<code>with.entrypoint</code></h3>
+  <p><code>with</code> は <code>uses</code> で指定したアクションに渡す入力パラメーターです。入力名はアクションの <code>action.yml</code> で定義されます。Docker コンテナアクションでは <code>args</code> や <code>entrypoint</code> を使える場合があります。</p>
   <pre><code>steps:
   - uses: actions/setup-node@v4
     with:
-      node-version: '20'</code></pre>
-
-  <h3 id="steps-env">jobs.&lt;job_id&gt;.steps[*].env</h3>
-  <p>その単一ステップでのみ有効な環境変数を設定します。</p>
-
-  <h3 id="steps-continue-on-error">jobs.&lt;job_id&gt;.steps[*].continue-on-error</h3>
-  <p><code>true</code> にすると、そのステップが失敗してもジョブを失敗させずに続行します。</p>
-
-  <h3 id="steps-timeout-minutes">jobs.&lt;job_id&gt;.steps[*].timeout-minutes</h3>
-  <p>そのステップを強制終了するまでの最大実行時間（分）です。</p>
-
-  <h2 id="job-id-timeout-minutes">jobs.&lt;job_id&gt;.timeout-minutes</h2>
-  <p>ジョブ全体が強制終了されるまでの最大実行時間（分）です。デフォルトは 360 分です。</p>
-
-  <h2 id="job-id-strategy">jobs.&lt;job_id&gt;.strategy</h2>
-  <p>ビルドのマトリックスを定義します。複数の OS や言語バージョンの組み合わせで同じジョブを並行実行できます。</p>
-  <pre><code>strategy:
-  matrix:
-    os: [ubuntu-latest, windows-latest]
-    node: [18, 20, 22]</code></pre>
-
-  <h3 id="strategy-fail-fast">jobs.&lt;job_id&gt;.strategy.fail-fast</h3>
-  <p>デフォルトは <code>true</code>。マトリックス内のいずれかが失敗すると進行中の他のジョブをキャンセルします。</p>
-
-  <h3 id="strategy-max-parallel">jobs.&lt;job_id&gt;.strategy.max-parallel</h3>
-  <p>マトリックスで同時に実行するジョブの最大数を指定します。</p>
-
-  <h2 id="job-id-container">jobs.&lt;job_id&gt;.container</h2>
-  <p>ステップを指定した Docker コンテナ内で実行します。</p>
-  <pre><code>container:
-  image: node:20-bookworm
-  env:
-    NODE_ENV: development</code></pre>
-
-  <h2 id="job-id-services">jobs.&lt;job_id&gt;.services</h2>
-  <p>ジョブで利用するサービスコンテナ（データベースやキャッシュなど）をホストします。</p>
-  <pre><code>services:
-  postgres:
-    image: postgres:16
-    ports:
-      - 5432:5432</code></pre>
-
-  <h2 id="job-id-uses">jobs.&lt;job_id&gt;.uses</h2>
-  <p>ジョブとして実行する、再利用可能なワークフロー（reusable workflow）ファイルの場所とバージョンを指定します。</p>
-  <pre><code>jobs:
-  call-workflow:
-    uses: octo-org/example-repo/.github/workflows/reusable.yml@main
+      node-version: '20'
+      cache: npm</code></pre>
+  <pre><code>steps:
+  - uses: docker://alpine:3.18
     with:
-      config-path: .github/labeler.yml
-    secrets:
-      token: ${{ secrets.MY_TOKEN }}</code></pre>
+      entrypoint: /bin/echo
+      args: Hello from Docker action</code></pre>
 
-  <h2 id="job-id-with">jobs.&lt;job_id&gt;.with / secrets</h2>
-  <p>再利用可能ワークフローを呼び出すジョブでは、<code>with</code> で入力を、<code>secrets</code> でシークレットを渡します。呼び出される側は <code>on.workflow_call</code> で受け取る入力・シークレットを宣言します。</p>
-  <pre><code>on:
-  workflow_call:
-    inputs:
-      config-path:
-        required: true
-        type: string
-    secrets:
-      token:
-        required: true</code></pre>
+  <h3 id="step-env">8.9 <code>env</code></h3>
+  <p>そのステップだけで有効な環境変数を指定します。ステップレベルの <code>env</code> はジョブレベルやワークフローレベルの同名変数を上書きします。</p>
 
-  <h2 id="summary">付録：構文の全体像</h2>
+  <h3 id="step-continue-timeout">8.10 <code>continue-on-error</code> と <code>timeout-minutes</code></h3>
+  <p><code>continue-on-error: true</code> を指定すると、ステップが失敗してもジョブを失敗として扱わず次のステップへ進みます。<code>timeout-minutes</code> はステップを強制終了するまでの最大実行時間です。</p>
+  <pre><code>steps:
+  - name: Experimental check
+    continue-on-error: true
+    timeout-minutes: 5
+    run: ./experimental-check.sh</code></pre>
+
+  <h2 id="appendix">9. 付録: キー階層と実例</h2>
+  <h3 id="hierarchy-table">9.1 主なキー階層</h3>
   <table>
-    <tr><th>レベル</th><th>主なキーワード</th></tr>
-    <tr><td>ワークフロー全体</td><td><code>name</code> / <code>run-name</code> / <code>on</code> / <code>permissions</code> / <code>env</code> / <code>defaults</code> / <code>concurrency</code> / <code>jobs</code></td></tr>
-    <tr><td>ジョブ</td><td><code>runs-on</code> / <code>needs</code> / <code>if</code> / <code>permissions</code> / <code>environment</code> / <code>outputs</code> / <code>strategy</code> / <code>container</code> / <code>services</code> / <code>timeout-minutes</code> / <code>uses</code></td></tr>
-    <tr><td>ステップ</td><td><code>id</code> / <code>name</code> / <code>uses</code> / <code>run</code> / <code>with</code> / <code>env</code> / <code>if</code> / <code>working-directory</code> / <code>shell</code> / <code>continue-on-error</code> / <code>timeout-minutes</code></td></tr>
+    <tr><th>階層</th><th>主なキー</th></tr>
+    <tr><td>ワークフロー全体</td><td><code>name</code>, <code>run-name</code>, <code>on</code>, <code>permissions</code>, <code>env</code>, <code>defaults</code>, <code>concurrency</code>, <code>jobs</code></td></tr>
+    <tr><td>トリガー</td><td><code>on.push</code>, <code>on.pull_request</code>, <code>on.schedule</code>, <code>on.workflow_dispatch</code>, <code>on.workflow_call</code>, <code>types</code>, <code>branches</code>, <code>tags</code>, <code>paths</code></td></tr>
+    <tr><td>ジョブ</td><td><code>name</code>, <code>needs</code>, <code>if</code>, <code>runs-on</code>, <code>permissions</code>, <code>environment</code>, <code>concurrency</code>, <code>outputs</code>, <code>env</code>, <code>defaults</code>, <code>steps</code>, <code>timeout-minutes</code>, <code>strategy</code>, <code>continue-on-error</code>, <code>container</code>, <code>services</code>, <code>uses</code>, <code>with</code>, <code>secrets</code></td></tr>
+    <tr><td>ステップ</td><td><code>id</code>, <code>if</code>, <code>name</code>, <code>uses</code>, <code>run</code>, <code>working-directory</code>, <code>shell</code>, <code>with</code>, <code>env</code>, <code>continue-on-error</code>, <code>timeout-minutes</code></td></tr>
   </table>
 
-  <p class="src">この日本語訳は英語版リファレンスの構成に沿ってまとめたものです。最新かつ正確な仕様は公式ドキュメントをご確認ください。<br>
-  原文: https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax</p>
+  <h3 id="complete-example">9.2 複合例</h3>
+  <pre><code>name: Build, test, and deploy
+run-name: ${{ github.workflow }} on ${{ github.ref_name }} by @${{ github.actor }}
+
+on:
+  push:
+    branches:
+      - main
+      - 'releases/**'
+    paths:
+      - 'src/**'
+      - '.github/workflows/**'
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: choice
+        options: [staging, production]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [18, 20]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment || 'staging' }}
+      url: https://example.com
+    concurrency:
+      group: deploy-${{ inputs.environment || 'staging' }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      deployments: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy
+        run: ./deploy.sh
+        env:
+          TARGET_ENV: ${{ inputs.environment || 'staging' }}</code></pre>
+
+  <p class="src">このファイルは非公式の日本語 HTML 参考資料です。公式の最新情報: <a href="https://docs.github.com/ja/actions/reference/workflows-and-actions/workflow-syntax">https://docs.github.com/ja/actions/reference/workflows-and-actions/workflow-syntax</a></p>
 </body>
 </html>
