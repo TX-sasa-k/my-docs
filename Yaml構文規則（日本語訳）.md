@@ -1,22 +1,22 @@
-# GitHub Actions ワークフロー構文（日本語）
+# GitHub Actions ワークフロー構文（日本語訳）
 
-## ワークフロー向け YAML 構文について
+## ワークフローの YAML 構文について
 
-ワークフローファイルは YAML 構文を使用し、拡張子は .yml または .yaml のいずれかである必要があります。 YAML が初めてで詳しく学びたい場合は、Learn YAML in Y minutes を参照してください。
+ワークフローファイルは YAML 構文を使用し、ファイル拡張子は `.yml` または `.yaml` のいずれかである必要があります。YAML が初めてで詳しく学びたい場合は、「Learn YAML in Y minutes」を参照してください。
 
-ワークフローファイルはリポジトリの .github/ワークフロー ディレクトリに保存する必要があります。
+ワークフローファイルは、リポジトリの `.github/workflows` ディレクトリに保存する必要があります。
 
 ## `name`
 
-ワークフローの名前です。 GitHub displays the names of your ワークフロー under your repository's "Actions" tab. もし omit name, GitHub displays the ワークフロー file path relative to the root of the repository.
+ワークフローの名前です。GitHub は、リポジトリの「Actions」タブの下にワークフローの名前を表示します。`name` を省略すると、GitHub はリポジトリのルートを基準としたワークフローファイルのパスを表示します。
 
 ## `run-name`
 
-The name for ワークフロー runs generated from the ワークフロー. GitHub displays the ワークフロー run name in the list of ワークフロー runs on your repository's "Actions" tab. If run-name is omitted or is only whitespace, then the run name is set to イベント-specific information for the ワークフロー run. 例えば、 for a ワークフロー triggered by a push or pull_request イベント, it is set as the commit message or the title of the pull request.
+ワークフローから生成されるワークフロー実行の名前です。GitHub は、リポジトリの「Actions」タブにあるワークフロー実行の一覧に、ワークフロー実行名を表示します。`run-name` が省略されている場合、または空白文字だけの場合、実行名はワークフロー実行のイベント固有の情報に設定されます。たとえば、`push` または `pull_request` イベントによってトリガーされたワークフローでは、コミットメッセージまたはプルリクエストのタイトルに設定されます。
 
-## この値には式を含めることができ、github および inputs コンテキストを参照できます。
+この値には式を含めることができ、`github` および `inputs` コンテキストを参照できます。
 
-### run-name の例
+### `run-name` の例
 
 ```yaml
 run-name: Deploy to ${{ inputs.deploy_target }} by @${{ github.actor }}
@@ -24,33 +24,33 @@ run-name: Deploy to ${{ inputs.deploy_target }} by @${{ github.actor }}
 
 ## `on`
 
-〜するには automatically trigger a ワークフロー, use on to define which イベント can cause the ワークフロー to run. For a list of available イベント, see Events that trigger ワークフロー.
+ワークフローを自動的にトリガーするには、`on` を使用して、どのイベントがワークフローの実行を引き起こせるかを定義します。利用可能なイベントの一覧については、「ワークフローをトリガーするイベント」を参照してください。
 
-次のことができます define single or multiple イベント that can trigger a ワークフロー, or set a time schedule. 次のことができます also restrict the execution of a ワークフロー to only occur for specific files, タグ, or ブランチ changes. These options are described in the following sections.
+ワークフローをトリガーできる単一または複数のイベントを定義したり、時刻スケジュールを設定したりできます。また、特定のファイル、タグ、またはブランチの変更があった場合にのみワークフローを実行するよう制限することもできます。これらのオプションについては、以降のセクションで説明します。
 
-## 単一イベントの使用
+### 単一のイベントを使用する
 
-例えば、 a ワークフロー with the following on value will run when a push is made to any ブランチ in the ワークフロー's repository:
+たとえば、次の `on` 値を持つワークフローは、ワークフローのリポジトリ内の任意のブランチに `push` が行われたときに実行されます。
 
 ```yaml
 on: push
 ```
 
-## 複数イベントの使用
+### 複数のイベントを使用する
 
-次のことができます specify a single イベント or multiple イベント. 例えば、 a ワークフロー with the following on value will run when a push is made to any ブランチ in the repository or when someone forks the repository:
+単一のイベントまたは複数のイベントを指定できます。たとえば、次の `on` 値を持つワークフローは、リポジトリ内の任意のブランチに `push` が行われたとき、または誰かがリポジトリをフォークしたときに実行されます。
 
 ```yaml
 on: [push, fork]
 ```
 
-もし specify multiple イベント, only one of those イベント needs to occur to trigger your ワークフロー. If multiple triggering イベント for your ワークフロー occur at the same time, multiple ワークフロー runs will be triggered.
+複数のイベントを指定した場合、ワークフローをトリガーするには、そのうち 1 つのイベントだけが発生すれば十分です。ワークフローの複数のトリガーイベントが同時に発生した場合は、複数のワークフロー実行がトリガーされます。
 
-## アクティビティタイプの使用
+### アクティビティの種類を使用する
 
-Some イベント have activity types that give you more control over when your ワークフロー should run. Use on.<イベント_name>.types to define the type of イベント activity that will trigger a ワークフロー run.
+一部のイベントには、ワークフローをいつ実行するかをより細かく制御できるアクティビティの種類があります。ワークフロー実行をトリガーするイベントアクティビティの種類を定義するには、`on.<event_name>.types` を使用します。
 
-例えば、 the issue_comment イベント has the created, edited, and deleted activity types. もし r ワークフロー triggers on the label イベント, it will run whenever a label is created, edited, or deleted. もし specify the created activity type for the label イベント, your ワークフロー will run when a label is created but not when a label is edited or deleted.
+たとえば、`issue_comment` イベントには、`created`、`edited`、`deleted` のアクティビティの種類があります。ワークフローが `label` イベントでトリガーされる場合、ラベルが作成、編集、または削除されるたびに実行されます。`label` イベントに `created` アクティビティの種類を指定した場合、ワークフローはラベルが作成されたときに実行されますが、ラベルが編集または削除されたときには実行されません。
 
 ```yaml
 on:
@@ -59,7 +59,7 @@ on:
       - created
 ```
 
-もし specify multiple activity types, only one of those イベント activity types needs to occur to trigger your ワークフロー. If multiple triggering イベント activity types for your ワークフロー occur at the same time, multiple ワークフロー runs will be triggered. 例えば、 the following ワークフロー triggers when an issue is opened or labeled. If an issue with two labels is opened, three ワークフロー runs will start: one for the issue opened イベント and two for the two issue labeled イベント.
+複数のアクティビティの種類を指定した場合、ワークフローをトリガーするには、それらのイベントアクティビティの種類のうち 1 つだけが発生すれば十分です。ワークフローの複数のトリガーイベントアクティビティの種類が同時に発生した場合は、複数のワークフロー実行がトリガーされます。たとえば、次のワークフローは、イシューが開かれたとき、またはラベル付けされたときにトリガーされます。2 つのラベルを持つイシューが開かれた場合、3 つのワークフロー実行が開始されます。イシューが開かれたイベントに対して 1 つ、2 つのイシューラベル付けイベントに対して 2 つです。
 
 ```yaml
 on:
@@ -69,13 +69,13 @@ on:
       - labeled
 ```
 
-詳細については about each イベント and their activity types, see Events that trigger ワークフロー.
+各イベントとそのアクティビティの種類の詳細については、「ワークフローをトリガーするイベント」を参照してください。
 
-## フィルターの使用
+### フィルターを使用する
 
-Some イベント have フィルターs that give you more control over when your ワークフロー should run.
+一部のイベントには、ワークフローをいつ実行するかをより細かく制御できるフィルターがあります。
 
-例えば、 the push イベント has a ブランチ フィルター that causes your ワークフロー to run only when a push to a ブランチ that matches the ブランチ フィルター occurs, instead of when any push occurs.
+たとえば、`push` イベントには `branches` フィルターがあり、任意の `push` が発生したときではなく、`branches` フィルターに一致するブランチへの `push` が発生したときにのみワークフローを実行します。
 
 ```yaml
 on:
@@ -85,17 +85,15 @@ on:
       - 'releases/**'
 ```
 
-## 複数イベントでのアクティビティタイプとフィルターの併用
+### 複数のイベントでアクティビティの種類とフィルターを使用する
 
-もし specify activity types or フィルターs for an イベント and your ワークフロー triggers on multiple イベント, you must configure each イベント separately. You must append a colon (:) to all イベント, including イベント without configuration.
+イベントにアクティビティの種類またはフィルターを指定し、ワークフローが複数のイベントでトリガーされる場合は、各イベントを個別に設定する必要があります。設定のないイベントも含め、すべてのイベントにコロン（`:`）を付ける必要があります。
 
-例えば、 a ワークフロー with the following on value will run when:
+たとえば、次の `on` 値を持つワークフローは、次の場合に実行されます。
 
-A label is created
-
-A push is made to the main ブランチ in the repository
-
-A push is made to a GitHub Pages-enabled ブランチ
+- ラベルが作成された場合
+- リポジトリ内の `main` ブランチに `push` が行われた場合
+- GitHub Pages が有効なブランチに `push` が行われた場合
 
 ```yaml
 on:
@@ -108,11 +106,11 @@ on:
   page_build:
 ```
 
-on.<イベント_name>.types
+## `on.<event_name>.types`
 
-Use on.<イベント_name>.types to define the type of activity that will trigger a ワークフロー run. Most GitHub イベント are triggered by more than one type of activity. 例えば、 the label is triggered when a label is created, edited, or deleted. The types keyword enables you to narrow down activity that causes the ワークフロー to run. 〜する場合、 only one activity type triggers a webhook イベント, the types keyword is unnecessary.
+ワークフロー実行をトリガーするアクティビティの種類を定義するには、`on.<event_name>.types` を使用します。ほとんどの GitHub イベントは、複数の種類のアクティビティによってトリガーされます。たとえば、`label` はラベルが作成、編集、または削除されたときにトリガーされます。`types` キーワードを使用すると、ワークフローの実行を引き起こすアクティビティを絞り込むことができます。1 つのアクティビティの種類だけが ウェブフックイベントをトリガーする場合、`types` キーワードは不要です。
 
-次のことができます use an array of イベント types. 詳細については about each イベント and their activity types, see Events that trigger ワークフロー.
+イベントの種類の配列を使用できます。各イベントとそのアクティビティの種類の詳細については、「ワークフローをトリガーするイベント」を参照してください。
 
 ```yaml
 on:
@@ -120,27 +118,23 @@ on:
     types: [created, edited]
 ```
 
-on.<pull_request|pull_request_target>.<ブランチ|ブランチ-ignore>
+## `on.<pull_request|pull_request_target>.<branches|branches-ignore>`
 
-〜する場合、 using the pull_request and pull_request_target イベント, you can configure a ワークフロー to run only for pull requests that target specific ブランチ.
+`pull_request` および `pull_request_target` イベントを使用する場合、特定のブランチを対象とするプルリクエストに対してのみワークフローを実行するよう設定できます。
 
-Use the ブランチ フィルター when you want to include ブランチ name patterns or when you want to both include and exclude ブランチ names patterns. Use the ブランチ-ignore フィルター when you only want to exclude ブランチ name patterns. 次のことができますnot use both the ブランチ and ブランチ-ignore フィルターs for the same イベント in a ワークフロー.
+ブランチ名パターンを含めたい場合、またはブランチ名パターンを含めると同時に除外もしたい場合は、`branches` フィルターを使用します。ブランチ名パターンを除外するだけの場合は、`branches-ignore` フィルターを使用します。同じワークフロー内の同じイベントに対して、`branches` フィルターと `branches-ignore` フィルターの両方を使用することはできません。
 
-もし define both ブランチ/ブランチ-ignore and paths/paths-ignore, the ワークフロー will only run when both フィルターs are satisfied.
+`branches`/`branches-ignore` と `paths`/`paths-ignore` の両方を定義した場合、ワークフローは両方のフィルターが満たされたときにのみ実行されます。
 
-The ブランチ and ブランチ-ignore keywords accept glob patterns that use characters like *, **, +, ?, ! and others to match more than one ブランチ name. If a name contains any of these characters and you want a literal match, you need to escape each of these special characters with \. 詳細については about glob patterns, see the Workflow syntax for GitHub Actions.
+`branches` および `branches-ignore` キーワードでは、複数のブランチ名に一致させるために、`*`、`**`、`+`、`?`、`!` などの文字を使用する glob パターンを受け入れます。名前にこれらの文字のいずれかが含まれており、リテラル一致を行いたい場合は、それぞれの特殊文字を `\` でエスケープする必要があります。glob パターンの詳細については、「GitHub Actions のワークフロー構文」を参照してください。
 
-```yaml
-Example: Including branches
-```
+### 例: ブランチを含める
 
-The patterns defined in ブランチ are evaluated against the Git ref's name. 例えば、 the following ワークフロー would run whenever there is a pull_request イベント for a pull request targeting:
+`branches` に定義されたパターンは、Git 参照 の名前に対して評価されます。たとえば、次のワークフローは、次を対象とするプルリクエストに対して `pull_request` イベントが発生するたびに実行されます。
 
-A ブランチ named main (refs/heads/main)
-
-A ブランチ named mona/octocat (refs/heads/mona/octocat)
-
-A ブランチ whose name starts with releases/, like releases/10 (refs/heads/releases/10)
+- `main` という名前のブランチ（`refs/heads/main`）
+- `mona/octocat` という名前のブランチ（`refs/heads/mona/octocat`）
+- 名前が `releases/` で始まるブランチ。たとえば `releases/10`（`refs/heads/releases/10`）
 
 ```yaml
 on:
@@ -152,17 +146,14 @@ on:
       - 'releases/**'
 ```
 
-If a ワークフロー is skipped due to ブランチ フィルターing, path フィルターing, or a commit message, then checks associated with that ワークフロー will remain in a "Pending" state. A pull request that requires those checks to be successful will be blocked from merging.
+ブランチフィルター、パスフィルター、またはコミットメッセージによってワークフローがスキップされた場合、そのワークフローに関連付けられたチェックは「Pending」状態のままになります。それらのチェックが成功することを必須としているプルリクエストは、マージがブロックされます。
 
-```yaml
-Example: Excluding branches
-```
+### 例: ブランチを除外する
 
-〜する場合、 a pattern matches the ブランチ-ignore pattern, the ワークフロー will not run. The patterns defined in ブランチ-ignore are evaluated against the Git ref's name. 例えば、 the following ワークフロー would run whenever there is a pull_request イベント unless the pull request is targeting:
+パターンが `branches-ignore` パターンに一致すると、ワークフローは実行されません。`branches-ignore` に定義されたパターンは、Git 参照 の名前に対して評価されます。たとえば、次のワークフローは、プルリクエストが次を対象としていない限り、`pull_request` イベントが発生するたびに実行されます。
 
-A ブランチ named mona/octocat (refs/heads/mona/octocat)
-
-A ブランチ whose name matches releases/**-alpha, like releases/beta/3-alpha (refs/heads/releases/beta/3-alpha)
+- `mona/octocat` という名前のブランチ（`refs/heads/mona/octocat`）
+- 名前が `releases/**-alpha` に一致するブランチ。たとえば `releases/beta/3-alpha`（`refs/heads/releases/beta/3-alpha`）
 
 ```yaml
 on:
@@ -171,20 +162,20 @@ on:
     branches-ignore:
       - 'mona/octocat'
       - 'releases/**-alpha'
-Example: Including and excluding branches
 ```
 
-次のことができますnot use ブランチ and ブランチ-ignore to フィルター the same イベント in a single ワークフロー. もし want to both include and exclude ブランチ patterns for a single イベント, use the ブランチ フィルター along with the ! character to indicate which ブランチ should be excluded.
+### 例: ブランチを含めるおよび除外する
 
-もし define a ブランチ with the ! character, you must also define at least one ブランチ without the ! character. もし only want to exclude ブランチ, use ブランチ-ignore instead.
+単一のワークフロー内で同じイベントをフィルターするために、`branches` と `branches-ignore` を使用することはできません。単一のイベントに対してブランチパターンを含めると同時に除外もしたい場合は、`branches` フィルターと `!` 文字を使用して、どのブランチを除外するかを示します。
 
-The order that you define patterns matters.
+`!` 文字を含むブランチを定義する場合、`!` 文字を含まないブランチも少なくとも 1 つ定義する必要があります。ブランチを除外するだけの場合は、代わりに `branches-ignore` を使用します。
 
-A matching negative pattern (prefixed with !) after a positive match will exclude the Git ref.
+パターンを定義する順序は重要です。
 
-A matching positive pattern after a negative match will include the Git ref again.
+- 肯定一致の後に一致する否定パターン（`!` が接頭辞として付いたもの）があると、その Git 参照 は除外されます。
+- 否定一致の後に一致する肯定パターンがあると、その Git 参照 は再び含められます。
 
-The following ワークフロー will run on pull_request イベント for pull requests that target releases/10 or releases/beta/mona, but not for pull requests that target releases/10-alpha or releases/beta/3-alpha because the negative pattern !releases/**-alpha follows the positive pattern.
+次のワークフローは、`releases/10` または `releases/beta/mona` を対象とするプルリクエストの `pull_request` イベントで実行されますが、`releases/10-alpha` または `releases/beta/3-alpha` を対象とするプルリクエストでは実行されません。これは、否定パターン `!releases/**-alpha` が肯定パターンの後に続いているためです。
 
 ```yaml
 on:
@@ -194,33 +185,27 @@ on:
       - '!releases/**-alpha'
 ```
 
-on.push.<ブランチ|タグ|ブランチ-ignore|タグ-ignore>
+## `on.push.<branches|tags|branches-ignore|tags-ignore>`
 
-〜する場合、 using the push イベント, you can configure a ワークフロー to run on specific ブランチ or タグ.
+`push` イベントを使用する場合、特定のブランチまたはタグでワークフローを実行するよう設定できます。
 
-Use the ブランチ フィルター when you want to include ブランチ name patterns or when you want to both include and exclude ブランチ names patterns. Use the ブランチ-ignore フィルター when you only want to exclude ブランチ name patterns. 次のことができますnot use both the ブランチ and ブランチ-ignore フィルターs for the same イベント in a ワークフロー.
+ブランチ名パターンを含めたい場合、またはブランチ名パターンを含めると同時に除外もしたい場合は、`branches` フィルターを使用します。ブランチ名パターンを除外するだけの場合は、`branches-ignore` フィルターを使用します。同じワークフロー内の同じイベントに対して、`branches` フィルターと `branches-ignore` フィルターの両方を使用することはできません。
 
-Use the タグ フィルター when you want to include タグ name patterns or when you want to both include and exclude タグ names patterns. Use the タグ-ignore フィルター when you only want to exclude タグ name patterns. 次のことができますnot use both the タグ and タグ-ignore フィルターs for the same イベント in a ワークフロー.
+タグ名パターンを含めたい場合、またはタグ名パターンを含めると同時に除外もしたい場合は、`tags` フィルターを使用します。タグ名パターンを除外するだけの場合は、`tags-ignore` フィルターを使用します。同じワークフロー内の同じイベントに対して、`tags` フィルターと `tags-ignore` フィルターの両方を使用することはできません。
 
-もし define only タグ/タグ-ignore or only ブランチ/ブランチ-ignore, the ワークフロー won't run for イベント affecting the undefined Git ref. もし define neither タグ/タグ-ignore or ブランチ/ブランチ-ignore, the ワークフロー will run for イベント affecting either ブランチ or タグ. もし define both ブランチ/ブランチ-ignore and paths/paths-ignore, the ワークフロー will only run when both フィルターs are satisfied.
+`tags`/`tags-ignore` のみ、または `branches`/`branches-ignore` のみを定義した場合、ワークフローは未定義の Git 参照 に影響するイベントでは実行されません。`tags`/`tags-ignore` も `branches`/`branches-ignore` も定義しない場合、ワークフローはブランチまたはタグのいずれかに影響するイベントで実行されます。`branches`/`branches-ignore` と `paths`/`paths-ignore` の両方を定義した場合、ワークフローは両方のフィルターが満たされたときにのみ実行されます。
 
-The ブランチ, ブランチ-ignore, タグ, and タグ-ignore keywords accept glob patterns that use characters like *, **, +, ?, ! and others to match more than one ブランチ or タグ name. If a name contains any of these characters and you want a literal match, you need to escape each of these special characters with \. 詳細については about glob patterns, see the Workflow syntax for GitHub Actions.
+`branches`、`branches-ignore`、`tags`、`tags-ignore` キーワードでは、複数のブランチ名またはタグ名に一致させるために、`*`、`**`、`+`、`?`、`!` などの文字を使用する glob パターンを受け入れます。名前にこれらの文字のいずれかが含まれており、リテラル一致を行いたい場合は、それぞれの特殊文字を `\` でエスケープする必要があります。glob パターンの詳細については、「GitHub Actions のワークフロー構文」を参照してください。
 
-```yaml
-Example: Including branches and tags
-```
+### 例: ブランチとタグを含める
 
-The patterns defined in ブランチ and タグ are evaluated against the Git ref's name. 例えば、 the following ワークフロー would run whenever there is a push イベント to:
+`branches` および `tags` に定義されたパターンは、Git 参照 の名前に対して評価されます。たとえば、次のワークフローは、次への `push` イベントが発生するたびに実行されます。
 
-A ブランチ named main (refs/heads/main)
-
-A ブランチ named mona/octocat (refs/heads/mona/octocat)
-
-A ブランチ whose name starts with releases/, like releases/10 (refs/heads/releases/10)
-
-A タグ named v2 (refs/タグ/v2)
-
-A タグ whose name starts with v1., like v1.9.1 (refs/タグ/v1.9.1)
+- `main` という名前のブランチ（`refs/heads/main`）
+- `mona/octocat` という名前のブランチ（`refs/heads/mona/octocat`）
+- 名前が `releases/` で始まるブランチ。たとえば `releases/10`（`refs/heads/releases/10`）
+- `v2` という名前のタグ（`refs/tags/v2`）
+- 名前が `v1.` で始まるタグ。たとえば `v1.9.1`（`refs/tags/v1.9.1`）
 
 ```yaml
 on:
@@ -234,18 +219,16 @@ on:
     tags:
       - v2
       - v1.*
-Example: Excluding branches and tags
 ```
 
-〜する場合、 a pattern matches the ブランチ-ignore or タグ-ignore pattern, the ワークフロー will not run. The patterns defined in ブランチ and タグ are evaluated against the Git ref's name. 例えば、 the following ワークフロー would run whenever there is a push イベント, unless the push イベント is to:
+### 例: ブランチとタグを除外する
 
-A ブランチ named mona/octocat (refs/heads/mona/octocat)
+パターンが `branches-ignore` または `tags-ignore` パターンに一致すると、ワークフローは実行されません。`branches` および `tags` に定義されたパターンは、Git 参照 の名前に対して評価されます。たとえば、次のワークフローは、`push` イベントが次に対するものでない限り、`push` イベントが発生するたびに実行されます。
 
-A ブランチ whose name matches releases/**-alpha, like releases/beta/3-alpha (refs/heads/releases/beta/3-alpha)
-
-A タグ named v2 (refs/タグ/v2)
-
-A タグ whose name starts with v1., like v1.9 (refs/タグ/v1.9)
+- `mona/octocat` という名前のブランチ（`refs/heads/mona/octocat`）
+- 名前が `releases/**-alpha` に一致するブランチ。たとえば `releases/beta/3-alpha`（`refs/heads/releases/beta/3-alpha`）
+- `v2` という名前のタグ（`refs/tags/v2`）
+- 名前が `v1.` で始まるタグ。たとえば `v1.9`（`refs/tags/v1.9`）
 
 ```yaml
 on:
@@ -258,20 +241,20 @@ on:
     tags-ignore:
       - v2
       - v1.*
-Example: Including and excluding branches and tags
 ```
 
-次のことができます't use ブランチ and ブランチ-ignore to フィルター the same イベント in a single ワークフロー. Similarly, you can't use タグ and タグ-ignore to フィルター the same イベント in a single ワークフロー. もし want to both include and exclude ブランチ or タグ patterns for a single イベント, use the ブランチ or タグ フィルター along with the ! character to indicate which ブランチ or タグ should be excluded.
+### 例: ブランチとタグを含めるおよび除外する
 
-もし define a ブランチ with the ! character, you must also define at least one ブランチ without the ! character. もし only want to exclude ブランチ, use ブランチ-ignore instead. Similarly, if you define a タグ with the ! character, you must also define at least one タグ without the ! character. もし only want to exclude タグ, use タグ-ignore instead.
+単一のワークフロー内で同じイベントをフィルターするために、`branches` と `branches-ignore` を使用することはできません。同様に、単一のワークフロー内で同じイベントをフィルターするために、`tags` と `tags-ignore` を使用することはできません。単一のイベントに対してブランチまたはタグのパターンを含めると同時に除外もしたい場合は、`branches` または `tags` フィルターと `!` 文字を使用して、どのブランチまたはタグを除外するかを示します。
 
-The order that you define patterns matters.
+`!` 文字を含むブランチを定義する場合、`!` 文字を含まないブランチも少なくとも 1 つ定義する必要があります。ブランチを除外するだけの場合は、代わりに `branches-ignore` を使用します。同様に、`!` 文字を含むタグを定義する場合、`!` 文字を含まないタグも少なくとも 1 つ定義する必要があります。タグを除外するだけの場合は、代わりに `tags-ignore` を使用します。
 
-A matching negative pattern (prefixed with !) after a positive match will exclude the Git ref.
+パターンを定義する順序は重要です。
 
-A matching positive pattern after a negative match will include the Git ref again.
+- 肯定一致の後に一致する否定パターン（`!` が接頭辞として付いたもの）があると、その Git 参照 は除外されます。
+- 否定一致の後に一致する肯定パターンがあると、その Git 参照 は再び含められます。
 
-The following ワークフロー will run on pushes to releases/10 or releases/beta/mona, but not on releases/10-alpha or releases/beta/3-alpha because the negative pattern !releases/**-alpha follows the positive pattern.
+次のワークフローは、`releases/10` または `releases/beta/mona` へのプッシュで実行されますが、`releases/10-alpha` または `releases/beta/3-alpha` では実行されません。これは、否定パターン `!releases/**-alpha` が肯定パターンの後に続いているためです。
 
 ```yaml
 on:
@@ -281,29 +264,26 @@ on:
       - '!releases/**-alpha'
 ```
 
-on.<push|pull_request|pull_request_target>.<paths|paths-ignore>
+## `on.<push|pull_request|pull_request_target>.<paths|paths-ignore>`
 
-〜する場合、 using the push and pull_request イベント, you can configure a ワークフロー to run based on what file paths are changed. Path フィルターs are not evaluated for pushes of タグ.
+`push` および `pull_request` イベントを使用する場合、変更されたファイルパスに基づいてワークフローを実行するよう設定できます。タグのプッシュでは、パスフィルターは評価されません。
 
-Use the paths フィルター when you want to include file path patterns or when you want to both include and exclude file path patterns. Use the paths-ignore フィルター when you only want to exclude file path patterns. 次のことができますnot use both the paths and paths-ignore フィルターs for the same イベント in a ワークフロー. もし want to both include and exclude path patterns for a single イベント, use the paths フィルター prefixed with the ! character to indicate which paths should be excluded.
+ファイルパスパターンを含めたい場合、またはファイルパスパターンを含めることと除外することの両方を行いたい場合は、`paths` フィルターを使用します。ファイルパスパターンを除外するだけでよい場合は、`paths-ignore` フィルターを使用します。1 つのワークフロー内の同じイベントに対して、`paths` フィルターと `paths-ignore` フィルターの両方を使用することはできません。単一のイベントでパスパターンの包含と除外の両方を行いたい場合は、除外するパスを示すために `!` 文字を前に付けた `paths` フィルターを使用します。
 
-## メモ
+> **メモ**
+>
+> `paths` パターンを定義する順序は重要です。
+>
+> - 肯定一致の後に一致する否定パターン（`!` が前に付いたもの）があると、そのパスは除外されます。
+> - 否定一致の後に一致する肯定パターンがあると、そのパスは再び含められます。
 
-The order that you define paths patterns matters:
+`branches`/`branches-ignore` と `paths`/`paths-ignore` の両方を定義した場合、ワークフローは両方のフィルターが満たされた場合にのみ実行されます。
 
-A matching negative pattern (prefixed with !) after a positive match will exclude the path.
+`paths` および `paths-ignore` キーワードは、複数のパス名に一致させるために `*` および `**` ワイルドカード文字を使用する glob パターンを受け付けます。詳しくは GitHub Actions のワークフロー構文を参照してください。
 
-A matching positive pattern after a negative match will include the path again.
+### 例: パスを含める
 
-もし define both ブランチ/ブランチ-ignore and paths/paths-ignore, the ワークフロー will only run when both フィルターs are satisfied.
-
-The paths and paths-ignore keywords accept glob patterns that use the * and ** wildcard characters to match more than one path name. 詳細については, see the Workflow syntax for GitHub Actions.
-
-```yaml
-Example: Including paths
-```
-
-If at least one path matches a pattern in the paths フィルター, the ワークフロー runs. 例えば、 the following ワークフロー would run anytime you push a JavaScript file (.js).
+`paths` フィルター内のパターンに少なくとも 1 つのパスが一致すると、ワークフローが実行されます。たとえば、次のワークフローは JavaScript ファイル（`.js`）をプッシュするたびに実行されます。
 
 ```yaml
 on:
@@ -312,35 +292,33 @@ on:
       - '**.js'
 ```
 
-If a ワークフロー is skipped due to path フィルターing, ブランチ フィルターing, or a commit message, then checks associated with that ワークフロー will remain in a "Pending" state. A pull request that requires those checks to be successful will be blocked from merging.
+パスフィルタリング、ブランチフィルタリング、またはコミットメッセージによってワークフローがスキップされた場合、そのワークフローに関連付けられたチェックは「Pending」状態のままになります。それらのチェックが成功することを必須としているプルリクエストは、マージがブロックされます。
 
-```yaml
-Example: Excluding paths
-```
+### 例: パスを除外する
 
-〜する場合、 all the path names match patterns in paths-ignore, the ワークフロー will not run. If any path names do not match patterns in paths-ignore, even if some path names match the patterns, the ワークフロー will run.
+すべてのパス名が `paths-ignore` のパターンに一致する場合、ワークフローは実行されません。一部のパス名がパターンに一致していても、いずれかのパス名が `paths-ignore` のパターンに一致しない場合、ワークフローは実行されます。
 
-A ワークフロー with the following path フィルター will only run on push イベント that include at least one file outside the docs directory at the root of the repository.
+次のパスフィルターを持つワークフローは、リポジトリのルートにある `docs` ディレクトリの外に少なくとも 1 つのファイルを含む `push` イベントでのみ実行されます。
 
 ```yaml
 on:
   push:
     paths-ignore:
       - 'docs/**'
-Example: Including and excluding paths
 ```
 
-次のことができますnot use paths and paths-ignore to フィルター the same イベント in a single ワークフロー. もし want to both include and exclude path patterns for a single イベント, use the paths フィルター prefixed with the ! character to indicate which paths should be excluded.
+### 例: パスを含め、除外する
 
-もし define a path with the ! character, you must also define at least one path without the ! character. もし only want to exclude paths, use paths-ignore instead.
+単一のワークフロー内で、同じイベントをフィルターするために `paths` と `paths-ignore` を使用することはできません。単一のイベントでパスパターンの包含と除外の両方を行いたい場合は、除外するパスを示すために `!` 文字を前に付けた `paths` フィルターを使用します。
 
-The order that you define paths patterns matters:
+`!` 文字を含むパスを定義する場合は、`!` 文字を含まないパスも少なくとも 1 つ定義する必要があります。パスを除外するだけでよい場合は、代わりに `paths-ignore` を使用します。
 
-A matching negative pattern (prefixed with !) after a positive match will exclude the path.
+`paths` パターンを定義する順序は重要です。
 
-A matching positive pattern after a negative match will include the path again.
+- 肯定一致の後に一致する否定パターン（`!` が前に付いたもの）があると、そのパスは除外されます。
+- 否定一致の後に一致する肯定パターンがあると、そのパスは再び含められます。
 
-This example runs anytime the push イベント includes a file in the sub-project directory or its subdirectories, unless the file is in the sub-project/docs directory. 例えば、 a push that changed sub-project/index.js or sub-project/src/index.js will trigger a ワークフロー run, but a push changing only sub-project/docs/readme.md will not.
+この例は、`push` イベントに `sub-project` ディレクトリまたはそのサブディレクトリ内のファイルが含まれるたびに実行されます。ただし、そのファイルが `sub-project/docs` ディレクトリ内にある場合は除きます。たとえば、`sub-project/index.js` または `sub-project/src/index.js` を変更したプッシュはワークフロー実行をトリガーしますが、`sub-project/docs/readme.md` のみを変更したプッシュはトリガーしません。
 
 ```yaml
 on:
@@ -350,67 +328,58 @@ on:
       - '!sub-project/docs/**'
 ```
 
-## Git diff comparisons
+### Git 差分の比較
 
-## メモ
+> **メモ**
+>
+> 1,000 件を超えるコミットをプッシュした場合、またはタイムアウトにより GitHub が差分を生成しない場合、ワークフローは常に実行されます。
 
-もし push more than 1,000 commits, or if GitHub does not generate the diff due to a timeout, the ワークフロー will always run.
+フィルターは、変更されたファイルを評価し、それらを `paths-ignore` または `paths` の一覧と照合することで、ワークフローを実行すべきかどうかを判定します。変更されたファイルがない場合、ワークフローは実行されません。
 
-The フィルター determines if a ワークフロー should run by evaluating the changed files and running them against the paths-ignore or paths list. If there are no files changed, the ワークフロー will not run.
+GitHub は、プッシュには 2 点差分、プルリクエストには 3 点差分を使用して、変更されたファイルの一覧を生成します。
 
-GitHub generates the list of changed files using two-dot diffs for pushes and three-dot diffs for pull requests:
+- プルリクエスト: 3 点差分は、トピックブランチの最新バージョンと、そのトピックブランチがベースブランチと最後に同期されたコミットとの比較です。
+- 既存のブランチへのプッシュ: 2 点差分は、head SHA と base SHA を直接比較します。
+- 新しいブランチへのプッシュ: プッシュされた最も深いコミットの祖先の親に対する 2 点差分です。
 
-Pull requests: Three-dot diffs are a comparison between the most recent version of the topic ブランチ and the commit where the topic ブランチ was last synced with the base ブランチ.
+> **メモ**
+>
+> 差分は 300 ファイルに制限されています。フィルターが返した最初の 300 ファイルに一致しない変更ファイルがある場合、ワークフローは実行されません。ワークフローが自動的に実行されるように、より具体的なフィルターを作成する必要がある場合があります。
 
-Pushes to existing ブランチ: A two-dot diff compares the head and base SHAs directly with each other.
-
-Pushes to new ブランチ: A two-dot diff against the parent of the ancestor of the deepest commit pushed.
-
-## メモ
-
-Diffs are limited to 300 files. If there are files changed that aren't matched in the first 300 files returned by the フィルター, the ワークフロー will not run. You may need to create more specific フィルターs so that the ワークフロー will run automatically.
-
-詳細については, see About comparing ブランチ in pull requests.
+詳しくは「プルリクエストでのブランチ比較について」を参照してください。
 
 ## `on.schedule`
 
-次のことができます use on.schedule to define a time schedule for your ワークフロー.
+`on.schedule` を使用して、ワークフローの時間スケジュールを定義できます。
 
-Use POSIX cron syntax to schedule ワークフロー to run at specific times. By デフォルト, scheduled ワークフロー run in UTC. 次のことができます optionally specify a timezone using an IANA timezone string for timezone-aware scheduling. Scheduled ワークフロー run on the latest commit on the デフォルト ブランチ. The shortest interval you can run scheduled ワークフロー is once every 5 minutes.
+POSIX cron 構文を使用して、特定の時刻にワークフローを実行するようスケジュールします。既定では、スケジュールされたワークフローは UTC で実行されます。タイムゾーンを考慮したスケジュール設定のために、IANA タイムゾーン文字列を使用して任意でタイムゾーンを指定できます。スケジュールされたワークフローは、既定のブランチ上の最新コミットで実行されます。スケジュールされたワークフローを実行できる最短間隔は 5 分に 1 回です。
 
-## メモ
+> **メモ**
+>
+> 夏時間（DST）を採用しているタイムゾーンを `timezone` に設定したスケジュールでは、DST の春の時刻繰り上げ移行中、スキップされた時間帯のスケジュール済みワークフローは次の有効な時刻に進みます。たとえば、午前 2:30 のスケジュールは午前 3:00 に進みます。
 
-For schedules that set timezone to a time zone that observes daylight saving time (DST), during DST spring-forward transitions, scheduled ワークフロー in skipped hours advance to the next valid time. 例えば、 a 2:30 AM schedule advances to 3:00 AM.
+Cron 構文には空白で区切られた 5 つのフィールドがあり、各フィールドは時間の単位を表します。
 
-Cron syntax has five fields separated by a space, and each field represents a unit of time.
-
+```text
 ┌───────────── minute (0 - 59)
-
 │ ┌───────────── hour (0 - 23)
-
 │ │ ┌───────────── day of the month (1 - 31)
-
 │ │ │ ┌───────────── month (1 - 12 or JAN-DEC)
-
 │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
+│ │ │ │ │
+* * * * *
+```
 
-## │ │ │ │ │
+5 つのフィールドのいずれでも、次の演算子を使用できます。
 
-## * * * * *
+| 演算子 | 説明 | 例 |
+| --- | --- | --- |
+| `*` | 任意の値 | `15 * * * *` は、毎日の毎時 15 分に実行されます。 |
+| `,` | 値リストの区切り文字 | `2,10 4,5 * * *` は、毎日の 4 時台と 5 時台の 2 分および 10 分に実行されます。 |
+| `-` | 値の範囲 | `30 4-6 * * *` は、4 時台、5 時台、6 時台の 30 分に実行されます。 |
+| `/` | ステップ値 | `20/15 * * * *` は、20 分から 59 分まで、20 分、35 分、50 分のように 15 分ごとに実行されます。 |
 
-次のことができます use these operators in any of the five fields:
-
-## Operator Description Example
-
-* Any value 15 * * * * runs at every minute 15 of every hour of every day.
-
-, Value list separator 2,10 4,5 * * * runs at minute 2 and 10 of the 4th and 5th hour of every day.
-
-- Range of values 30 4-6 * * * runs at minute 30 of the 4th, 5th, and 6th hour.
-
-/ Step values 20/15 * * * * runs every 15 minutes starting from minute 20 through 59 (minutes 20, 35, and 50).
-
-This example triggers the ワークフロー to run at 5:30 AM in the America/New_York timezone every Monday through Friday:
+この例は、America/New_York タイムゾーンで毎週月曜日から金曜日の午前 5:30 にワークフローの実行をトリガーします。
 
 ```yaml
 on:
@@ -419,16 +388,14 @@ on:
       timezone: "America/New_York"
 ```
 
-A single ワークフロー can be triggered by multiple schedule イベント. Access the schedule イベント that triggered the ワークフロー through the github.イベント.schedule コンテキスト. This example triggers the ワークフロー to run at 5:30 UTC every Monday-Thursday, and 17:30 UTC on Tuesdays and Thursdays, but skips the Not on Monday or Wednesday ステップ on Monday and Wednesday.
+1 つのワークフローは、複数の `schedule` イベントによってトリガーできます。ワークフローをトリガーした `schedule` イベントには、`github.event.schedule` コンテキストを通じてアクセスします。この例は、毎週月曜日から木曜日の 5:30 UTC、および火曜日と木曜日の 17:30 UTC にワークフローの実行をトリガーしますが、月曜日と水曜日には `Not on Monday or Wednesday` ステップをスキップします。
 
 ```yaml
 on:
   schedule:
     - cron: '30 5 * * 1,3'
     - cron: '30 5,17 * * 2,4'
-```
 
-```yaml
 jobs:
   test_schedule:
     runs-on: ubuntu-latest
@@ -440,25 +407,25 @@ jobs:
         run: echo "This step will always run"
 ```
 
-詳細については about schedule イベント, see Events that trigger ワークフロー.
+`schedule` イベントについて詳しくは、「ワークフローをトリガーするイベント」を参照してください。
 
 ## `on.workflow_call`
 
-Use on.ワークフロー_call to define the inputs and outputs for a reusable ワークフロー. 次のことができます also map the secrets that are available to the called ワークフロー. 詳細については on reusable ワークフロー, see Reuse ワークフロー.
+`on.workflow_call` を使用して、再利用可能なワークフローの入力と出力を定義します。呼び出されるワークフローで使用できるシークレットをマッピングすることもできます。再利用可能なワークフローについて詳しくは、「ワークフローの再利用」を参照してください。
 
 ## `on.workflow_call.inputs`
 
-〜する場合、 using the ワークフロー_call keyword, you can optionally specify inputs that are passed to the called ワークフロー from the caller ワークフロー. 詳細については about the ワークフロー_call keyword, see Events that trigger ワークフロー.
+`workflow_call` キーワードを使用する場合、呼び出し元ワークフローから呼び出されるワークフローに渡される入力を任意で指定できます。`workflow_call` キーワードについて詳しくは、「ワークフローをトリガーするイベント」を参照してください。
 
-In addition to the standard input parameters that are available, on.ワークフロー_call.inputs requires a type parameter. 詳細については, see on.ワークフロー_call.inputs.<input_id>.type.
+利用可能な標準の入力パラメーターに加えて、`on.workflow_call.inputs` には `type` パラメーターが必要です。詳しくは `on.workflow_call.inputs.<input_id>.type` を参照してください。
 
-If a デフォルト parameter is not set, the デフォルト value of the input is false for a boolean, 0 for a number, and "" for a string.
+`default` パラメーターが設定されていない場合、入力の既定値は、`boolean` では `false`、`number` では `0`、`string` では `""` です。
 
-Within the called ワークフロー, you can use the inputs コンテキスト to refer to an input. 詳細については, see Contexts reference.
+呼び出されるワークフロー内では、`inputs` コンテキストを使用して入力を参照できます。詳しくは「コンテキストリファレンス」を参照してください。
 
-If a caller ワークフロー passes an input that is not specified in the called ワークフロー, this results in an error.
+呼び出し元ワークフローが、呼び出されるワークフローで指定されていない入力を渡すと、エラーになります。
 
-### Example of on.ワークフロー_call.inputs
+### `on.workflow_call.inputs` の例
 
 ```yaml
 on:
@@ -469,33 +436,29 @@ on:
         default: 'john-doe'
         required: false
         type: string
-```
 
-```yaml
 jobs:
   print-username:
     runs-on: ubuntu-latest
-```
 
-```yaml
     steps:
       - name: Print the input name to STDOUT
         run: echo The username is ${{ inputs.username }}
 ```
 
-詳細については, see Reuse ワークフロー.
+詳しくは「ワークフローの再利用」を参照してください。
 
-on.ワークフロー_call.inputs.<input_id>.type
+## `on.workflow_call.inputs.<input_id>.type`
 
-Required if input is defined for the on.ワークフロー_call keyword. The value of this parameter is a string specifying the data type of the input. This must be one of: boolean, number, or string.
+`on.workflow_call` キーワードに入力が定義されている場合は必須です。このパラメーターの値は、入力のデータ型を指定する文字列です。これは `boolean`、`number`、または `string` のいずれかである必要があります。
 
 ## `on.workflow_call.outputs`
 
-A map of outputs for a called ワークフロー. Called ワークフロー outputs are available to all downstream ジョブ in the caller ワークフロー. Each output has an identifier, an optional description, and a value. The value must be set to the value of an output from a ジョブ within the called ワークフロー.
+呼び出されるワークフローの出力のマップです。呼び出されるワークフローの出力は、呼び出し元ワークフロー内のすべての下流ジョブで使用できます。各出力には、識別子、任意の説明、および値があります。値は、呼び出されるワークフロー内のジョブからの出力の値に設定する必要があります。
 
-In the example below, two outputs are defined for this reusable ワークフロー: ワークフロー_output1 and ワークフロー_output2. These are mapped to outputs called ジョブ_output1 and ジョブ_output2, both from a ジョブ called my_ジョブ.
+次の例では、この再利用可能なワークフローに対して `workflow_output1` と `workflow_output2` という 2 つの出力が定義されています。これらは、どちらも `my_job` というジョブからの `job_output1` および `job_output2` という出力にマッピングされます。
 
-### Example of on.ワークフロー_call.outputs
+### `on.workflow_call.outputs` の例
 
 ```yaml
 on:
@@ -510,21 +473,21 @@ on:
         value: ${{ jobs.my_job.outputs.job_output2 }}
 ```
 
-For information on how to reference a ジョブ output, see ジョブ.<ジョブ_id>.outputs. 詳細については, see Reuse ワークフロー.
+ジョブ出力の参照方法については、`jobs.<job_id>.outputs` を参照してください。詳しくは「ワークフローの再利用」を参照してください。
 
 ## `on.workflow_call.secrets`
 
-A map of the secrets that can be used in the called ワークフロー.
+呼び出されるワークフローで使用できるシークレットのマップです。
 
-Within the called ワークフロー, you can use the secrets コンテキスト to refer to a secret.
+呼び出されるワークフロー内では、`secrets` コンテキストを使用してシークレットを参照できます。
 
-## メモ
+> **メモ**
+>
+> シークレットを入れ子になった再利用可能なワークフローに渡す場合は、そのシークレットを渡すために `jobs.<job_id>.secrets` を再度使用する必要があります。詳しくは「ワークフローの再利用」を参照してください。
 
-もし are passing the secret to a nested reusable ワークフロー, then you must use ジョブ.<ジョブ_id>.secrets again to pass the secret. 詳細については, see Reuse ワークフロー.
+呼び出し元ワークフローが、呼び出されるワークフローで指定されていないシークレットを渡すと、エラーになります。
 
-If a caller ワークフロー passes a secret that is not specified in the called ワークフロー, this results in an error.
-
-### Example of on.ワークフロー_call.secrets
+### `on.workflow_call.secrets` の例
 
 ```yaml
 on:
@@ -533,13 +496,9 @@ on:
       access-token:
         description: 'A token passed from the caller workflow'
         required: false
-```
 
-```yaml
 jobs:
-```
 
-```yaml
   pass-secret-to-action:
     runs-on: ubuntu-latest
     steps:
@@ -548,9 +507,7 @@ jobs:
         uses: ./.github/actions/my-action
         with:
           token: ${{ secrets.access-token }}
-```
 
-```yaml
   # passing the secret to a nested reusable workflow
   pass-secret-to-workflow:
     uses: ./.github/workflows/my-workflow
@@ -558,21 +515,21 @@ jobs:
        token: ${{ secrets.access-token }}
 ```
 
-on.ワークフロー_call.secrets.<secret_id>
+## `on.workflow_call.secrets.<secret_id>`
 
-A string identifier to associate with the secret.
+シークレットに関連付ける文字列識別子です。
 
-on.ワークフロー_call.secrets.<secret_id>.required
+## `on.workflow_call.secrets.<secret_id>.required`
 
-A boolean specifying whether the secret must be supplied.
+シークレットを指定する必要があるかどうかを示すブール値です。
 
-on.ワークフロー_run.<ブランチ|ブランチ-ignore>
+## `on.workflow_run.<branches|branches-ignore>`
 
-〜する場合、 using the ワークフロー_run イベント, you can specify what ブランチ the triggering ワークフロー must run on in order to trigger your ワークフロー.
+`workflow_run` イベントを使用する場合、ワークフローをトリガーするために、トリガー元ワークフローがどのブランチで実行されている必要があるかを指定できます。
 
-The ブランチ and ブランチ-ignore フィルターs accept glob patterns that use characters like *, **, +, ?, ! and others to match more than one ブランチ name. If a name contains any of these characters and you want a literal match, you need to escape each of these special characters with \. 詳細については about glob patterns, see the Workflow syntax for GitHub Actions.
+`branches` および `branches-ignore` フィルターは、複数のブランチ名に一致させるために `*`、`**`、`+`、`?`、`!` などの文字を使用する glob パターンを受け付けます。名前にこれらの文字が含まれており、リテラル一致させたい場合は、これらの特殊文字をそれぞれ `\` でエスケープする必要があります。glob パターンについて詳しくは、GitHub Actions のワークフロー構文を参照してください。
 
-例えば、 a ワークフロー with the following trigger will only run when the ワークフロー named Build runs on a ブランチ whose name starts with releases/:
+たとえば、次のトリガーを持つワークフローは、`Build` という名前のワークフローが、名前が `releases/` で始まるブランチで実行された場合にのみ実行されます。
 
 ```yaml
 on:
@@ -583,7 +540,7 @@ on:
       - 'releases/**'
 ```
 
-A ワークフロー with the following trigger will only run when the ワークフロー named Build runs on a ブランチ that is not named canary:
+次のトリガーを持つワークフローは、`Build` という名前のワークフローが `canary` という名前ではないブランチで実行された場合にのみ実行されます。
 
 ```yaml
 on:
@@ -594,15 +551,14 @@ on:
       - "canary"
 ```
 
-次のことができますnot use both the ブランチ and ブランチ-ignore フィルターs for the same イベント in a ワークフロー. もし want to both include and exclude ブランチ patterns for a single イベント, use the ブランチ フィルター along with the ! character to indicate which ブランチ should be excluded.
+1 つのワークフロー内の同じイベントに対して、`branches` フィルターと `branches-ignore` フィルターの両方を使用することはできません。単一のイベントでブランチパターンの包含と除外の両方を行いたい場合は、除外するブランチを示すために `!` 文字とともに `branches` フィルターを使用します。
 
-The order that you define patterns matters.
+パターンを定義する順序は重要です。
 
-A matching negative pattern (prefixed with !) after a positive match will exclude the ブランチ.
+- 肯定一致の後に一致する否定パターン（`!` が前に付いたもの）があると、そのブランチは除外されます。
+- 否定一致の後に一致する肯定パターンがあると、そのブランチは再び含められます。
 
-A matching positive pattern after a negative match will include the ブランチ again.
-
-例えば、 a ワークフロー with the following trigger will run when the ワークフロー named Build runs on a ブランチ that is named releases/10 or releases/beta/mona but will not releases/10-alpha, releases/beta/3-alpha, or main.
+たとえば、次のトリガーを持つワークフローは、`Build` という名前のワークフローが `releases/10` または `releases/beta/mona` という名前のブランチで実行された場合に実行されますが、`releases/10-alpha`、`releases/beta/3-alpha`、または `main` では実行されません。
 
 ```yaml
 on:
@@ -616,23 +572,21 @@ on:
 
 ## `on.workflow_dispatch`
 
-〜する場合、 using the ワークフロー_dispatch イベント, you can optionally specify inputs that are passed to the ワークフロー.
+`workflow_dispatch` イベントを使用する場合、ワークフローに渡される入力を任意で指定できます。
 
-This trigger only receives イベント when the ワークフロー file is on the デフォルト ブランチ.
+このトリガーは、ワークフローファイルが既定のブランチ上にある場合にのみイベントを受信します。
 
 ## `on.workflow_dispatch.inputs`
 
-The triggered ワークフロー receives the inputs in the inputs コンテキスト. 詳細については, see Contexts.
+トリガーされたワークフローは、`inputs` コンテキストで入力を受け取ります。詳しくは「コンテキスト」を参照してください。
 
-## メモ
+> **メモ**
+>
+> ワークフローは、`github.event.inputs` コンテキストでも入力を受け取ります。`inputs` コンテキストと `github.event.inputs` コンテキストの情報は同一ですが、`inputs` コンテキストはブール値を文字列に変換せず、ブール値として保持します。`choice` 型は文字列に解決され、単一選択可能なオプションです。
+> `inputs` の最上位プロパティの最大数は 25 です。
+> `inputs` の最大ペイロードは 65,535 文字です。
 
-The ワークフロー will also receive the inputs in the github.イベント.inputs コンテキスト. The information in the inputs コンテキスト and github.イベント.inputs コンテキスト is identical except that the inputs コンテキスト preserves Boolean values as Booleans instead of converting them to strings. The choice type resolves to a string and is a single selectable option.
-
-The maximum number of top-level properties for inputs is 25 .
-
-The maximum payload for inputs is 65,535 characters.
-
-### Example of on.ワークフロー_dispatch.inputs
+### `on.workflow_dispatch.inputs` の例
 
 ```yaml
 on:
@@ -659,81 +613,61 @@ on:
         description: 'Environment to run tests against'
         type: environment
         required: true
-```
 
-```yaml
 jobs:
   print-tag:
     runs-on: ubuntu-latest
-    if: ${{ inputs.print_tags }}
+    if: ${{ inputs.print_tags }} 
     steps:
       - name: Print the input tag to STDOUT
-        run: echo  The tags are ${{ inputs.tags }}
+        run: echo  The tags are ${{ inputs.tags }} 
 ```
 
-on.ワークフロー_dispatch.inputs.<input_id>.required
+## `on.workflow_dispatch.inputs.<input_id>.required`
 
-A boolean specifying whether the input must be supplied.
+入力を指定する必要があるかどうかを示すブール値です。
 
-on.ワークフロー_dispatch.inputs.<input_id>.type
+## `on.workflow_dispatch.inputs.<input_id>.type`
 
-The value of this parameter is a string specifying the data type of the input. This must be one of: boolean, choice, number, environment or string.
+このパラメーターの値は、入力のデータ型を指定する文字列です。これは `boolean`、`choice`、`number`、`environment`、または `string` のいずれかである必要があります。
 
 ## `permissions`
 
-次のことができます use 権限 to modify the デフォルト 権限 granted to the GITHUB_TOKEN, adding or removing access as required, so that you only allow the minimum required access. 詳細については, see Use GITHUB_TOKEN for authentication in ワークフロー.
+`permissions` を使用すると、GITHUB_TOKEN に付与されるデフォルトの権限を変更し、必要に応じてアクセス権を追加または削除できます。これにより、必要最小限のアクセスだけを許可できます。詳しくは、ワークフローで認証に GITHUB_TOKEN を使用する方法を参照してください。
 
-次のことができます use 権限 either as a top-level key, to apply to all ジョブ in the ワークフロー, or within specific ジョブ. 〜する場合、 you add the 権限 key within a specific ジョブ, all actions and run commands within that ジョブ that use the GITHUB_TOKEN gain the access rights you specify. 詳細については, see ジョブ.<ジョブ_id>.権限.
+`permissions` は、ワークフロー内のすべてのジョブに適用するためのトップレベルのキーとして使用することも、特定のジョブ内で使用することもできます。特定のジョブ内に `permissions` キーを追加すると、そのジョブ内で GITHUB_TOKEN を使用するすべてのアクションと `run` コマンドに、指定したアクセス権が付与されます。詳しくは、`jobs.<job_id>.permissions` を参照してください。
 
-Owners of an organization can restrict write access for the GITHUB_TOKEN at the repository level. 詳細については, see Disabling or limiting GitHub Actions for your organization.
+組織の所有者は、リポジトリレベルで GITHUB_TOKEN の書き込みアクセスを制限できます。詳しくは、組織で GitHub Actions を無効化または制限する方法を参照してください。
 
-〜する場合、 a ワークフロー is triggered by the pull_request_target イベント, the GITHUB_TOKEN is granted read/write repository permission, even when it is triggered from a public fork. 詳細については, see Events that trigger ワークフロー.
+ワークフローが `pull_request_target` イベントによってトリガーされた場合、公開フォークからトリガーされた場合でも、GITHUB_TOKEN にはリポジトリへの読み取りおよび書き込み権限が付与されます。詳しくは、ワークフローをトリガーするイベントを参照してください。
 
-For each of the available 権限, shown in the table below, you can assign one of the access levels: read (if applicable), write, or none. write includes read. もし specify the access for any of these 権限, all of those that are not specified are set to none.
+次の表に示す利用可能な各権限には、`read`（該当する場合）、`write`、または `none` のいずれかのアクセスレベルを割り当てることができます。`write` には `read` が含まれます。これらの権限のいずれかについてアクセス権を指定すると、指定されていないすべての権限は `none` に設定されます。
 
-Available 権限 and details of what each allows an action to do:
+利用可能な権限と、それぞれがアクションに許可する操作の詳細は次のとおりです。
 
-## Permission Allows an action using GITHUB_TOKEN to
+| 権限 | GITHUB_TOKEN を使用するアクションに許可される操作 |
+| --- | --- |
+| `actions` | GitHub Actions を操作します。たとえば、`actions: write` は、アクションがワークフロー実行をキャンセルすることを許可します。詳しくは、GitHub Apps に必要な権限を参照してください。 |
+| `artifact-metadata` | アーティファクトのメタデータを操作します。たとえば、`artifact-metadata: write` は、アクションがビルドアーティファクトに代わってストレージレコードを作成することを許可します。詳しくは、アーティファクトメタデータの REST API エンドポイントを参照してください。 |
+| `attestations` | アーティファクトの証明を操作します。たとえば、`attestations: write` は、アクションがビルドのアーティファクト証明を生成することを許可します。詳しくは、ビルドの来歴を確立するためにアーティファクト証明を使用する方法を参照してください。 |
+| `checks` | チェック実行とチェックスイートを操作します。たとえば、`checks: write` は、アクションがチェック実行を作成することを許可します。詳しくは、GitHub Apps に必要な権限を参照してください。 |
+| `code-quality` | コード品質を操作します。たとえば、`code-quality: write` は、アクションがコードカバレッジレポートをアップロードすることを許可します。詳しくは、GitHub Code Quality についてを参照してください。 |
+| `contents` | リポジトリの内容を操作します。たとえば、`contents: read` は、アクションがコミットを一覧表示することを許可し、`contents: write` は、アクションがリリースを作成することを許可します。詳しくは、GitHub Apps に必要な権限を参照してください。 |
+| `deployments` | デプロイを操作します。たとえば、`deployments: write` は、アクションが新しいデプロイを作成することを許可します。詳しくは、GitHub Apps に必要な権限を参照してください。 |
+| `discussions` | GitHub Discussions を操作します。たとえば、`discussions: write` は、アクションがディスカッションを閉じる、または削除することを許可します。詳しくは、ディスカッションに GraphQL API を使用する方法を参照してください。 |
+| `id-token` | OpenID Connect (OIDC) トークンを取得します。これには `id-token: write` が必要です。詳しくは、OpenID Connect を参照してください。 |
+| `issues` | issue を操作します。たとえば、`issues: write` は、アクションが issue にコメントを追加することを許可します。詳しくは、GitHub Apps に必要な権限を参照してください。 |
+| `models` | GitHub Models で AI 推論応答を生成します。たとえば、`models: read` は、アクションが GitHub Models 推論 API を使用することを許可します。AI モデルでプロトタイプを作成する方法を参照してください。 |
+| `packages` | GitHub Packages を操作します。たとえば、`packages: write` は、アクションが GitHub Packages にパッケージをアップロードして公開することを許可します。詳しくは、GitHub Packages の権限についてを参照してください。 |
+| `pages` | GitHub Pages を操作します。たとえば、`pages: write` は、アクションが GitHub Pages のビルドを要求することを許可します。詳しくは、GitHub Apps に必要な権限を参照してください。 |
+| `pull-requests` | プルリクエストを操作します。たとえば、`pull-requests: write` は、アクションがプルリクエストにラベルを追加することを許可します。詳しくは、GitHub Apps に必要な権限を参照してください。 |
+| `security-events` | GitHub のコードスキャンアラートを操作します。たとえば、`security-events: read` は、アクションがリポジトリのコードスキャンアラートを一覧表示することを許可し、`security-events: write` は、アクションがコードスキャンアラートの状態を更新することを許可します。詳しくは、「コードスキャンアラート」のリポジトリ権限を参照してください。<br><br>Dependabot アラートには、`vulnerability-alerts` 権限を使用してください。シークレットスキャンアラートはこの権限では読み取れず、GitHub App または個人用アクセストークンが必要です。詳しくは、「GitHub Apps に必要な権限」の「シークレットスキャンアラート」のリポジトリ権限を参照してください。 |
+| `statuses` | コミットステータスを操作します。たとえば、`statuses:read` は、アクションが指定された参照のコミットステータスを一覧表示することを許可します。詳しくは、GitHub Apps に必要な権限を参照してください。 |
+| `vulnerability-alerts` | Dependabot アラートを読み取ります。たとえば、`vulnerability-alerts: read` は、アクションがリポジトリの Dependabot アラートを一覧表示することを許可します。サポートされるのは `read` と `none` のみで、`write` は有効ではありません。`write-all` または `read-all` が使用されると、`vulnerability-alerts` は自動的に `read` として含まれます。詳しくは、「Dependabot alerts」のリポジトリ権限を参照してください。 |
 
-actions Work with GitHub Actions. 例えば、 actions: write permits an action to cancel a ワークフロー run. 詳細については, see Permissions required for GitHub Apps.
+### GITHUB_TOKEN スコープのアクセス権を定義する
 
-artifact-metadata Work with artifact metadata. 例えば、 artifact-metadata: write permits an action to create storage records on behalf of a build artifact. 詳細については, see REST API endpoints for artifact metadata.
-
-attestations Work with artifact attestations. 例えば、 attestations: write permits an action to generate an artifact attestation for a build. 詳細については, see Using artifact attestations to establish provenance for builds
-
-checks Work with check runs and check suites. 例えば、 checks: write permits an action to create a check run. 詳細については, see Permissions required for GitHub Apps.
-
-code-quality Work with code quality. 例えば、 code-quality: write permits an action to upload code coverage reports. 詳細については, see About GitHub Code Quality.
-
-contents Work with the contents of the repository. 例えば、 contents: read permits an action to list the commits, and contents: write allows the action to create a release. 詳細については, see Permissions required for GitHub Apps.
-
-deployments Work with deployments. 例えば、 deployments: write permits an action to create a new deployment. 詳細については, see Permissions required for GitHub Apps.
-
-discussions Work with GitHub Discussions. 例えば、 discussions: write permits an action to close or delete a discussion. 詳細については, see Using the GraphQL API for Discussions.
-
-id-token Fetch an OpenID Connect (OIDC) token. This requires id-token: write. 詳細については, see OpenID Connect
-
-issues Work with issues. 例えば、 issues: write permits an action to add a comment to an issue. 詳細については, see Permissions required for GitHub Apps.
-
-models Generate AI inference responses with GitHub Models. 例えば、 models: read permits an action to use the GitHub Models inference API. See Prototyping with AI models.
-
-packages Work with GitHub Packages. 例えば、 packages: write permits an action to upload and publish packages on GitHub Packages. 詳細については, see About 権限 for GitHub Packages.
-
-pages Work with GitHub Pages. 例えば、 pages: write permits an action to request a GitHub Pages build. 詳細については, see Permissions required for GitHub Apps.
-
-pull-requests Work with pull requests. 例えば、 pull-requests: write permits an action to add a label to a pull request. 詳細については, see Permissions required for GitHub Apps.
-
-security-イベント Work with GitHub code scanning alerts. 例えば、 security-イベント: read permits an action to list the code scanning alerts for the repository, and security-イベント: write allows an action to update the status of a code scanning alert. 詳細については, see Repository 権限 for "Code scanning alerts".
-
-For Dependabot alerts, use the vulnerability-alerts permission. Secret scanning alerts cannot be read with this permission and require a GitHub App or a personal access token. 詳細については, see Repository 権限 for "Secret scanning alerts" in "Permissions required for GitHub Apps."
-
-statuses Work with commit statuses. 例えば、 statuses:read permits an action to list the commit statuses for a given reference. 詳細については, see Permissions required for GitHub Apps.
-
-vulnerability-alerts Read Dependabot alerts. 例えば、 vulnerability-alerts: read permits an action to list Dependabot alerts for the repository. Only read and none are supported; write is not valid. 〜する場合、 write-all or read-all is used, vulnerability-alerts is automatically included as read. 詳細については, see Repository 権限 for "Dependabot alerts".
-
-## Defining access for the GITHUB_TOKEN scopes
-
-次のことができます define the access that the GITHUB_TOKEN will permit by specifying read, write, or none as the value of the available 権限 within the 権限 key.
+`permissions` キー内で利用可能な権限の値として `read`、`write`、または `none` を指定することで、GITHUB_TOKEN が許可するアクセス権を定義できます。
 
 ```yaml
 permissions:
@@ -751,82 +685,71 @@ permissions:
   packages: read|write|none
   pages: read|write|none
   pull-requests: read|write|none
-```
 
-```yaml
   security-events: read|write|none
   statuses: read|write|none
   vulnerability-alerts: read|none
 ```
 
-もし specify the access for any of these 権限, all of those that are not specified are set to none.
+これらの権限のいずれかについてアクセス権を指定すると、指定されていないすべての権限は `none` に設定されます。
 
-次のことができます use the following syntax to define one of read-all or write-all access for all of the available 権限:
+利用可能なすべての権限に対して `read-all` または `write-all` のいずれかのアクセス権を定義するには、次の構文を使用できます。
 
 ```yaml
 permissions: read-all
 permissions: write-all
 ```
 
-次のことができます use the following syntax to disable 権限 for all of the available 権限:
+利用可能なすべての権限を無効にするには、次の構文を使用できます。
 
 ```yaml
 permissions: {}
 ```
 
-## Changing the 権限 in a forked repository
+### フォークされたリポジトリで権限を変更する
 
-次のことができます use the 権限 key to add and remove read 権限 for forked repositories, but typically you can't grant write access. The exception to this behavior is where an admin user has selected the Send write tokens to ワークフロー from pull requests option in the GitHub Actions settings. 詳細については, see Managing GitHub Actions settings for a repository.
+フォークされたリポジトリに対しては、`permissions` キーを使用して読み取り権限を追加および削除できますが、通常は書き込みアクセスを付与できません。この動作の例外は、管理者ユーザーが GitHub Actions 設定で `Send write tokens to workflows from pull requests` オプションを選択している場合です。詳しくは、リポジトリの GitHub Actions 設定を管理する方法を参照してください。
 
-## How 権限 are calculated for a ワークフロー ジョブ
+### ワークフロージョブの権限が計算される仕組み
 
-The 権限 for the GITHUB_TOKEN are initially set to the デフォルト setting for the enterprise, organization, or repository. If the デフォルト is set to the restricted 権限 at any of these levels then this will apply to the relevant repositories. 例えば、 if you choose the restricted デフォルト at the organization level then all repositories in that organization will use the restricted 権限 as the デフォルト. The 権限 are then adjusted based on any configuration within the ワークフロー file, first at the ワークフロー level and then at the ジョブ level. Finally, if the ワークフロー was triggered by a pull request イベント other than pull_request_target from a forked repository, and the Send write tokens to ワークフロー from pull requests setting is not selected, the 権限 are adjusted to change any write 権限 to read only.
+GITHUB_TOKEN の権限は、最初に Enterprise、組織、またはリポジトリのデフォルト設定に設定されます。これらのレベルのいずれかでデフォルトが制限付き権限に設定されている場合、その設定が該当するリポジトリに適用されます。たとえば、組織レベルで制限付きデフォルトを選択した場合、その組織内のすべてのリポジトリは、制限付き権限をデフォルトとして使用します。その後、権限はワークフローファイル内の構成に基づいて、まずワークフローレベルで、次にジョブレベルで調整されます。最後に、ワークフローがフォークされたリポジトリからの `pull_request_target` 以外の pull request イベントによってトリガーされ、`Send write tokens to workflows from pull requests` 設定が選択されていない場合、書き込み権限は読み取り専用に変更されるように調整されます。
 
-## Setting the GITHUB_TOKEN 権限 for all ジョブ in a ワークフロー
+### ワークフロー内のすべてのジョブに GITHUB_TOKEN 権限を設定する
 
-次のことができます specify 権限 at the top level of a ワークフロー, so that the setting applies to all ジョブ in the ワークフロー.
+ワークフローのトップレベルで権限を指定すると、その設定をワークフロー内のすべてのジョブに適用できます。
 
-```yaml
-Example: Setting the GITHUB_TOKEN permissions for an entire workflow
-```
+### 例: ワークフロー全体に GITHUB_TOKEN 権限を設定する
 
-This example shows 権限 being set for the GITHUB_TOKEN that will apply to all ジョブ in the ワークフロー. All 権限 are granted read access.
+この例は、ワークフロー内のすべてのジョブに適用される GITHUB_TOKEN の権限を設定する方法を示しています。すべての権限に読み取りアクセスが付与されます。
 
 ```yaml
 name: "My workflow"
-```
 
-```yaml
 on: [ push ]
-```
 
-```yaml
 permissions: read-all
-```
 
-```yaml
 jobs:
+  ...
 ```
 
-## `...`
+### フォークされたリポジトリで `permissions` キーを使用する
 
-## Using the 権限 key for forked repositories
+フォークされたリポジトリに対しては、`permissions` キーを使用して読み取り権限を追加および削除できますが、通常は書き込みアクセスを付与できません。この動作の例外は、管理者ユーザーが GitHub Actions 設定で `Send write tokens to workflows from pull requests` オプションを選択している場合です。詳しくは、リポジトリの GitHub Actions 設定を管理する方法を参照してください。
 
-次のことができます use the 権限 key to add and remove read 権限 for forked repositories, but typically you can't grant write access. The exception to this behavior is where an admin user has selected the Send write tokens to ワークフロー from pull requests option in the GitHub Actions settings. 詳細については, see Managing GitHub Actions settings for a repository.
+### Dependabot によってトリガーされたワークフロー実行の権限
 
-## Permissions for ワークフロー runs triggered by Dependabot
-
-Workflow runs triggered by Dependabot pull requests run as if they are from a forked repository, and therefore use a read-only GITHUB_TOKEN. These ワークフロー runs cannot access any secrets. For information about strategies to keep these ワークフロー secure, see Secure use reference.
+Dependabot プルリクエストによってトリガーされたワークフロー実行は、フォークされたリポジトリからの実行であるかのように実行されるため、読み取り専用の GITHUB_TOKEN を使用します。これらのワークフロー実行は、どのシークレットにもアクセスできません。これらのワークフローを安全に保つための戦略については、安全な使用に関するリファレンスを参照してください。
 
 ## `env`
 
-A map of variables that are available to the ステップ of all ジョブ in the ワークフロー. 次のことができます also set variables that are only available to the ステップ of a single ジョブ or to a single ステップ. 詳細については, see ジョブ.<ジョブ_id>.env and ジョブ.<ジョブ_id>.ステップ[*].env.
+ワークフロー内のすべてのジョブのステップで使用できる変数のマップです。単一のジョブのステップ、または単一のステップでのみ使用できる変数を設定することもできます。詳しくは、`jobs.<job_id>.env` と `jobs.<job_id>.steps[*].env` を参照してください。
 
-Variables in the env map cannot be defined in terms of other variables in the map.
+`env` マップ内の変数は、同じマップ内の他の変数に基づいて定義することはできません。
 
-〜する場合、 more than one environment variable is defined with the same name, GitHub uses the most specific variable. 例えば、 an environment variable defined in a ステップ will override ジョブ and ワークフロー environment variables with the same name, while the ステップ executes. An environment variable defined for a ジョブ will override a ワークフロー variable with the same name, while the ジョブ executes.
+同じ名前で複数の環境変数が定義されている場合、GitHub は最も具体的な変数を使用します。たとえば、ステップで定義された環境変数は、そのステップの実行中、同じ名前のジョブおよびワークフローの環境変数を上書きします。ジョブに定義された環境変数は、そのジョブの実行中、同じ名前のワークフロー変数を上書きします。
 
-### Example of env
+### `env` の例
 
 ```yaml
 env:
@@ -835,18 +758,19 @@ env:
 
 ## `defaults`
 
-Use デフォルトs to create a map of デフォルト settings that will apply to all ジョブ in the ワークフロー. 次のことができます also set デフォルト settings that are only available to a ジョブ. 詳細については, see ジョブ.<ジョブ_id>.デフォルトs.
+`defaults` を使用して、ワークフロー内のすべてのジョブに適用されるデフォルト設定のマップを作成します。ジョブでのみ使用できるデフォルト設定を設定することもできます。詳しくは、`jobs.<job_id>.defaults` を参照してください。
 
-〜する場合、 more than one デフォルト setting is defined with the same name, GitHub uses the most specific デフォルト setting. 例えば、 a デフォルト setting defined in a ジョブ will override a デフォルト setting that has the same name defined in a ワークフロー.
+同じ名前で複数のデフォルト設定が定義されている場合、GitHub は最も具体的なデフォルト設定を使用します。たとえば、ジョブで定義されたデフォルト設定は、ワークフローで定義された同じ名前のデフォルト設定を上書きします。
 
 ## `defaults.run`
 
-次のことができます use デフォルトs.run to provide デフォルト shell and working-directory options for all run ステップ in a ワークフロー. 次のことができます also set デフォルト settings for run that are only available to a ジョブ. 詳細については, see ジョブ.<ジョブ_id>.デフォルトs.run. 次のことができますnot use コンテキストs or 式s in this keyword.
+`defaults.run` を使用すると、ワークフロー内のすべての `run` ステップに対して、デフォルトのシェルと作業ディレクトリのオプションを指定できます。ジョブでのみ使用できる `run` のデフォルト設定を設定することもできます。詳しくは、`jobs.<job_id>.defaults.run` を参照してください。このキーワードでは、コンテキストまたは式を使用できません。
 
-〜する場合、 more than one デフォルト setting is defined with the same name, GitHub uses the most specific デフォルト setting. 例えば、 a デフォルト setting defined in a ジョブ will override a デフォルト setting that has the same name defined in a ワークフロー.
+同じ名前で複数のデフォルト設定が定義されている場合、GitHub は最も具体的なデフォルト設定を使用します。たとえば、ジョブで定義されたデフォルト設定は、ワークフローで定義された同じ名前のデフォルト設定を上書きします。
+
+### 例: デフォルトのシェルと作業ディレクトリを設定する
 
 ```yaml
-Example: Set the default shell and working directory
 defaults:
   run:
     shell: bash
@@ -855,111 +779,96 @@ defaults:
 
 ## `defaults.run.shell`
 
-Use shell to define the shell for a ステップ. This keyword can reference several コンテキストs. 詳細については, see Contexts.
+ステップのシェルを定義するには、`shell` を使用します。このキーワードは複数のコンテキストを参照できます。詳しくは、コンテキストを参照してください。
 
-## Supported platform shell parameter Description Command run internally
+| サポートされるプラットフォーム | シェルパラメーター | 説明 | 内部で実行されるコマンド |
+| --- | --- | --- | --- |
+| Linux / macOS | `unspecified` | Windows 以外のプラットフォームでのデフォルトのシェルです。`bash` を明示的に指定した場合とは異なるコマンドが実行される点に注意してください。`bash` がパス内に見つからない場合、これは `sh` として扱われます。 | `bash -e {0}` |
+| All | `bash` | Windows 以外のプラットフォームでのデフォルトのシェルで、`sh` へのフォールバックがあります。Windows で bash シェルを指定すると、Git for Windows に含まれる bash シェルが使用されます。 | `bash --noprofile --norc -eo pipefail {0}` |
+| All | `pwsh` | PowerShell Core です。GitHub はスクリプト名に拡張子 `.ps1` を追加します。 | `pwsh -command ". '{0}'"` |
+| All | `python` | `python` コマンドを実行します。 | `python {0}` |
+| Linux / macOS | `sh` | シェルが指定されておらず、パス内に `bash` が見つからない場合の、Windows 以外のプラットフォーム向けのフォールバック動作です。 | `sh -e {0}` |
+| Windows | `cmd` | GitHub はスクリプト名に拡張子 `.cmd` を追加し、`{0}` に代入します。 | `%ComSpec% /D /E:ON /V:OFF /S /C "CALL "{0}"".` |
+| Windows | `pwsh` | これは Windows で使用されるデフォルトのシェルです。PowerShell Core です。GitHub はスクリプト名に拡張子 `.ps1` を追加します。セルフホスト Windows ランナーに PowerShell Core がインストールされていない場合は、代わりに PowerShell Desktop が使用されます。 | `pwsh -command ". '{0}'".` |
+| Windows | `powershell` | PowerShell Desktop です。GitHub はスクリプト名に拡張子 `.ps1` を追加します。 | `powershell -command ". '{0}'".` |
 
-Linux / macOS unspecified The デフォルト shell on non-Windows platforms. 注意: this runs a different command to when bash is specified explicitly. If bash is not found in the path, this is treated as sh. bash -e {0}
-
-All bash The デフォルト shell on non-Windows platforms with a fallback to sh. 〜する場合、 specifying a bash shell on Windows, the bash shell included with Git for Windows is used. bash --noprofile --norc -eo pipefail {0}
-
-All pwsh The PowerShell Core. GitHub appends the extension .ps1 to your script name. pwsh -command ". '{0}'"
-
-All python Executes the python command. python {0}
-
-Linux / macOS sh The fallback behavior for non-Windows platforms if no shell is provided and bash is not found in the path. sh -e {0}
-
-Windows cmd GitHub appends the extension .cmd to your script name and substitutes for {0}. %ComSpec% /D /E:ON /V:OFF /S /C "CALL "{0}"".
-
-Windows pwsh This is the デフォルト shell used on Windows. The PowerShell Core. GitHub appends the extension .ps1 to your script name. もし r self-hosted Windows runner does not have PowerShell Core installed, then PowerShell Desktop is used instead. pwsh -command ". '{0}'".
-
-Windows powershell The PowerShell Desktop. GitHub appends the extension .ps1 to your script name. powershell -command ". '{0}'".
-
-〜する場合、 more than one デフォルト setting is defined with the same name, GitHub uses the most specific デフォルト setting. 例えば、 a デフォルト setting defined in a ジョブ will override a デフォルト setting that has the same name defined in a ワークフロー.
+同じ名前で複数のデフォルト設定が定義されている場合、GitHub は最も具体的なデフォルト設定を使用します。たとえば、ジョブで定義されたデフォルト設定は、ワークフローで定義された同じ名前のデフォルト設定を上書きします。
 
 ## `defaults.run.working-directory`
 
-Use working-directory to define the working directory for the shell for a ステップ. This keyword can reference several コンテキストs. 詳細については, see Contexts.
+ステップのシェルの作業ディレクトリを定義するには、`working-directory` を使用します。このキーワードは複数のコンテキストを参照できます。詳しくは、コンテキストを参照してください。
 
-## ヒント
-
-Ensure the working-directory you assign exists on the runner before you run your shell in it. 〜する場合、 more than one デフォルト setting is defined with the same name, GitHub uses the most specific デフォルト setting. 例えば、 a デフォルト setting defined in a ジョブ will override a デフォルト setting that has the same name defined in a ワークフロー.
+> **ヒント**
+> 
+> 割り当てた作業ディレクトリがランナー上に存在することを、そこでシェルを実行する前に確認してください。同じ名前で複数のデフォルト設定が定義されている場合、GitHub は最も具体的なデフォルト設定を使用します。たとえば、ジョブで定義されたデフォルト設定は、ワークフローで定義された同じ名前のデフォルト設定を上書きします。
 
 ## `concurrency`
 
-Use 同時実行制御 to ensure that only a single ジョブ or ワークフロー using the same 同時実行制御 group will run at a time. A 同時実行制御 group can be any string or 式. The 式 can only use github, inputs and vars コンテキストs. 詳細については about 式s, see Evaluate 式s in ワークフロー and actions.
+`concurrency` を使用すると、同じ同時実行グループを使用する単一のジョブまたはワークフローだけが一度に実行されるようにできます。同時実行グループには、任意の文字列または式を指定できます。式では、`github`、`inputs`、`vars` コンテキストのみを使用できます。式について詳しくは、ワークフローとアクションで式を評価する方法を参照してください。
 
-次のことができます also specify 同時実行制御 at the ジョブ level. 詳細については, see ジョブ.<ジョブ_id>.同時実行制御.
+ジョブレベルで `concurrency` を指定することもできます。詳しくは、`jobs.<job_id>.concurrency` を参照してください。
 
-This means that there can be at most one running ジョブ or ワークフロー in a 同時実行制御 group at any time. 〜する場合、 a concurrent ジョブ or ワークフロー is queued, if another ジョブ or ワークフロー using the same 同時実行制御 group in the repository is in progress, the queued ジョブ or ワークフロー will be pending. By デフォルト, any existing pending ジョブ or ワークフロー in the same 同時実行制御 group will be canceled and the new queued ジョブ or ワークフロー will take its place.
+これは、任意の時点で同時実行グループ内に、実行中のジョブまたはワークフローが最大 1 つしか存在できないことを意味します。同時実行するジョブまたはワークフローがキューに入れられたとき、リポジトリ内で同じ同時実行グループを使用している別のジョブまたはワークフローが進行中である場合、キューに入れられたジョブまたはワークフローは保留中になります。デフォルトでは、同じ同時実行グループ内に既存の保留中のジョブまたはワークフローがある場合、それはキャンセルされ、新しくキューに入れられたジョブまたはワークフローがその代わりになります。
 
-〜するには also cancel any currently running ジョブ or ワークフロー in the same 同時実行制御 group, specify cancel-in-progress: true. 〜するには conditionally cancel currently running ジョブ or ワークフロー in the same 同時実行制御 group, you can specify cancel-in-progress as an 式 with any of the allowed 式 コンテキストs.
+同じ同時実行グループ内で現在実行中のジョブまたはワークフローもキャンセルするには、`cancel-in-progress: true` を指定します。同じ同時実行グループ内で現在実行中のジョブまたはワークフローを条件付きでキャンセルするには、許可されている式コンテキストのいずれかを使用した式として `cancel-in-progress` を指定できます。
 
-〜するには allow more than one pending ジョブ or ワークフロー run to wait in the same 同時実行制御 group, use the optional queue property. The queue property accepts the following values:
+複数の保留中のジョブまたはワークフロー実行が同じ同時実行グループ内で待機できるようにするには、省略可能な `queue` プロパティを使用します。`queue` プロパティは次の値を受け付けます。
 
-single (デフォルト): At most one ジョブ or ワークフロー run can be pending in the 同時実行制御 group. 〜する場合、 a new ジョブ or ワークフロー run is queued, any existing pending ジョブ or ワークフロー run in the same group is canceled and replaced.
+`single`（デフォルト）: 同時実行グループ内で保留中にできるジョブまたはワークフロー実行は最大 1 つです。新しいジョブまたはワークフロー実行がキューに入れられると、同じグループ内の既存の保留中のジョブまたはワークフロー実行はキャンセルされ、置き換えられます。
 
-```yaml
-max: Up to 100 jobs or workflow runs can be pending in the concurrency group. When the queue is full, any additional jobs or workflow runs are canceled.
-```
+`max`: 同時実行グループ内で最大 100 個のジョブまたはワークフロー実行を保留中にできます。キューがいっぱいになると、追加のジョブまたはワークフロー実行はキャンセルされます。
 
-The combination of queue: max and cancel-in-progress: true is not allowed and will result in a ワークフロー validation error.
+`queue: max` と `cancel-in-progress: true` の組み合わせは許可されず、ワークフロー検証エラーになります。
 
-## メモ
+> **メモ**
+> 
+> 同時実行グループ名では大文字と小文字は区別されません。たとえば、`prod` と `Prod` は同じ同時実行グループとして扱われます。
+> 同じ同時実行グループ内のジョブまたはワークフロー実行は、各ワークフローがディスパッチされた時刻ではなく、それぞれが同時実行グループの待機を開始した時刻に従って、先入れ先出し（FIFO）順に処理されます。ジョブまたは実行の実際の開始時刻は変動する可能性があるため、順序は保証されません。
 
-The 同時実行制御 group name is case insensitive. 例えば、 prod and Prod will be treated as the same 同時実行制御 group.
+### 例: 同時実行とデフォルトの動作を使用する
 
-Jobs or ワークフロー runs in the same 同時実行制御 group are processed in first-in-first-out (FIFO) order according to the time each one started waiting on the 同時実行制御 group, not the time each ワークフロー was dispatched. Since the actual start time of a ジョブ or run may vary, ordering is not guaranteed.
+GitHub Actions のデフォルトの動作では、複数のジョブまたはワークフロー実行を同時に実行できます。`concurrency` キーワードを使用すると、ワークフロー実行の同時実行を制御できます。
 
-```yaml
-Example: Using concurrency and the default behavior
-```
-
-The デフォルト behavior of GitHub Actions is to allow multiple ジョブ or ワークフロー runs to run concurrently. The 同時実行制御 keyword allows you to control the 同時実行制御 of ワークフロー runs.
-
-例えば、 you can use the 同時実行制御 keyword immediately after where trigger conditions are defined to limit the 同時実行制御 of entire ワークフロー runs for a specific ブランチ:
+たとえば、特定のブランチに対するワークフロー実行全体の同時実行を制限するために、トリガー条件を定義した直後に `concurrency` キーワードを使用できます。
 
 ```yaml
 on:
   push:
     branches:
       - main
-```
 
-```yaml
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 ```
 
-次のことができます also limit the 同時実行制御 of ジョブ within a ワークフロー by using the 同時実行制御 keyword at the ジョブ level:
+ワークフロー内のジョブの同時実行も、ジョブレベルで `concurrency` キーワードを使用することで制限できます。
 
 ```yaml
 on:
   push:
     branches:
       - main
-```
 
-```yaml
 jobs:
   job-1:
     runs-on: ubuntu-latest
     concurrency:
       group: example-group
       cancel-in-progress: true
-Example: Concurrency groups
 ```
 
-Concurrency groups provide a way to manage and limit the execution of ワークフロー runs or ジョブ that share the same 同時実行制御 key.
+### 例: 同時実行グループ
 
-The 同時実行制御 key is used to group ワークフロー or ジョブ together into a 同時実行制御 group. 〜する場合、 you define a 同時実行制御 key, GitHub Actions ensures that only one ワークフロー or ジョブ with that key runs at any given time. If a new ワークフロー run or ジョブ starts with the same 同時実行制御 key, GitHub Actions will cancel any ワークフロー or ジョブ already running with that key. The 同時実行制御 key can be a hard-coded string, or it can be a dynamic 式 that includes コンテキスト variables.
+同時実行グループは、同じ同時実行キーを共有するワークフロー実行またはジョブの実行を管理および制限する方法を提供します。
 
-It is possible to define 同時実行制御 conditions in your ワークフロー so that the ワークフロー or ジョブ is part of a 同時実行制御 group.
+同時実行キーは、ワークフローまたはジョブを同時実行グループにまとめるために使用されます。同時実行キーを定義すると、GitHub Actions は、そのキーを持つワークフローまたはジョブが常に 1 つだけ実行されるようにします。同じ同時実行キーで新しいワークフロー実行またはジョブが開始されると、GitHub Actions は、そのキーですでに実行中のワークフローまたはジョブをキャンセルします。同時実行キーには、ハードコードされた文字列を使用することも、コンテキスト変数を含む動的な式を使用することもできます。
 
-This means that when a ワークフロー run or ジョブ starts, GitHub will cancel any ワークフロー runs or ジョブ that are already in progress in the same 同時実行制御 group. This is useful in scenarios where you want to prイベント parallel runs for a certain set of a ワークフロー or ジョブ, such as the ones used for deployments to a sタグing environment, in order to prイベント actions that could cause conflicts or consume more resources than necessary.
+ワークフロー内で同時実行条件を定義し、ワークフローまたはジョブを同時実行グループの一部にすることができます。
 
-In this example, ジョブ-1 is part of a 同時実行制御 group named sタグing_environment. This means that if a new run of ジョブ-1 is triggered, any runs of the same ジョブ in the sタグing_environment 同時実行制御 group that are already in progress will be cancelled.
+これは、ワークフロー実行またはジョブが開始されると、GitHub が同じ同時実行グループ内ですでに進行中のワークフロー実行またはジョブをキャンセルすることを意味します。これは、必要以上のリソースを消費したり競合を引き起こしたりする可能性のあるアクションを防ぐために、ステージング環境へのデプロイに使用されるものなど、特定のワークフローまたはジョブのセットの並列実行を防ぎたいシナリオで役立ちます。
+
+この例では、`job-1` は `staging_environment` という名前の同時実行グループの一部です。つまり、`job-1` の新しい実行がトリガーされた場合、`staging_environment` 同時実行グループ内ですでに進行中の同じジョブの実行はキャンセルされます。
 
 ```yaml
 jobs:
@@ -968,47 +877,43 @@ jobs:
     concurrency:
       group: staging_environment
       cancel-in-progress: true
-Alternatively, using a dynamic expression such as concurrency: ci-${{ github.ref }} in your workflow means that the workflow or job would be part of a concurrency group named ci- followed by the reference of the branch or tag that triggered the workflow. In this example, if a new commit is pushed to the main branch while a previous run is still in progress, the previous run will be cancelled and the new one will start:
 ```
+
+または、ワークフロー内で `concurrency: ci-${{ github.ref }}` のような動的な式を使用すると、ワークフローまたはジョブは、`ci-` に続いてワークフローをトリガーしたブランチまたはタグの参照を付けた名前の同時実行グループの一部になります。この例では、前の実行がまだ進行中の間に `main` ブランチへ新しいコミットがプッシュされると、前の実行はキャンセルされ、新しい実行が開始されます。
 
 ```yaml
 on:
   push:
     branches:
       - main
-```
 
-```yaml
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
-Example: Queueing multiple pending runs
 ```
 
-By デフォルト, only one ジョブ or ワークフロー run can be pending in a 同時実行制御 group at a time. 〜するには allow multiple runs to queue instead of being canceled, set queue: max. With queue: max, up to 100 ジョブ or ワークフロー runs can wait in the 同時実行制御 group; once the queue is full, any additional runs are canceled.
+### 例: 複数の保留中の実行をキューに入れる
 
-例えば、 the following ワークフロー queues deployments to the production environment, processing them one at a time in order based on when each run started waiting on the 同時実行制御 group:
+デフォルトでは、同時実行グループ内で一度に保留中にできるジョブまたはワークフロー実行は 1 つだけです。複数の実行をキャンセルせずにキューに入れられるようにするには、`queue: max` を設定します。`queue: max` を使用すると、最大 100 個のジョブまたはワークフロー実行が同時実行グループ内で待機できます。キューがいっぱいになると、追加の実行はキャンセルされます。
+
+たとえば、次のワークフローは本番環境へのデプロイをキューに入れ、それぞれの実行が同時実行グループの待機を開始した時刻に基づいて、1 つずつ順番に処理します。
 
 ```yaml
 on:
   push:
     branches:
       - main
-```
 
-```yaml
 concurrency:
   group: production-deploy
   queue: max
 ```
 
-注意: queue: max cannot be combined with cancel-in-progress: true, because the two options describe conflicting behaviors for handling in-progress runs.
+`queue: max` は `cancel-in-progress: true` と組み合わせることはできません。これは、進行中の実行の処理方法について、2 つのオプションが相反する動作を表すためです。
 
-```yaml
-Example: Using concurrency to cancel any in-progress job or run
-```
+### 例: 同時実行を使用して進行中のジョブまたは実行をキャンセルする
 
-〜するには use 同時実行制御 to cancel any in-progress ジョブ or run in GitHub Actions, you can use the 同時実行制御 key with the cancel-in-progress option set to true:
+GitHub Actions で同時実行を使用して進行中のジョブまたは実行をキャンセルするには、`cancel-in-progress` オプションを `true` に設定した `concurrency` キーを使用できます。
 
 ```yaml
 concurrency:
@@ -1016,35 +921,35 @@ concurrency:
   cancel-in-progress: true
 ```
 
-注意: in this example, without defining a particular 同時実行制御 group, GitHub Actions will cancel any in-progress run of the ジョブ or ワークフロー.
+この例では、特定の同時実行グループを定義しない場合、GitHub Actions はジョブまたはワークフローの進行中の実行をすべてキャンセルする点に注意してください。
 
-```yaml
-Example: Using a fallback value
-```
+### 例: フォールバック値を使用する
 
-もし build the group name with a property that is only defined for specific イベント, you can use a fallback value. 例えば、 github.head_ref is only defined on pull_request イベント. もし r ワークフロー responds to other イベント in addition to pull_request イベント, you will need to provide a fallback to avoid a syntax error. The following 同時実行制御 group cancels in-progress ジョブ or runs on pull_request イベント only; if github.head_ref is undefined, the 同時実行制御 group will fallback to the run ID, which is guaranteed to be both unique and defined for the run.
+特定のイベントでのみ定義されるプロパティを使用してグループ名を作成する場合は、フォールバック値を使用できます。たとえば、`github.head_ref` は `pull_request` イベントでのみ定義されます。ワークフローが `pull_request` イベントに加えて他のイベントにも応答する場合、構文エラーを避けるためにフォールバックを指定する必要があります。次の同時実行グループは、`pull_request` イベントでのみ進行中のジョブまたは実行をキャンセルします。`github.head_ref` が未定義の場合、同時実行グループは実行 ID にフォールバックします。これは、その実行に対して一意であり、かつ必ず定義されています。
 
 ```yaml
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
-Example: Only cancel in-progress jobs or runs for the current workflow
 ```
 
-もし have multiple ワークフロー in the same repository, 同時実行制御 group names must be unique across ワークフロー to avoid canceling in-progress ジョブ or runs from other ワークフロー. Otherwise, any previously in-progress or pending ジョブ will be canceled, regardless of the ワークフロー.
+### 例: 現在のワークフローの進行中のジョブまたは実行だけをキャンセルする
 
-〜するには only cancel in-progress runs of the same ワークフロー, you can use the github.ワークフロー property to build the 同時実行制御 group:
+同じリポジトリ内に複数のワークフローがある場合、他のワークフローの進行中のジョブまたは実行をキャンセルしないように、同時実行グループ名はワークフロー間で一意である必要があります。そうでない場合、以前から進行中または保留中のジョブは、ワークフローに関係なくキャンセルされます。
+
+同じワークフローの進行中の実行だけをキャンセルするには、`github.workflow` プロパティを使用して同時実行グループを作成できます。
 
 ```yaml
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-Example: Only cancel in-progress jobs on specific branches
 ```
 
-もし would like to cancel in-progress ジョブ on certain ブランチ but not on others, you can use conditional 式s with cancel-in-progress. 例えば、 you can do this if you would like to cancel in-progress ジョブ on development ブランチ but not on release ブランチ.
+### 例: 特定のブランチでのみ進行中のジョブをキャンセルする
 
-〜するには only cancel in-progress runs of the same ワークフロー when not running on a release ブランチ, you can set cancel-in-progress to an 式 similar to the following:
+特定のブランチでは進行中のジョブをキャンセルし、他のブランチではキャンセルしたくない場合は、`cancel-in-progress` で条件式を使用できます。たとえば、リリースブランチではなく開発ブランチで進行中のジョブをキャンセルしたい場合に、このようにできます。
+
+リリースブランチで実行されていない場合に、同じワークフローの進行中の実行だけをキャンセルするには、`cancel-in-progress` を次のような式に設定できます。
 
 ```yaml
 concurrency:
@@ -1052,27 +957,25 @@ concurrency:
   cancel-in-progress: ${{ !contains(github.ref, 'release/')}}
 ```
 
-In this example, multiple pushes to a release/1.2.3 ブランチ would not cancel in-progress runs. Pushes to another ブランチ, such as main, would cancel in-progress runs.
+この例では、`release/1.2.3` ブランチへの複数回のプッシュは、進行中の実行をキャンセルしません。`main` など別のブランチへのプッシュは、進行中の実行をキャンセルします。
 
 ## `jobs`
 
-A ワークフロー run is made up of one or more ジョブ, which run in parallel by デフォルト. 〜するには run ジョブ sequentially, you can define dependencies on other ジョブ using the ジョブ.<ジョブ_id>.needs keyword.
+ワークフロー実行は 1 つ以上のジョブで構成され、既定では並列に実行されます。ジョブを順番に実行するには、`jobs.<job_id>.needs` キーワードを使用して他のジョブへの依存関係を定義できます。
 
-Each ジョブ runs in a runner environment specified by runs-on.
+各ジョブは、`runs-on` で指定されたランナー環境で実行されます。
 
-次のことができます run an unlimited number of ジョブ as long as you are within the ワークフロー usage limits. 詳細については, see Billing and usage for GitHub-hosted runners and Actions limits for self-hosted runner usage limits.
+ワークフローの使用制限内であれば、ジョブはいくつでも実行できます。詳しくは、「GitHub ホストランナーの課金と使用状況」および「セルフホストランナーの使用制限に関する Actions の制限」を参照してください。
 
-もし need to find the unique identifier of a ジョブ running in a ワークフロー run, you can use the GitHub API. 詳細については, see REST API endpoints for GitHub Actions.
+ワークフロー実行内で実行されているジョブの一意の識別子を調べる必要がある場合は、GitHub API を使用できます。詳しくは、「GitHub Actions の REST API エンドポイント」を参照してください。
 
-ジョブ.<ジョブ_id>
+## `jobs.<job_id>`
 
-Use ジョブ.<ジョブ_id> to give your ジョブ a unique identifier. The key ジョブ_id is a string and its value is a map of the ジョブ's configuration data. You must replace <ジョブ_id> with a string that is unique to the ジョブ object. The <ジョブ_id> must start with a letter or _ and contain only alphanumeric characters, -, or _.
+`jobs.<job_id>` を使用して、ジョブに一意の識別子を付けます。キー `job_id` は文字列で、その値はジョブの構成データのマップです。`<job_id>` は、`jobs` オブジェクト内で一意の文字列に置き換える必要があります。`<job_id>` は英字または `_` で始まり、英数字、`-`、または `_` のみを含める必要があります。
 
-```yaml
-Example: Creating jobs
-```
+### 例: ジョブを作成する
 
-In this example, two ジョブ have been created, and their ジョブ_id values are my_first_ジョブ and my_second_ジョブ.
+この例では、2 つのジョブが作成され、それぞれの `job_id` 値は `my_first_job` と `my_second_job` です。
 
 ```yaml
 jobs:
@@ -1082,61 +985,43 @@ jobs:
     name: My second job
 ```
 
-ジョブ.<ジョブ_id>.name
+## `jobs.<job_id>.name`
 
-Use ジョブ.<ジョブ_id>.name to set a name for the ジョブ, which is displayed in the GitHub UI.
+`jobs.<job_id>.name` を使用して、GitHub UI に表示されるジョブの名前を設定します。
 
-ジョブ.<ジョブ_id>.権限
+## `jobs.<job_id>.permissions`
 
-For a specific ジョブ, you can use ジョブ.<ジョブ_id>.権限 to modify the デフォルト 権限 granted to the GITHUB_TOKEN, adding or removing access as required, so that you only allow the minimum required access. 詳細については, see Use GITHUB_TOKEN for authentication in ワークフロー.
+特定のジョブについて、`jobs.<job_id>.permissions` を使用すると、`GITHUB_TOKEN` に付与される既定の権限を変更し、必要に応じてアクセスを追加または削除して、必要最小限のアクセスだけを許可できます。詳しくは、「ワークフローでの認証に GITHUB_TOKEN を使用する」を参照してください。
 
-By specifying the permission within a ジョブ definition, you can configure a different set of 権限 for the GITHUB_TOKEN for each ジョブ, if required. Alternatively, you can specify the 権限 for all ジョブ in the ワークフロー. For information on defining 権限 at the ワークフロー level, see 権限.
+ジョブ定義内で権限を指定することで、必要に応じてジョブごとに `GITHUB_TOKEN` の異なる権限セットを構成できます。別の方法として、ワークフロー内のすべてのジョブに対して権限を指定することもできます。ワークフローレベルで権限を定義する方法については、`permissions` を参照してください。
 
-For each of the available 権限, shown in the table below, you can assign one of the access levels: read (if applicable), write, or none. write includes read. もし specify the access for any of these 権限, all of those that are not specified are set to none.
+次の表に示す利用可能な各権限には、`read`（該当する場合）、`write`、または `none` のいずれかのアクセスレベルを割り当てることができます。`write` には `read` が含まれます。これらの権限のいずれかについてアクセスを指定すると、指定されていない権限はすべて `none` に設定されます。
 
-Available 権限 and details of what each allows an action to do:
+利用可能な権限と、各権限でアクションが実行できることの詳細は次のとおりです。
 
-## Permission Allows an action using GITHUB_TOKEN to
+| 権限 | GITHUB_TOKEN を使用するアクションに許可される操作 |
+| --- | --- |
+| actions | GitHub Actions を操作します。たとえば、`actions: write` はアクションがワークフロー実行をキャンセルすることを許可します。詳しくは、「GitHub Apps に必要な権限」を参照してください。 |
+| artifact-metadata | アーティファクトのメタデータを操作します。たとえば、`artifact-metadata: write` はアクションがビルドアーティファクトの代わりにストレージレコードを作成することを許可します。詳しくは、「アーティファクトメタデータの REST API エンドポイント」を参照してください。 |
+| attestations | アーティファクトの証明を操作します。たとえば、`attestations: write` はアクションがビルドのアーティファクト証明を生成することを許可します。詳しくは、「ビルドの来歴を確立するためにアーティファクト証明を使用する」を参照してください。 |
+| checks | チェック実行とチェック スイートを操作します。たとえば、`checks: write` はアクションがチェック実行を作成することを許可します。詳しくは、「GitHub Apps に必要な権限」を参照してください。 |
+| code-quality | コード品質を操作します。たとえば、`code-quality: write` はアクションがコードカバレッジレポートをアップロードすることを許可します。詳しくは、「GitHub Code Quality について」を参照してください。 |
+| contents | リポジトリの内容を操作します。たとえば、`contents: read` はアクションがコミットを一覧表示することを許可し、`contents: write` はアクションがリリースを作成することを許可します。詳しくは、「GitHub Apps に必要な権限」を参照してください。 |
+| deployments | デプロイを操作します。たとえば、`deployments: write` はアクションが新しいデプロイを作成することを許可します。詳しくは、「GitHub Apps に必要な権限」を参照してください。 |
+| discussions | GitHub Discussions を操作します。たとえば、`discussions: write` はアクションがディスカッションを閉じたり削除したりすることを許可します。詳しくは、「ディスカッションに GraphQL API を使用する」を参照してください。 |
+| id-token | OpenID Connect (OIDC) トークンを取得します。これには `id-token: write` が必要です。詳しくは、「OpenID Connect」を参照してください。 |
+| issues | Issue を操作します。たとえば、`issues: write` はアクションが Issue にコメントを追加することを許可します。詳しくは、「GitHub Apps に必要な権限」を参照してください。 |
+| models | GitHub Models で AI 推論レスポンスを生成します。たとえば、`models: read` はアクションが GitHub Models 推論 API を使用することを許可します。「AI モデルでプロトタイプを作成する」を参照してください。 |
+| packages | GitHub Packages を操作します。たとえば、`packages: write` はアクションが GitHub Packages にパッケージをアップロードして公開することを許可します。詳しくは、「GitHub Packages の権限について」を参照してください。 |
+| pages | GitHub Pages を操作します。たとえば、`pages: write` はアクションが GitHub Pages ビルドを要求することを許可します。詳しくは、「GitHub Apps に必要な権限」を参照してください。 |
+| pull-requests | プルリクエストを操作します。たとえば、`pull-requests: write` はアクションがプルリクエストにラベルを追加することを許可します。詳しくは、「GitHub Apps に必要な権限」を参照してください。 |
+| security-events | GitHub コードスキャンアラートを操作します。たとえば、`security-events: read` はアクションがリポジトリのコードスキャンアラートを一覧表示することを許可し、`security-events: write` はアクションがコードスキャンアラートの状態を更新することを許可します。詳しくは、「コードスキャンアラート」のリポジトリ権限を参照してください。<br><br>Dependabot アラートには、`vulnerability-alerts` 権限を使用してください。シークレットスキャンアラートはこの権限では読み取れず、GitHub App または個人用アクセストークンが必要です。詳しくは、「GitHub Apps に必要な権限」の「シークレットスキャンアラート」のリポジトリ権限を参照してください。 |
+| statuses | コミットステータスを操作します。たとえば、`statuses:read` はアクションが特定の参照に対するコミットステータスを一覧表示することを許可します。詳しくは、「GitHub Apps に必要な権限」を参照してください。 |
+| vulnerability-alerts | Dependabot アラートを読み取ります。たとえば、`vulnerability-alerts: read` はアクションがリポジトリの Dependabot アラートを一覧表示することを許可します。`read` と `none` のみがサポートされ、`write` は有効ではありません。`write-all` または `read-all` が使用されると、`vulnerability-alerts` は自動的に `read` として含まれます。詳しくは、「Dependabot アラート」のリポジトリ権限を参照してください。 |
 
-actions Work with GitHub Actions. 例えば、 actions: write permits an action to cancel a ワークフロー run. 詳細については, see Permissions required for GitHub Apps.
+### GITHUB_TOKEN スコープのアクセスを定義する
 
-artifact-metadata Work with artifact metadata. 例えば、 artifact-metadata: write permits an action to create storage records on behalf of a build artifact. 詳細については, see REST API endpoints for artifact metadata.
-
-attestations Work with artifact attestations. 例えば、 attestations: write permits an action to generate an artifact attestation for a build. 詳細については, see Using artifact attestations to establish provenance for builds
-
-checks Work with check runs and check suites. 例えば、 checks: write permits an action to create a check run. 詳細については, see Permissions required for GitHub Apps.
-
-code-quality Work with code quality. 例えば、 code-quality: write permits an action to upload code coverage reports. 詳細については, see About GitHub Code Quality.
-
-contents Work with the contents of the repository. 例えば、 contents: read permits an action to list the commits, and contents: write allows the action to create a release. 詳細については, see Permissions required for GitHub Apps.
-
-deployments Work with deployments. 例えば、 deployments: write permits an action to create a new deployment. 詳細については, see Permissions required for GitHub Apps.
-
-discussions Work with GitHub Discussions. 例えば、 discussions: write permits an action to close or delete a discussion. 詳細については, see Using the GraphQL API for Discussions.
-
-id-token Fetch an OpenID Connect (OIDC) token. This requires id-token: write. 詳細については, see OpenID Connect
-
-issues Work with issues. 例えば、 issues: write permits an action to add a comment to an issue. 詳細については, see Permissions required for GitHub Apps.
-
-models Generate AI inference responses with GitHub Models. 例えば、 models: read permits an action to use the GitHub Models inference API. See Prototyping with AI models.
-
-packages Work with GitHub Packages. 例えば、 packages: write permits an action to upload and publish packages on GitHub Packages. 詳細については, see About 権限 for GitHub Packages.
-
-pages Work with GitHub Pages. 例えば、 pages: write permits an action to request a GitHub Pages build. 詳細については, see Permissions required for GitHub Apps.
-
-pull-requests Work with pull requests. 例えば、 pull-requests: write permits an action to add a label to a pull request. 詳細については, see Permissions required for GitHub Apps.
-
-security-イベント Work with GitHub code scanning alerts. 例えば、 security-イベント: read permits an action to list the code scanning alerts for the repository, and security-イベント: write allows an action to update the status of a code scanning alert. 詳細については, see Repository 権限 for "Code scanning alerts".
-
-For Dependabot alerts, use the vulnerability-alerts permission. Secret scanning alerts cannot be read with this permission and require a GitHub App or a personal access token. 詳細については, see Repository 権限 for "Secret scanning alerts" in "Permissions required for GitHub Apps."
-
-statuses Work with commit statuses. 例えば、 statuses:read permits an action to list the commit statuses for a given reference. 詳細については, see Permissions required for GitHub Apps.
-
-vulnerability-alerts Read Dependabot alerts. 例えば、 vulnerability-alerts: read permits an action to list Dependabot alerts for the repository. Only read and none are supported; write is not valid. 〜する場合、 write-all or read-all is used, vulnerability-alerts is automatically included as read. 詳細については, see Repository 権限 for "Dependabot alerts".
-
-## Defining access for the GITHUB_TOKEN scopes
-
-次のことができます define the access that the GITHUB_TOKEN will permit by specifying read, write, or none as the value of the available 権限 within the 権限 key.
+`permissions` キー内で利用可能な権限の値として `read`、`write`、または `none` を指定することで、`GITHUB_TOKEN` が許可するアクセスを定義できます。
 
 ```yaml
 permissions:
@@ -1154,62 +1039,55 @@ permissions:
   packages: read|write|none
   pages: read|write|none
   pull-requests: read|write|none
-```
 
-```yaml
   security-events: read|write|none
   statuses: read|write|none
   vulnerability-alerts: read|none
 ```
 
-もし specify the access for any of these 権限, all of those that are not specified are set to none.
+これらの権限のいずれかについてアクセスを指定すると、指定されていない権限はすべて `none` に設定されます。
 
-次のことができます use the following syntax to define one of read-all or write-all access for all of the available 権限:
+次の構文を使用して、利用可能なすべての権限に対して `read-all` または `write-all` のいずれかのアクセスを定義できます。
 
 ```yaml
 permissions: read-all
 permissions: write-all
 ```
 
-次のことができます use the following syntax to disable 権限 for all of the available 権限:
+次の構文を使用して、利用可能なすべての権限を無効にできます。
 
 ```yaml
 permissions: {}
 ```
 
-## Changing the 権限 in a forked repository
+### フォークされたリポジトリで権限を変更する
 
-次のことができます use the 権限 key to add and remove read 権限 for forked repositories, but typically you can't grant write access. The exception to this behavior is where an admin user has selected the Send write tokens to ワークフロー from pull requests option in the GitHub Actions settings. 詳細については, see Managing GitHub Actions settings for a repository.
+`permissions` キーを使用して、フォークされたリポジトリの読み取り権限を追加および削除できますが、通常は書き込みアクセスを付与できません。この動作の例外は、管理者ユーザーが GitHub Actions 設定で「プルリクエストからのワークフローに書き込みトークンを送信する」オプションを選択している場合です。詳しくは、「リポジトリの GitHub Actions 設定を管理する」を参照してください。
 
-```yaml
-Example: Setting the GITHUB_TOKEN permissions for one job in a workflow
-```
+### 例: ワークフロー内の 1 つのジョブに GITHUB_TOKEN 権限を設定する
 
-This example shows 権限 being set for the GITHUB_TOKEN that will only apply to the ジョブ named stale. Write access is granted for the issues and pull-requests 権限. All other 権限 will have no access.
+この例では、`stale` という名前のジョブにのみ適用される `GITHUB_TOKEN` の権限を設定しています。`issues` 権限と `pull-requests` 権限には書き込みアクセスが付与されます。他のすべての権限にはアクセスがありません。
 
 ```yaml
 jobs:
   stale:
     runs-on: ubuntu-latest
-```
 
-```yaml
     permissions:
       issues: write
       pull-requests: write
-```
 
-```yaml
     steps:
       - uses: actions/stale@v10
 ```
 
-ジョブ.<ジョブ_id>.needs
+## `jobs.<job_id>.needs`
 
-Use ジョブ.<ジョブ_id>.needs to identify any ジョブ that must complete successfully before this ジョブ will run. It can be a string or array of strings. If a ジョブ fails or is skipped, all ジョブ that need it are skipped unless the ジョブ use a conditional 式 that causes the ジョブ to continue. If a run contains a series of ジョブ that need each other, a failure or skip applies to all ジョブ in the dependency chain from the point of failure or skip onwards. もし would like a ジョブ to run even if a ジョブ it is dependent on did not succeed, use the always() conditional 式 in ジョブ.<ジョブ_id>.if.
+`jobs.<job_id>.needs` を使用して、このジョブが実行される前に正常に完了している必要があるジョブを指定します。これは文字列または文字列の配列にできます。ジョブが失敗またはスキップされた場合、そのジョブを必要とするすべてのジョブは、ジョブが続行されるようにする条件式を使用していない限りスキップされます。実行に互いを必要とする一連のジョブが含まれる場合、失敗またはスキップは、その失敗またはスキップの時点以降の依存関係チェーン内のすべてのジョブに適用されます。依存しているジョブが成功しなかった場合でもジョブを実行したい場合は、`jobs.<job_id>.if` で `always()` 条件式を使用します。
+
+### 例: 依存ジョブの成功を必須にする
 
 ```yaml
-Example: Requiring successful dependent jobs
 jobs:
   job1:
   job2:
@@ -1218,15 +1096,19 @@ jobs:
     needs: [job1, job2]
 ```
 
-In this example, ジョブ1 must complete successfully before ジョブ2 begins, and ジョブ3 waits for both ジョブ1 and ジョブ2 to complete.
+この例では、`job2` が開始する前に `job1` が正常に完了している必要があり、`job3` は `job1` と `job2` の両方が完了するのを待ちます。
 
-The ジョブ in this example run sequentially:
+この例のジョブは順番に実行されます。
 
 ```yaml
 job1
 job2
 job3
-Example: Not requiring successful dependent jobs
+```
+
+### 例: 依存ジョブの成功を必須にしない
+
+```yaml
 jobs:
   job1:
   job2:
@@ -1236,38 +1118,31 @@ jobs:
     needs: [job1, job2]
 ```
 
-In this example, ジョブ3 uses the always() conditional 式 so that it always runs after ジョブ1 and ジョブ2 have completed, regardless of whether they were successful. 詳細については, see Evaluate 式s in ワークフロー and actions.
+この例では、`job3` は `always()` 条件式を使用しているため、`job1` と `job2` が完了した後、それらが成功したかどうかに関係なく常に実行されます。詳しくは、「ワークフローとアクションで式を評価する」を参照してください。
 
-ジョブ.<ジョブ_id>.if
+## `jobs.<job_id>.if`
 
-次のことができます use the ジョブ.<ジョブ_id>.if conditional to prイベント a ジョブ from running unless a condition is met. 次のことができます use any supported コンテキスト and 式 to create a conditional. 詳細については on which コンテキストs are supported in this key, see Contexts reference.
+`jobs.<job_id>.if` 条件を使用すると、条件が満たされない限りジョブが実行されないようにできます。サポートされている任意のコンテキストと式を使用して、条件を作成できます。このキーでサポートされるコンテキストについて詳しくは、「コンテキストのリファレンス」を参照してください。
 
-## メモ
+> **メモ**
+>
+> `jobs.<job_id>.if` 条件は、`jobs.<job_id>.strategy.matrix` が適用される前に評価されます。
 
-The ジョブ.<ジョブ_id>.if condition is evaluated before ジョブ.<ジョブ_id>.strategy.matrix is applied.
+`if` 条件で式を使用する場合、GitHub Actions は `if` 条件を式として自動的に評価するため、任意で `${{ }}` 式構文を省略できます。ただし、この例外はすべての場所に適用されるわけではありません。
 
-```yaml
-When you use expressions in an if conditional, you can, optionally, omit the ${{ }} expression syntax because GitHub Actions automatically evaluates the if conditional as an expression. However, this exception does not apply everywhere.
-```
-
-```yaml
-You must always use the ${{ }} expression syntax or escape with '', "", or () when the expression starts with !, since ! is reserved notation in YAML format. For example:
-```
+式が `!` で始まる場合は、`!` が YAML 形式で予約された表記であるため、常に `${{ }}` 式構文を使用するか、`''`、`""`、または `()` でエスケープする必要があります。例:
 
 ```yaml
 if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
 ```
 
-詳細については, see Evaluate 式s in ワークフロー and actions.
+詳しくは、「ワークフローとアクションで式を評価する」を参照してください。
+
+### 例: 特定のリポジトリでのみジョブを実行する
+
+この例では、`if` を使用して、`production-deploy` ジョブを実行できるタイミングを制御します。リポジトリの名前が `octo-repo-prod` で、`octo-org` 組織内にある場合にのみ実行されます。それ以外の場合、ジョブはスキップ済みとしてマークされます。
 
 ```yaml
-Example: Only run job for specific repository
-```
-
-This example uses if to control when the production-deploy ジョブ can run. It will only run if the repository is named octo-repo-prod and is within the octo-org organization. Otherwise, the ジョブ will be marked as skipped.
-
-```yaml
-YAML
 name: example-workflow
 on: [push]
 jobs:
@@ -1282,33 +1157,30 @@ jobs:
       - run: npm install -g bats
 ```
 
-ジョブ.<ジョブ_id>.runs-on
+## `jobs.<job_id>.runs-on`
 
-Use ジョブ.<ジョブ_id>.runs-on to define the type of machine to run the ジョブ on.
+`jobs.<job_id>.runs-on` を使用して、ジョブを実行するマシンの種類を定義します。
 
-The destination machine can be either a GitHub-hosted runner, larger runner, or a self-hosted runner.
+宛先のマシンには、GitHub ホストランナー、大規模ランナー、またはセルフホストランナーを使用できます。
 
-次のことができます target runners based on the labels assigned to them, or their group membership, or a combination of these.
+ランナーに割り当てられたラベル、ランナーグループのメンバーシップ、またはこれらの組み合わせに基づいて、ランナーを対象にできます。
 
-次のことができます provide runs-on as:
+`runs-on` は次の形式で指定できます。
 
-A single string
+- 単一の文字列
+- 文字列を含む単一の変数
+- 文字列、文字列を含む変数、またはその両方の組み合わせの配列
+- `group` キーまたは `labels` キーを使用した `key: value` ペア
 
-A single variable containing a string
-
-An array of strings, variables containing strings, or a combination of both
-
-A key: value pair using the group or labels keys
-
-もし specify an array of strings or variables, your ワークフロー will execute on any runner that matches all of the specified runs-on values. 例えば、 here the ジョブ will only run on a self-hosted runner that has the labels linux, x64, and gpu:
+文字列または変数の配列を指定すると、ワークフローは、指定されたすべての `runs-on` 値に一致する任意のランナーで実行されます。たとえば、ここではジョブは `linux`、`x64`、`gpu` のラベルを持つセルフホストランナーでのみ実行されます。
 
 ```yaml
 runs-on: [self-hosted, linux, x64, gpu]
 ```
 
-詳細については, see Choosing self-hosted runners.
+詳しくは、「セルフホストランナーを選択する」を参照してください。
 
-次のことができます mix strings and variables in an array. For example:
+配列内で文字列と変数を混在させることができます。例:
 
 ```yaml
 on:
@@ -1320,9 +1192,7 @@ on:
         options:
         - Ubuntu
         - macOS
-```
 
-```yaml
 jobs:
   test:
     runs-on: [self-hosted, "${{ inputs.chosen-os }}"]
@@ -1330,114 +1200,100 @@ jobs:
     - run: echo Hello world!
 ```
 
-もし would like to run your ワークフロー on multiple machines, use ジョブ.<ジョブ_id>.strategy.
+複数のマシンでワークフローを実行したい場合は、`jobs.<job_id>.strategy` を使用します。
 
-## メモ
+> **メモ**
+>
+> `self-hosted` のような単純な文字列を囲む引用符は不要ですが、`"${{ inputs.chosen-os }}"` のような式には引用符が必要です。
 
-```yaml
-Quotation marks are not required around simple strings like self-hosted, but they are required for expressions like "${{ inputs.chosen-os }}".
-```
+### GitHub ホストランナーを選択する
 
-Choosing GitHub-hosted runners
+GitHub ホストランナーを使用する場合、各ジョブは `runs-on` で指定されたランナーイメージの新しいインスタンスで実行されます。
 
-もし use a GitHub-hosted runner, each ジョブ runs in a fresh instance of a runner image specified by runs-on.
+GitHub ホストランナーを使用している場合の `runs-on` の値は、ランナーラベルまたはランナーグループの名前です。標準 GitHub ホストランナーのラベルは、次の表に示されています。
 
-The value for runs-on, when you are using a GitHub-hosted runner, is a runner label or the name of a runner group. The labels for the standard GitHub-hosted runners are shown in the following tables.
+詳しくは、「GitHub ホストランナー」を参照してください。
 
-詳細については, see GitHub-hosted runners.
+### パブリックリポジトリ用の標準 GitHub ホストランナー
 
-Standard GitHub-hosted runners for public repositories
+パブリックリポジトリでは、次の表に示すワークフローラベルを使用するジョブは、関連付けられた仕様で実行されます。単一 CPU ランナーを除き、各 GitHub ホストランナーは GitHub によってホストされる新しい仮想マシン (VM) です。単一 CPU ランナーは、共有 VM 上のコンテナでホストされます。詳しくは、「GitHub ホストランナーのリファレンス」を参照してください。標準 GitHub ホストランナーの使用は、パブリックリポジトリでは無料かつ無制限です。
 
-For public repositories, ジョブ using the ワークフロー labels shown in the table below will run with the associated specifications. With the exception of single-CPU runners, each GitHub-hosted runner is a new virtual machine (VM) hosted by GitHub. Single-CPU runners are hosted in a container on a shared VM—see GitHub-hosted runners reference. Use of the standard GitHub-hosted runners is free and unlimited on public repositories.
+| 仮想マシン / コンテナ | プロセッサ (CPU) | メモリ (RAM) | ストレージ (SSD) | アーキテクチャ | ワークフローラベル |
+| --- | --- | --- | --- | --- | --- |
+| Linux | 1 | 5 GB | 14 GB | x64 | ubuntu-slim |
+| Linux | 4 | 16 GB | 14 GB | x64 | ubuntu-latest, ubuntu-24.04, ubuntu-22.04 |
+| Windows | 4 | 16 GB | 14 GB | x64 | windows-latest, windows-2025, windows-2025-vs2026, windows-2022 |
+| Linux | 4 | 16 GB | 14 GB | arm64 | ubuntu-24.04-arm, ubuntu-22.04-arm |
+| Windows | 4 | 16 GB | 14 GB | arm64 | windows-11-arm |
+| macOS | 4 | 14 GB | 14 GB | Intel | macos-15-intel, macos-26-intel |
+| macOS | 3 (M1) | 7 GB | 14 GB | arm64 | macos-latest, macos-14, macos-15, macos-26 |
 
-Virtual machine / container Processor (CPU) Memory (RAM) Storage (SSD) Architecture Workflow label
+### プライベートリポジトリ用の標準 GitHub ホストランナー
 
-## Linux 1 5 GB 14 GB x64 ubuntu-slim
+プライベートリポジトリでは、次の表に示すワークフローラベルを使用するジョブは、関連付けられた仕様の仮想マシンで実行されます。これらのランナーは GitHub アカウントに割り当てられた無料分の時間を使用し、その後は 1 分あたりの料金で課金されます。「Actions ランナーの料金」を参照してください。
 
-Linux 4 16 GB 14 GB x64 ubuntu-latest, ubuntu-24.04, ubuntu-22.04
+| 仮想マシン | プロセッサ (CPU) | メモリ (RAM) | ストレージ (SSD) | アーキテクチャ | ワークフローラベル |
+| --- | --- | --- | --- | --- | --- |
+| Linux | 1 | 5 GB | 14 GB | x64 | ubuntu-slim |
+| Linux | 2 | 8 GB | 14 GB | x64 | ubuntu-latest, ubuntu-24.04, ubuntu-22.04 |
+| Windows | 2 | 8 GB | 14 GB | x64 | windows-latest, windows-2025, windows-2022 |
+| Linux | 2 | 8 GB | 14 GB | arm64 | ubuntu-24.04-arm, ubuntu-22.04-arm |
+| Windows | 2 | 8 GB | 14 GB | arm64 | windows-11-arm |
+| macOS | 4 | 14 GB | 14 GB | Intel | macos-15-intel, macos-26-intel |
+| macOS | 3 (M1) | 7 GB | 14 GB | arm64 | macos-latest, macos-14, macos-15, macos-26 |
 
-## Windows 4 16 GB 14 GB x64 windows-latest, windows-2025, windows-2025-vs2026, windows-2022
+標準 GitHub ホストランナーに加えて、GitHub は GitHub Team および GitHub Enterprise Cloud プランのお客様に、高度な機能を備えた各種の管理された仮想マシンを提供しています。たとえば、より多くのコアとディスク容量、GPU 搭載マシン、ARM 搭載マシンなどです。詳しくは、「大規模ランナー」を参照してください。
 
-Linux 4 16 GB 14 GB arm64 ubuntu-24.04-arm, ubuntu-22.04-arm
+> **メモ**
+>
+> `-latest` ランナーイメージは GitHub が提供する最新の安定版イメージであり、オペレーティングシステムのベンダーから入手可能なオペレーティングシステムの最新バージョンではない場合があります。
 
-## Windows 4 16 GB 14 GB arm64 windows-11-arm
+> **警告**
+>
+> ベータ版および非推奨のイメージは、「現状有姿」、「すべての不具合を含む」および「提供可能な状態」で提供され、サービスレベル契約および保証の対象外です。ベータ版イメージはカスタマーサポートの対象外となる場合があります。
 
-## macOS 4 14 GB 14 GB Intel macos-15-intel, macos-26-intel
-
-macOS 3 (M1) 7 GB 14 GB arm64 macos-latest, macos-14, macos-15, macos-26
-
-Standard GitHub-hosted runners for private repositories
-
-For private repositories, ジョブ using the ワークフロー labels shown in the table below will run on virtual machines with the associated specifications. These runners use your GitHub account's allotment of free minutes, and are then charged at the per minute rates. See Actions runner pricing.
-
-Virtual Machine Processor (CPU) Memory (RAM) Storage (SSD) Architecture Workflow label
-
-## Linux 1 5 GB 14 GB x64 ubuntu-slim
-
-Linux 2 8 GB 14 GB x64 ubuntu-latest, ubuntu-24.04, ubuntu-22.04
-
-## Windows 2 8 GB 14 GB x64 windows-latest, windows-2025, windows-2022
-
-Linux 2 8 GB 14 GB arm64 ubuntu-24.04-arm, ubuntu-22.04-arm
-
-## Windows 2 8 GB 14 GB arm64 windows-11-arm
-
-## macOS 4 14 GB 14 GB Intel macos-15-intel, macos-26-intel
-
-macOS 3 (M1) 7 GB 14 GB arm64 macos-latest, macos-14, macos-15, macos-26
-
-In addition to the standard GitHub-hosted runners, GitHub offers customers on GitHub Team and GitHub Enterprise Cloud plans a range of managed virtual machines with advanced features - for example, more cores and disk space, GPU-powered machines, and ARM-powered machines. 詳細については, see Larger runners.
-
-## メモ
-
-The -latest runner images are the latest stable images that GitHub provides, and might not be the most recent version of the operating system available from the operating system vendor.
-
-## 警告
-
-Beta and Deprecated Images are provided "as-is", "with all faults" and "as available" and are excluded from the service level agreement and warranty. Beta Images may not be covered by customer support.
+### 例: オペレーティングシステムを指定する
 
 ```yaml
-Example: Specifying an operating system
 runs-on: ubuntu-latest
 ```
 
-詳細については, see GitHub-hosted runners.
+詳しくは、「GitHub ホストランナー」を参照してください。
 
-## Choosing self-hosted runners
+### セルフホストランナーを選択する
 
-〜するには specify a self-hosted runner for your ジョブ, configure runs-on in your ワークフロー file with self-hosted runner labels.
+ジョブにセルフホストランナーを指定するには、ワークフローファイルで `runs-on` をセルフホストランナーのラベルで構成します。
 
-Self-hosted runners may have the self-hosted label. 〜する場合、 setting up a self-hosted runner, by デフォルト we will include the label self-hosted. You may pass in the --no-デフォルト-labels flag to prイベント the self-hosted label from being applied. Labels can be used to create targeting options for runners, such as operating system or architecture, we recommend providing an array of labels that begins with self-hosted (this must be listed first) and then includes additional labels as needed. 〜する場合、 you specify an array of labels, ジョブ will be queued on runners that have all the labels that you specify.
+セルフホストランナーには `self-hosted` ラベルが付いている場合があります。セルフホストランナーを設定すると、既定では `self-hosted` ラベルが含まれます。`self-hosted` ラベルが適用されないようにするには、`--no-default-labels` フラグを渡すことができます。ラベルを使用すると、オペレーティングシステムやアーキテクチャなど、ランナーのターゲット指定オプションを作成できます。`self-hosted` で始まり（これは先頭に記載する必要があります）、必要に応じて追加のラベルを含めるラベル配列を指定することをおすすめします。ラベルの配列を指定すると、指定したすべてのラベルを持つランナーにジョブがキューに入れられます。
 
-## メモ
+> **メモ**
+>
+> Actions Runner Controller は `self-hosted` ラベルをサポートしていません。
 
-Actions Runner Controller does not support the self-hosted label.
+### 例: ランナー選択にラベルを使用する
 
 ```yaml
-Example: Using labels for runner selection
 runs-on: [self-hosted, linux]
 ```
 
-詳細については, see Self-hosted runners and Using self-hosted runners in a ワークフロー.
+詳しくは、「セルフホストランナー」および「ワークフローでセルフホストランナーを使用する」を参照してください。
 
-## Choosing runners in a group
+### グループ内のランナーを選択する
 
-次のことができます use runs-on to target runner groups, so that the ジョブ will execute on any runner that is a member of that group. For more granular control, you can also combine runner groups with labels.
+`runs-on` を使用してランナーグループを対象にできるため、ジョブはそのグループのメンバーである任意のランナーで実行されます。より細かく制御するには、ランナーグループとラベルを組み合わせることもできます。
 
-Runner groups can only have larger runners or self-hosted runners as members.
+ランナーグループには、大規模ランナーまたはセルフホストランナーのみをメンバーとして含めることができます。
 
-```yaml
-Example: Using groups to control where jobs are run
-```
+### 例: ジョブが実行される場所を制御するためにグループを使用する
 
-In this example, Ubuntu runners have been added to a group called ubuntu-runners. The runs-on key sends the ジョブ to any available runner in the ubuntu-runners group:
+この例では、Ubuntu ランナーが `ubuntu-runners` というグループに追加されています。`runs-on` キーは、ジョブを `ubuntu-runners` グループ内の利用可能な任意のランナーに送信します。
 
 ```yaml
 name: learn-github-actions
 on: [push]
 jobs:
   check-bats-version:
-    runs-on:
+    runs-on: 
       group: ubuntu-runners
     steps:
       - uses: actions/checkout@v6
@@ -1446,12 +1302,13 @@ jobs:
           node-version: '14'
       - run: npm install -g bats
       - run: bats -v
-Example: Combining groups and labels
 ```
 
-〜する場合、 you combine groups and labels, the runner must meet both requirements to be eligible to run the ジョブ.
+### 例: グループとラベルを組み合わせる
 
-In this example, a runner group called ubuntu-runners is populated with Ubuntu runners, which have also been assigned the label ubuntu-24.04-16core. The runs-on key combines group and labels so that the ジョブ is routed to any available runner within the group that also has a matching label:
+グループとラベルを組み合わせる場合、ジョブを実行する資格を得るには、ランナーが両方の要件を満たす必要があります。
+
+この例では、`ubuntu-runners` というランナーグループに Ubuntu ランナーが含まれており、これらには `ubuntu-24.04-16core` ラベルも割り当てられています。`runs-on` キーは `group` と `labels` を組み合わせているため、ジョブは、グループ内にあり、一致するラベルも持つ利用可能な任意のランナーにルーティングされます。
 
 ```yaml
 name: learn-github-actions
@@ -1470,54 +1327,62 @@ jobs:
       - run: bats -v
 ```
 
-ジョブ.<ジョブ_id>.snapshot
+## `jobs.<job_id>.snapshot`
 
-次のことができます use ジョブ.<ジョブ_id>.snapshot to generate a custom image.
+`jobs.<job_id>.snapshot` を使用すると、カスタムイメージを生成できます。
 
-Add the snapshot keyword to the ジョブ, using either the string syntax or mapping syntax as shown in Generating a custom image.
+「カスタムイメージの生成」に示されているように、文字列構文またはマッピング構文のいずれかを使用して、ジョブに `snapshot` キーワードを追加します。
 
-Each ジョブ that includes the snapshot keyword creates a separate image. 〜するには generate only one image or image version, include all ワークフロー ステップ in a single ジョブ. Each successful run of a ジョブ that includes the snapshot keyword creates a new version of that image.
+`snapshot` キーワードを含む各ジョブは、個別のイメージを作成します。1 つのイメージまたはイメージバージョンだけを生成するには、すべてのワークフローステップを 1 つのジョブに含めます。`snapshot` キーワードを含むジョブが正常に実行されるたびに、そのイメージの新しいバージョンが作成されます。
 
-詳細については, see Using custom images.
+詳しくは、「カスタムイメージの使用」を参照してください。
 
-ジョブ.<ジョブ_id>.environment
+## `jobs.<job_id>.environment`
 
-Use ジョブ.<ジョブ_id>.environment to define the environment that the ジョブ references.
+`jobs.<job_id>.environment` を使用して、ジョブが参照する環境を定義します。
 
-次のことができます provide the environment as only the environment name, or as an environment object with the name and url. The URL maps to environment_url in the deployments API. 詳細については about the deployments API, see REST API endpoints for repositories.
+環境は、環境名のみとして指定することも、`name` と `url` を持つ環境オブジェクトとして指定することもできます。この URL は、deployments API の `environment_url` に対応します。deployments API について詳しくは、「リポジトリ用 REST API エンドポイント」を参照してください。
 
-## メモ
+> **メモ**
+>
+> 環境を参照するジョブがランナーに送信される前に、すべてのデプロイ保護ルールに合格する必要があります。詳しくは、「デプロイ用環境の管理」を参照してください。
 
-All deployment protection rules must pass before a ジョブ referencing the environment is sent to a runner. 詳細については, see Managing environments for deployment.
+### 例: 単一の環境名を使用する
 
 ```yaml
-Example: Using a single environment name
 environment: staging_environment
-Example: Using environment name and URL
+```
+
+### 例: 環境名と URL を使用する
+
+```yaml
 environment:
   name: production_environment
   url: https://github.com
 ```
 
-The value of url can be an 式. Allowed 式 コンテキストs: github, inputs, vars, needs, strategy, matrix, ジョブ, runner, env, and ステップ. 詳細については about 式s, see Evaluate 式s in ワークフロー and actions.
+`url` の値には式を使用できます。使用できる式コンテキスト: `github`、`inputs`、`vars`、`needs`、`strategy`、`matrix`、`job`、`runner`、`env`、`steps`。式について詳しくは、「ワークフローとアクションで式を評価する」を参照してください。
+
+### 例: 出力を URL として使用する
 
 ```yaml
-Example: Using output as URL
 environment:
   name: production_environment
   url: ${{ steps.step_id.outputs.url_output }}
 ```
 
-The value of name can be an 式. Allowed 式 コンテキストs: github, inputs, vars, needs, strategy, and matrix. 詳細については about 式s, see Evaluate 式s in ワークフロー and actions.
+`name` の値には式を使用できます。使用できる式コンテキスト: `github`、`inputs`、`vars`、`needs`、`strategy`、`matrix`。式について詳しくは、「ワークフローとアクションで式を評価する」を参照してください。
+
+### 例: 式を環境名として使用する
 
 ```yaml
-Example: Using an expression as environment name
 environment:
   name: ${{ github.ref_name }}
-Example: Using an environment without creating a deployment
 ```
 
-Set deployment to false to use an environment's secrets and variables without creating a deployment object.
+### 例: デプロイを作成せずに環境を使用する
+
+デプロイオブジェクトを作成せずに環境のシークレットと変数を使用するには、`deployment` を `false` に設定します。
 
 ```yaml
 environment:
@@ -1525,83 +1390,73 @@ environment:
   deployment: false
 ```
 
-Setting deployment: false is not compatible with custom deployment protection rules. 詳細については, see Deploying with GitHub Actions.
+`deployment: false` の設定は、カスタムデプロイ保護ルールと互換性がありません。詳しくは、「GitHub Actions を使用したデプロイ」を参照してください。
 
-ジョブ.<ジョブ_id>.同時実行制御
+## `jobs.<job_id>.concurrency`
 
-次のことができます use ジョブ.<ジョブ_id>.同時実行制御 to ensure that only a single ジョブ or ワークフロー using the same 同時実行制御 group will run at a time. A 同時実行制御 group can be any string or 式. Allowed 式 コンテキストs: github, inputs, vars, needs, strategy, and matrix. 詳細については about 式s, see Evaluate 式s in ワークフロー and actions.
+`jobs.<job_id>.concurrency` を使用すると、同じ同時実行グループを使用するジョブまたはワークフローが、一度に 1 つだけ実行されるようにできます。同時実行グループには、任意の文字列または式を指定できます。使用できる式コンテキスト: `github`、`inputs`、`vars`、`needs`、`strategy`、`matrix`。式について詳しくは、「ワークフローとアクションで式を評価する」を参照してください。
 
-次のことができます also specify 同時実行制御 at the ワークフロー level. 詳細については, see 同時実行制御.
+ワークフローレベルで同時実行を指定することもできます。詳しくは、`concurrency` を参照してください。
 
-This means that there can be at most one running ジョブ or ワークフロー in a 同時実行制御 group at any time. 〜する場合、 a concurrent ジョブ or ワークフロー is queued, if another ジョブ or ワークフロー using the same 同時実行制御 group in the repository is in progress, the queued ジョブ or ワークフロー will be pending. By デフォルト, any existing pending ジョブ or ワークフロー in the same 同時実行制御 group will be canceled and the new queued ジョブ or ワークフロー will take its place.
+これは、同時実行グループ内で、実行中のジョブまたはワークフローが常に最大 1 つだけになることを意味します。同時実行するジョブまたはワークフローがキューに入ったとき、リポジトリ内で同じ同時実行グループを使用する別のジョブまたはワークフローが進行中の場合、キューに入ったジョブまたはワークフローは保留中になります。既定では、同じ同時実行グループ内に既存の保留中ジョブまたはワークフローがある場合、それはキャンセルされ、新しくキューに入ったジョブまたはワークフローが代わりに入ります。
 
-〜するには also cancel any currently running ジョブ or ワークフロー in the same 同時実行制御 group, specify cancel-in-progress: true. 〜するには conditionally cancel currently running ジョブ or ワークフロー in the same 同時実行制御 group, you can specify cancel-in-progress as an 式 with any of the allowed 式 コンテキストs.
+同じ同時実行グループ内で現在実行中のジョブまたはワークフローもキャンセルするには、`cancel-in-progress: true` を指定します。同じ同時実行グループ内で現在実行中のジョブまたはワークフローを条件付きでキャンセルするには、使用可能な任意の式コンテキストを使って `cancel-in-progress` を式として指定できます。
 
-〜するには allow more than one pending ジョブ or ワークフロー run to wait in the same 同時実行制御 group, use the optional queue property. The queue property accepts the following values:
+同じ同時実行グループ内で、複数の保留中のジョブまたはワークフロー実行を待機できるようにするには、省略可能な `queue` プロパティを使用します。`queue` プロパティは、次の値を受け付けます。
 
-single (デフォルト): At most one ジョブ or ワークフロー run can be pending in the 同時実行制御 group. 〜する場合、 a new ジョブ or ワークフロー run is queued, any existing pending ジョブ or ワークフロー run in the same group is canceled and replaced.
+`single`（既定）: 同時実行グループ内で保留中にできるジョブまたはワークフロー実行は最大 1 つです。新しいジョブまたはワークフロー実行がキューに入ると、同じグループ内の既存の保留中ジョブまたはワークフロー実行はキャンセルされ、置き換えられます。
+`max`: 同時実行グループ内で最大 100 個のジョブまたはワークフロー実行を保留中にできます。キューが満杯になると、追加のジョブまたはワークフロー実行はキャンセルされます。
+`queue: max` と `cancel-in-progress: true` の組み合わせは許可されておらず、ワークフロー検証エラーになります。
 
-```yaml
-max: Up to 100 jobs or workflow runs can be pending in the concurrency group. When the queue is full, any additional jobs or workflow runs are canceled.
-```
+> **メモ**
+>
+> 同時実行グループ名では、大文字と小文字は区別されません。たとえば、`prod` と `Prod` は同じ同時実行グループとして扱われます。
+> 同じ同時実行グループ内のジョブまたはワークフロー実行は、各ワークフローがディスパッチされた時刻ではなく、それぞれが同時実行グループで待機を開始した時刻に従って、先入れ先出し（FIFO）順に処理されます。ジョブまたは実行の実際の開始時刻は変動する可能性があるため、順序は保証されません。
 
-The combination of queue: max and cancel-in-progress: true is not allowed and will result in a ワークフロー validation error.
+### 例: 同時実行と既定の動作を使用する
 
-## メモ
+GitHub Actions の既定の動作では、複数のジョブまたはワークフロー実行を同時に実行できます。`concurrency` キーワードを使用すると、ワークフロー実行の同時実行を制御できます。
 
-The 同時実行制御 group name is case insensitive. 例えば、 prod and Prod will be treated as the same 同時実行制御 group.
-
-Jobs or ワークフロー runs in the same 同時実行制御 group are processed in first-in-first-out (FIFO) order according to the time each one started waiting on the 同時実行制御 group, not the time each ワークフロー was dispatched. Since the actual start time of a ジョブ or run may vary, ordering is not guaranteed.
-
-```yaml
-Example: Using concurrency and the default behavior
-```
-
-The デフォルト behavior of GitHub Actions is to allow multiple ジョブ or ワークフロー runs to run concurrently. The 同時実行制御 keyword allows you to control the 同時実行制御 of ワークフロー runs.
-
-例えば、 you can use the 同時実行制御 keyword immediately after where trigger conditions are defined to limit the 同時実行制御 of entire ワークフロー runs for a specific ブランチ:
+たとえば、トリガー条件が定義されている場所の直後に `concurrency` キーワードを使用して、特定のブランチに対するワークフロー実行全体の同時実行を制限できます。
 
 ```yaml
 on:
   push:
     branches:
       - main
-```
 
-```yaml
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 ```
 
-次のことができます also limit the 同時実行制御 of ジョブ within a ワークフロー by using the 同時実行制御 keyword at the ジョブ level:
+ジョブレベルで `concurrency` キーワードを使用して、ワークフロー内のジョブの同時実行を制限することもできます。
 
 ```yaml
 on:
   push:
     branches:
       - main
-```
 
-```yaml
 jobs:
   job-1:
     runs-on: ubuntu-latest
     concurrency:
       group: example-group
       cancel-in-progress: true
-Example: Concurrency groups
 ```
 
-Concurrency groups provide a way to manage and limit the execution of ワークフロー runs or ジョブ that share the same 同時実行制御 key.
+### 例: 同時実行グループ
 
-The 同時実行制御 key is used to group ワークフロー or ジョブ together into a 同時実行制御 group. 〜する場合、 you define a 同時実行制御 key, GitHub Actions ensures that only one ワークフロー or ジョブ with that key runs at any given time. If a new ワークフロー run or ジョブ starts with the same 同時実行制御 key, GitHub Actions will cancel any ワークフロー or ジョブ already running with that key. The 同時実行制御 key can be a hard-coded string, or it can be a dynamic 式 that includes コンテキスト variables.
+同時実行グループは、同じ同時実行キーを共有するワークフロー実行またはジョブの実行を管理し、制限する方法を提供します。
 
-It is possible to define 同時実行制御 conditions in your ワークフロー so that the ワークフロー or ジョブ is part of a 同時実行制御 group.
+同時実行キーは、ワークフローまたはジョブを同時実行グループにまとめるために使用されます。同時実行キーを定義すると、GitHub Actions は、そのキーを持つワークフローまたはジョブが常に 1 つだけ実行されるようにします。同じ同時実行キーで新しいワークフロー実行またはジョブが開始されると、GitHub Actions は、そのキーですでに実行中のワークフローまたはジョブをキャンセルします。同時実行キーには、ハードコーディングされた文字列、またはコンテキスト変数を含む動的な式を指定できます。
 
-This means that when a ワークフロー run or ジョブ starts, GitHub will cancel any ワークフロー runs or ジョブ that are already in progress in the same 同時実行制御 group. This is useful in scenarios where you want to prイベント parallel runs for a certain set of a ワークフロー or ジョブ, such as the ones used for deployments to a sタグing environment, in order to prイベント actions that could cause conflicts or consume more resources than necessary.
+ワークフロー内で同時実行条件を定義して、ワークフローまたはジョブが同時実行グループの一部になるようにできます。
 
-In this example, ジョブ-1 is part of a 同時実行制御 group named sタグing_environment. This means that if a new run of ジョブ-1 is triggered, any runs of the same ジョブ in the sタグing_environment 同時実行制御 group that are already in progress will be cancelled.
+これは、ワークフロー実行またはジョブが開始されると、GitHub が同じ同時実行グループ内ですでに進行中のワークフロー実行またはジョブをキャンセルすることを意味します。これは、ステージング環境へのデプロイに使用されるものなど、特定の一連のワークフローまたはジョブについて並列実行を防ぎ、競合を引き起こしたり必要以上にリソースを消費したりする可能性のあるアクションを防止したいシナリオで役立ちます。
+
+この例では、`job-1` は `staging_environment` という名前の同時実行グループの一部です。つまり、`job-1` の新しい実行がトリガーされると、`staging_environment` 同時実行グループ内ですでに進行中の同じジョブの実行はすべてキャンセルされます。
 
 ```yaml
 jobs:
@@ -1610,47 +1465,43 @@ jobs:
     concurrency:
       group: staging_environment
       cancel-in-progress: true
-Alternatively, using a dynamic expression such as concurrency: ci-${{ github.ref }} in your workflow means that the workflow or job would be part of a concurrency group named ci- followed by the reference of the branch or tag that triggered the workflow. In this example, if a new commit is pushed to the main branch while a previous run is still in progress, the previous run will be cancelled and the new one will start:
 ```
+
+または、ワークフローで `concurrency: ci-${{ github.ref }}` のような動的な式を使用すると、ワークフローまたはジョブは、ワークフローをトリガーしたブランチまたはタグの参照が `ci-` に続く名前の同時実行グループの一部になります。この例では、前の実行がまだ進行中の間に新しいコミットが `main` ブランチにプッシュされると、前の実行はキャンセルされ、新しい実行が開始されます。
 
 ```yaml
 on:
   push:
     branches:
       - main
-```
 
-```yaml
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
-Example: Queueing multiple pending runs
 ```
 
-By デフォルト, only one ジョブ or ワークフロー run can be pending in a 同時実行制御 group at a time. 〜するには allow multiple runs to queue instead of being canceled, set queue: max. With queue: max, up to 100 ジョブ or ワークフロー runs can wait in the 同時実行制御 group; once the queue is full, any additional runs are canceled.
+### 例: 複数の保留中実行をキューに入れる
 
-例えば、 the following ワークフロー queues deployments to the production environment, processing them one at a time in order based on when each run started waiting on the 同時実行制御 group:
+既定では、同時実行グループ内で保留中にできるジョブまたはワークフロー実行は、一度に 1 つだけです。キャンセルする代わりに複数の実行をキューに入れられるようにするには、`queue: max` を設定します。`queue: max` では、最大 100 個のジョブまたはワークフロー実行を同時実行グループ内で待機させることができます。キューが満杯になると、追加の実行はキャンセルされます。
+
+たとえば、次のワークフローは本番環境へのデプロイをキューに入れ、各実行が同時実行グループで待機を開始した時刻に基づく順序で、1 つずつ処理します。
 
 ```yaml
 on:
   push:
     branches:
       - main
-```
 
-```yaml
 concurrency:
   group: production-deploy
   queue: max
 ```
 
-注意: queue: max cannot be combined with cancel-in-progress: true, because the two options describe conflicting behaviors for handling in-progress runs.
+`queue: max` は `cancel-in-progress: true` と組み合わせることができない点に注意してください。この 2 つのオプションは、進行中の実行の処理について矛盾する動作を表すためです。
 
-```yaml
-Example: Using concurrency to cancel any in-progress job or run
-```
+### 例: 同時実行を使用して進行中のジョブまたは実行をキャンセルする
 
-〜するには use 同時実行制御 to cancel any in-progress ジョブ or run in GitHub Actions, you can use the 同時実行制御 key with the cancel-in-progress option set to true:
+GitHub Actions で同時実行を使用して進行中のジョブまたは実行をキャンセルするには、`cancel-in-progress` オプションを `true` に設定して `concurrency` キーを使用できます。
 
 ```yaml
 concurrency:
@@ -1658,35 +1509,35 @@ concurrency:
   cancel-in-progress: true
 ```
 
-注意: in this example, without defining a particular 同時実行制御 group, GitHub Actions will cancel any in-progress run of the ジョブ or ワークフロー.
+この例では、特定の同時実行グループを定義していない場合、GitHub Actions はそのジョブまたはワークフローの進行中の実行をすべてキャンセルする点に注意してください。
 
-```yaml
-Example: Using a fallback value
-```
+### 例: フォールバック値を使用する
 
-もし build the group name with a property that is only defined for specific イベント, you can use a fallback value. 例えば、 github.head_ref is only defined on pull_request イベント. もし r ワークフロー responds to other イベント in addition to pull_request イベント, you will need to provide a fallback to avoid a syntax error. The following 同時実行制御 group cancels in-progress ジョブ or runs on pull_request イベント only; if github.head_ref is undefined, the 同時実行制御 group will fallback to the run ID, which is guaranteed to be both unique and defined for the run.
+特定のイベントに対してのみ定義されるプロパティを使ってグループ名を作成する場合は、フォールバック値を使用できます。たとえば、`github.head_ref` は `pull_request` イベントでのみ定義されます。ワークフローが `pull_request` イベントに加えて他のイベントにも応答する場合は、構文エラーを回避するためにフォールバックを指定する必要があります。次の同時実行グループは、`pull_request` イベントでのみ進行中のジョブまたは実行をキャンセルします。`github.head_ref` が未定義の場合、同時実行グループは実行 ID にフォールバックします。実行 ID は、その実行について一意であり、定義されていることが保証されています。
 
 ```yaml
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
-Example: Only cancel in-progress jobs or runs for the current workflow
 ```
 
-もし have multiple ワークフロー in the same repository, 同時実行制御 group names must be unique across ワークフロー to avoid canceling in-progress ジョブ or runs from other ワークフロー. Otherwise, any previously in-progress or pending ジョブ will be canceled, regardless of the ワークフロー.
+### 例: 現在のワークフローの進行中ジョブまたは実行のみをキャンセルする
 
-〜するには only cancel in-progress runs of the same ワークフロー, you can use the github.ワークフロー property to build the 同時実行制御 group:
+同じリポジトリに複数のワークフローがある場合、他のワークフローの進行中ジョブまたは実行をキャンセルしないようにするには、同時実行グループ名はワークフロー間で一意である必要があります。そうしないと、ワークフローに関係なく、以前に進行中または保留中だったジョブはすべてキャンセルされます。
+
+同じワークフローの進行中実行のみをキャンセルするには、`github.workflow` プロパティを使用して同時実行グループを作成できます。
 
 ```yaml
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-Example: Only cancel in-progress jobs on specific branches
 ```
 
-もし would like to cancel in-progress ジョブ on certain ブランチ but not on others, you can use conditional 式s with cancel-in-progress. 例えば、 you can do this if you would like to cancel in-progress ジョブ on development ブランチ but not on release ブランチ.
+### 例: 特定のブランチでのみ進行中ジョブをキャンセルする
 
-〜するには only cancel in-progress runs of the same ワークフロー when not running on a release ブランチ, you can set cancel-in-progress to an 式 similar to the following:
+特定のブランチでは進行中ジョブをキャンセルし、他のブランチではキャンセルしたくない場合は、`cancel-in-progress` で条件式を使用できます。たとえば、開発ブランチでは進行中ジョブをキャンセルし、リリースブランチではキャンセルしたくない場合に、このようにできます。
+
+リリースブランチで実行されていない場合にのみ同じワークフローの進行中実行をキャンセルするには、次のような式を `cancel-in-progress` に設定できます。
 
 ```yaml
 concurrency:
@@ -1694,22 +1545,23 @@ concurrency:
   cancel-in-progress: ${{ !contains(github.ref, 'release/')}}
 ```
 
-In this example, multiple pushes to a release/1.2.3 ブランチ would not cancel in-progress runs. Pushes to another ブランチ, such as main, would cancel in-progress runs.
+この例では、`release/1.2.3` ブランチへの複数のプッシュは、進行中の実行をキャンセルしません。`main` など別のブランチへのプッシュは、進行中の実行をキャンセルします。
 
-ジョブ.<ジョブ_id>.outputs
+## `jobs.<job_id>.outputs`
 
-次のことができます use ジョブ.<ジョブ_id>.outputs to create a map of outputs for a ジョブ. Job outputs are available to all downstream ジョブ that depend on this ジョブ. 詳細については on defining ジョブ dependencies, see ジョブ.<ジョブ_id>.needs.
+`jobs.<job_id>.outputs` を使用して、ジョブの出力のマップを作成できます。ジョブの出力は、このジョブに依存するすべての下流ジョブで利用できます。ジョブの依存関係の定義について詳しくは、`jobs.<job_id>.needs` を参照してください。
 
-Outputs can be a maximum of 1 MB per ジョブ. The total of all outputs in a ワークフロー run can be a maximum of 50 MB. Size is approximated based on UTF-16 encoding.
+出力は、ジョブごとに最大 1 MB です。ワークフロー実行内のすべての出力の合計は、最大 50 MB です。サイズは UTF-16 エンコードに基づいて概算されます。
 
-Job outputs containing 式s are evaluated on the runner at the end of each ジョブ. Outputs containing secrets are redacted on the runner and not sent to GitHub Actions.
+式を含むジョブ出力は、各ジョブの終了時にランナー上で評価されます。シークレットを含む出力はランナー上で秘匿化され、GitHub Actions には送信されません。
 
-If an output is skipped because it may contain a secret, you will see the following warning message: "Skip output {output.Key} since it may contain secret." 詳細については on how to handle secrets, please refer to the 例: Masking and passing a secret between ジョブ or ワークフロー.
+出力がシークレットを含む可能性があるためスキップされた場合、次の警告メッセージが表示されます: "Skip output {output.Key} since it may contain secret." シークレットの扱い方について詳しくは、「例: ジョブまたはワークフロー間でシークレットをマスクして渡す」を参照してください。
 
-〜するには use ジョブ outputs in a dependent ジョブ, you can use the needs コンテキスト. 詳細については, see Contexts reference.
+依存ジョブでジョブ出力を使用するには、`needs` コンテキストを使用できます。詳しくは、「コンテキストのリファレンス」を参照してください。
+
+### 例: ジョブの出力を定義する
 
 ```yaml
-Example: Defining outputs for a job
 jobs:
   job1:
     runs-on: ubuntu-latest
@@ -1732,9 +1584,9 @@ jobs:
         run: echo "$OUTPUT1 $OUTPUT2"
 ```
 
-## Using Job Outputs in a Matrix Job
+### マトリックスジョブでジョブ出力を使用する
 
-Matrices can be used to generate multiple outputs of different names. 〜する場合、 using a matrix, ジョブ outputs will be combined from all ジョブ inside the matrix.
+マトリックスを使用すると、異なる名前の複数の出力を生成できます。マトリックスを使用する場合、ジョブ出力はマトリックス内のすべてのジョブから結合されます。
 
 ```yaml
 jobs:
@@ -1766,17 +1618,17 @@ jobs:
       - run: echo '${{ toJSON(needs.job1.outputs) }}'
 ```
 
-## 警告
+> **警告**
+>
+> Actions は、マトリックスジョブが実行される順序を保証しません。出力名が一意であることを確認してください。一意でない場合、最後に実行されたマトリックスジョブが出力値を上書きします。
 
-Actions does not guarantee the order that matrix ジョブ will run in. Ensure that the output name is unique, otherwise the last matrix ジョブ that runs will override the output value.
+## `jobs.<job_id>.env`
 
-ジョブ.<ジョブ_id>.env
+ジョブ内のすべてのステップで使用できる変数のマップです。ワークフロー全体または個々のステップに変数を設定できます。詳しくは、`env` と `jobs.<job_id>.steps[*].env` を参照してください。
 
-A map of variables that are available to all ステップ in the ジョブ. 次のことができます set variables for the entire ワークフロー or an individual ステップ. 詳細については, see env and ジョブ.<ジョブ_id>.ステップ[*].env.
+同じ名前の環境変数が複数定義されている場合、GitHub は最も具体的な変数を使用します。たとえば、ステップで定義された環境変数は、そのステップの実行中、同じ名前のジョブおよびワークフローの環境変数をオーバーライドします。ジョブに定義された環境変数は、そのジョブの実行中、同じ名前のワークフロー変数をオーバーライドします。
 
-〜する場合、 more than one environment variable is defined with the same name, GitHub uses the most specific variable. 例えば、 an environment variable defined in a ステップ will override ジョブ and ワークフロー environment variables with the same name, while the ステップ executes. An environment variable defined for a ジョブ will override a ワークフロー variable with the same name, while the ジョブ executes.
-
-### Example of ジョブ.<ジョブ_id>.env
+### `jobs.<job_id>.env` の例
 
 ```yaml
 jobs:
@@ -1785,56 +1637,50 @@ jobs:
       FIRST_NAME: Mona
 ```
 
-ジョブ.<ジョブ_id>.デフォルトs
+## `jobs.<job_id>.defaults`
 
-Use ジョブ.<ジョブ_id>.デフォルトs to create a map of デフォルト settings that will apply to all ステップ in the ジョブ. 次のことができます also set デフォルト settings for the entire ワークフロー. 詳細については, see デフォルトs.
+`jobs.<job_id>.defaults` を使用して、ジョブ内のすべてのステップに適用されるデフォルト設定のマップを作成します。ワークフロー全体にデフォルト設定を設定することもできます。詳しくは、`defaults` を参照してください。
 
-〜する場合、 more than one デフォルト setting is defined with the same name, GitHub uses the most specific デフォルト setting. 例えば、 a デフォルト setting defined in a ジョブ will override a デフォルト setting that has the same name defined in a ワークフロー.
+同じ名前のデフォルト設定が複数定義されている場合、GitHub は最も具体的なデフォルト設定を使用します。たとえば、ジョブで定義されたデフォルト設定は、ワークフローで定義された同じ名前のデフォルト設定をオーバーライドします。
 
-ジョブ.<ジョブ_id>.デフォルトs.run
+## `jobs.<job_id>.defaults.run`
 
-Use ジョブ.<ジョブ_id>.デフォルトs.run to provide デフォルト shell and working-directory to all run ステップ in the ジョブ.
+`jobs.<job_id>.defaults.run` を使用して、ジョブ内のすべての `run` ステップに既定のシェルと作業ディレクトリを指定します。
 
-次のことができます provide デフォルト shell and working-directory options for all run ステップ in a ジョブ. 次のことができます also set デフォルト settings for run for the entire ワークフロー. 詳細については, see デフォルトs.run.
+ジョブ内のすべての `run` ステップに、既定のシェルと作業ディレクトリのオプションを指定できます。ワークフロー全体の `run` にデフォルト設定を設定することもできます。詳しくは、`defaults.run` を参照してください。
 
-These can be overridden at the ジョブ.<ジョブ_id>.デフォルトs.run and ジョブ.<ジョブ_id>.ステップ[*].run levels.
+これらは、`jobs.<job_id>.defaults.run` レベルおよび `jobs.<job_id>.steps[*].run` レベルでオーバーライドできます。
 
-〜する場合、 more than one デフォルト setting is defined with the same name, GitHub uses the most specific デフォルト setting. 例えば、 a デフォルト setting defined in a ジョブ will override a デフォルト setting that has the same name defined in a ワークフロー.
+同じ名前のデフォルト設定が複数定義されている場合、GitHub は最も具体的なデフォルト設定を使用します。たとえば、ジョブで定義されたデフォルト設定は、ワークフローで定義された同じ名前のデフォルト設定をオーバーライドします。
 
-ジョブ.<ジョブ_id>.デフォルトs.run.shell
+## `jobs.<job_id>.defaults.run.shell`
 
-Use shell to define the shell for a ステップ. This keyword can reference several コンテキストs. 詳細については, see Contexts.
+`shell` を使用して、ステップのシェルを定義します。このキーワードは、複数のコンテキストを参照できます。詳しくは、「コンテキスト」を参照してください。
 
-## Supported platform shell parameter Description Command run internally
+| サポートされるプラットフォーム | シェルパラメーター | 説明 | 内部で実行されるコマンド |
+| --- | --- | --- | --- |
+| Linux / macOS | unspecified | Windows 以外のプラットフォームでの既定のシェルです。`bash` を明示的に指定した場合とは異なるコマンドが実行される点に注意してください。パスに `bash` が見つからない場合、これは `sh` として扱われます。 | bash -e {0} |
+| All | bash | `sh` へのフォールバックを備えた、Windows 以外のプラットフォームでの既定のシェルです。Windows で `bash` シェルを指定すると、Git for Windows に含まれる `bash` シェルが使用されます。 | bash --noprofile --norc -eo pipefail {0} |
+| All | pwsh | PowerShell Core です。GitHub はスクリプト名に拡張子 `.ps1` を追加します。 | pwsh -command ". '{0}'" |
+| All | python | `python` コマンドを実行します。 | python {0} |
+| Linux / macOS | sh | シェルが指定されておらず、パスに `bash` が見つからない場合の、Windows 以外のプラットフォームでのフォールバック動作です。 | sh -e {0} |
+| Windows | cmd | GitHub はスクリプト名に拡張子 `.cmd` を追加し、`{0}` を置換します。 | %ComSpec% /D /E:ON /V:OFF /S /C "CALL "{0}"". |
+| Windows | pwsh | これは Windows で使用される既定のシェルです。PowerShell Core です。GitHub はスクリプト名に拡張子 `.ps1` を追加します。セルフホスト Windows ランナーに PowerShell Core がインストールされていない場合は、代わりに PowerShell Desktop が使用されます。 | pwsh -command ". '{0}'". |
+| Windows | powershell | PowerShell Desktop です。GitHub はスクリプト名に拡張子 `.ps1` を追加します。 | powershell -command ". '{0}'". |
 
-Linux / macOS unspecified The デフォルト shell on non-Windows platforms. 注意: this runs a different command to when bash is specified explicitly. If bash is not found in the path, this is treated as sh. bash -e {0}
+同じ名前のデフォルト設定が複数定義されている場合、GitHub は最も具体的なデフォルト設定を使用します。たとえば、ジョブで定義されたデフォルト設定は、ワークフローで定義された同じ名前のデフォルト設定をオーバーライドします。
 
-All bash The デフォルト shell on non-Windows platforms with a fallback to sh. 〜する場合、 specifying a bash shell on Windows, the bash shell included with Git for Windows is used. bash --noprofile --norc -eo pipefail {0}
+## `jobs.<job_id>.defaults.run.working-directory`
 
-All pwsh The PowerShell Core. GitHub appends the extension .ps1 to your script name. pwsh -command ". '{0}'"
+`working-directory` を使用して、ステップのシェルの作業ディレクトリを定義します。このキーワードは、複数のコンテキストを参照できます。詳しくは、「コンテキスト」を参照してください。
 
-All python Executes the python command. python {0}
+> **ヒント**
+>
+> 割り当てる `working-directory` が、そこでシェルを実行する前にランナー上に存在していることを確認してください。同じ名前のデフォルト設定が複数定義されている場合、GitHub は最も具体的なデフォルト設定を使用します。たとえば、ジョブで定義されたデフォルト設定は、ワークフローで定義された同じ名前のデフォルト設定をオーバーライドします。
 
-Linux / macOS sh The fallback behavior for non-Windows platforms if no shell is provided and bash is not found in the path. sh -e {0}
-
-Windows cmd GitHub appends the extension .cmd to your script name and substitutes for {0}. %ComSpec% /D /E:ON /V:OFF /S /C "CALL "{0}"".
-
-Windows pwsh This is the デフォルト shell used on Windows. The PowerShell Core. GitHub appends the extension .ps1 to your script name. もし r self-hosted Windows runner does not have PowerShell Core installed, then PowerShell Desktop is used instead. pwsh -command ". '{0}'".
-
-Windows powershell The PowerShell Desktop. GitHub appends the extension .ps1 to your script name. powershell -command ". '{0}'".
-
-〜する場合、 more than one デフォルト setting is defined with the same name, GitHub uses the most specific デフォルト setting. 例えば、 a デフォルト setting defined in a ジョブ will override a デフォルト setting that has the same name defined in a ワークフロー.
-
-ジョブ.<ジョブ_id>.デフォルトs.run.working-directory
-
-Use working-directory to define the working directory for the shell for a ステップ. This keyword can reference several コンテキストs. 詳細については, see Contexts.
-
-## ヒント
-
-Ensure the working-directory you assign exists on the runner before you run your shell in it. 〜する場合、 more than one デフォルト setting is defined with the same name, GitHub uses the most specific デフォルト setting. 例えば、 a デフォルト setting defined in a ジョブ will override a デフォルト setting that has the same name defined in a ワークフロー.
+### 例: ジョブの既定の run ステップオプションを設定する
 
 ```yaml
-Example: Setting default run step options for a job
 jobs:
   job1:
     runs-on: ubuntu-latest
@@ -1844,23 +1690,19 @@ jobs:
         working-directory: ./scripts
 ```
 
-ジョブ.<ジョブ_id>.ステップ
+## `jobs.<job_id>.steps`
 
-A ジョブ contains a sequence of tasks called ステップ. Steps can run commands, run setup tasks, or run an action in your repository, a public repository, or an action published in a Docker registry. Not all ステップ run actions, but all actions run as a ステップ. Each ステップ runs in its own process in the runner environment and has access to the workspace and filesystem. Because ステップ run in their own process, changes to environment variables are not preserved between ステップ. GitHub provides built-in ステップ to set up and complete a ジョブ.
+ジョブには、ステップと呼ばれる一連のタスクが含まれます。ステップでは、コマンドの実行、セットアップ タスクの実行、リポジトリ内のアクション、パブリック リポジトリ内のアクション、または Docker レジストリに公開されたアクションの実行ができます。すべてのステップがアクションを実行するわけではありませんが、すべてのアクションはステップとして実行されます。各ステップはランナー環境内の独自プロセスで実行され、ワークスペースとファイルシステムにアクセスできます。ステップは独自プロセスで実行されるため、環境変数への変更はステップ間で保持されません。GitHub には、ジョブを設定して完了するための組み込みステップが用意されています。
 
-GitHub only displays the first 1,000 checks, however, you can run an unlimited number of ステップ as long as you are within the ワークフロー usage limits. 詳細については, see Billing and usage for GitHub-hosted runners and Actions limits for self-hosted runner usage limits.
+GitHub に表示されるチェックは最初の 1,000 件だけですが、ワークフローの使用制限内であれば、ステップ数に上限はありません。詳しくは GitHub ホステッド ランナーの課金と使用量、およびセルフホステッド ランナーの使用制限に関する Actions の制限を参照してください。
 
-### Example of ジョブ.<ジョブ_id>.ステップ
+### `jobs.<job_id>.steps` の例
 
 ```yaml
 name: Greeting from Mona
-```
 
-```yaml
 on: push
-```
 
-```yaml
 jobs:
   my-job:
     name: My Job
@@ -1876,43 +1718,38 @@ jobs:
           echo $MY_VAR $FIRST_NAME $MIDDLE_NAME $LAST_NAME.
 ```
 
-ジョブ.<ジョブ_id>.ステップ[*].id
+## `jobs.<job_id>.steps[*].id`
 
-A unique identifier for the ステップ. 次のことができます use the id to reference the ステップ in コンテキストs. 詳細については, see Contexts reference.
+ステップの一意の識別子です。`id` を使って、コンテキスト内でステップを参照できます。詳しくはコンテキストのリファレンスを参照してください。
 
-ジョブ.<ジョブ_id>.ステップ[*].if
+## `jobs.<job_id>.steps[*].if`
 
-次のことができます use the if conditional to prイベント a ステップ from running unless a condition is met. 次のことができます use any supported コンテキスト and 式 to create a conditional. 詳細については on which コンテキストs are supported in this key, see Contexts reference.
+`if` 条件を使うと、条件が満たされない限りステップが実行されないようにできます。サポートされている任意のコンテキストと式を使って条件を作成できます。このキーでサポートされているコンテキストについて詳しくは、コンテキストのリファレンスを参照してください。
 
-```yaml
-When you use expressions in an if conditional, you can, optionally, omit the ${{ }} expression syntax because GitHub Actions automatically evaluates the if conditional as an expression. However, this exception does not apply everywhere.
-```
+`if` 条件内で式を使う場合、GitHub Actions は `if` 条件を自動的に式として評価するため、必要に応じて `${{ }}` 式構文を省略できます。ただし、この例外はすべての場所に適用されるわけではありません。
 
-```yaml
-You must always use the ${{ }} expression syntax or escape with '', "", or () when the expression starts with !, since ! is reserved notation in YAML format. For example:
-```
+式が `!` で始まる場合、`!` は YAML 形式の予約表記であるため、必ず `${{ }}` 式構文を使うか、`''`、`""`、または `()` でエスケープする必要があります。例:
 
 ```yaml
 if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
 ```
 
-詳細については, see Evaluate 式s in ワークフロー and actions.
+詳しくは、ワークフローとアクションで式を評価する方法を参照してください。
 
-```yaml
-Example: Using contexts
-```
+### コンテキストを使う例
 
-This ステップ only runs when the イベント type is a pull_request and the イベント action is unassigned.
+このステップは、イベントの種類が `pull_request` で、イベント アクションが `unassigned` の場合にのみ実行されます。
 
 ```yaml
 steps:
   - name: My first step
     if: ${{ github.event_name == 'pull_request' && github.event.action == 'unassigned' }}
     run: echo This event is a pull request that had an assignee removed.
-Example: Using status check functions
 ```
 
-The my backup ステップ only runs when the previous ステップ of a ジョブ fails. 詳細については, see Evaluate 式s in ワークフロー and actions.
+### ステータス チェック関数を使う例
+
+`my backup step` は、ジョブの前のステップが失敗した場合にのみ実行されます。詳しくは、ワークフローとアクションで式を評価する方法を参照してください。
 
 ```yaml
 steps:
@@ -1921,14 +1758,13 @@ steps:
   - name: My backup step
     if: ${{ failure() }}
     uses: actions/heroku@1.0.0
-Example: Using secrets
 ```
 
-Secrets cannot be directly referenced in if: conditionals. Instead, consider setting secrets as ジョブ-level environment variables, then referencing the environment variables to conditionally run ステップ in the ジョブ.
+### シークレットを使う例
 
-```yaml
-If a secret has not been set, the return value of an expression referencing the secret (such as ${{ secrets.SuperSecret }} in the example) will be an empty string.
-```
+シークレットは `if:` 条件内で直接参照できません。代わりに、シークレットをジョブ レベルの環境変数として設定し、その環境変数を参照してジョブ内のステップを条件付きで実行することを検討してください。
+
+シークレットが設定されていない場合、そのシークレットを参照する式（例の `${{ secrets.SuperSecret }}` など）の戻り値は空文字列になります。
 
 ```yaml
 name: Run a step if a secret has been set
@@ -1945,30 +1781,28 @@ jobs:
         run: echo 'This step will only run if the secret does not have a value set.'
 ```
 
-詳細については, see Contexts reference and Using secrets in GitHub Actions.
+詳しくは、コンテキストのリファレンスと GitHub Actions でのシークレットの使用を参照してください。
 
-ジョブ.<ジョブ_id>.ステップ[*].name
+## `jobs.<job_id>.steps[*].name`
 
-A name for your ステップ to display on GitHub.
+GitHub に表示されるステップの名前です。
 
-ジョブ.<ジョブ_id>.ステップ[*].uses
+## `jobs.<job_id>.steps[*].uses`
 
-Selects an action to run as part of a ステップ in your ジョブ. An action is a reusable unit of code. 次のことができます use an action defined in the same repository as the ワークフロー, a public repository, or in a published Docker container image.
+ジョブ内のステップの一部として実行するアクションを選択します。アクションとは、再利用可能なコード単位です。ワークフローと同じリポジトリで定義されたアクション、パブリック リポジトリのアクション、または公開済みの Docker コンテナ イメージ内のアクションを使用できます。
 
-We strongly recommend that you include the version of the action you are using by specifying a Git ref, SHA, or Docker タグ. もし don't specify a version, it could break your ワークフロー or cause unexpected behavior when the action owner publishes an update.
+Git ref、SHA、または Docker タグを指定して、使用するアクションのバージョンを含めることを強くおすすめします。バージョンを指定しないと、アクションの所有者が更新を公開したときに、ワークフローが壊れたり、予期しない動作が発生したりする可能性があります。
 
-Using the commit SHA of a released action version is the safest for stability and security.
+リリース済みアクション バージョンのコミット SHA を使うことが、安定性とセキュリティの面で最も安全です。
+アクションがメジャー バージョン タグを公開している場合は、互換性を維持したまま重要な修正とセキュリティ パッチを受け取れることが期待できます。ただし、この動作はアクションの作者の裁量に委ねられます。
+アクションの既定ブランチを使うのは便利な場合がありますが、破壊的変更を含む新しいメジャー バージョンがリリースされると、ワークフローが壊れる可能性があります。
+一部のアクションでは、`with` キーワードを使って設定する必要がある入力が求められます。必要な入力を確認するには、アクションの README ファイルを確認してください。
 
-If the action publishes major version タグ, you should expect to receive critical fixes and security patches while still retaining compatibility. 注意: this behavior is at the discretion of the action's author.
+アクションは JavaScript ファイルまたは Docker コンテナのいずれかです。使用しているアクションが Docker コンテナの場合は、Linux 環境でジョブを実行する必要があります。詳しくは `runs-on` を参照してください。
 
-Using the デフォルト ブランチ of an action may be convenient, but if someone releases a new major version with a breaking change, your ワークフロー could break.
-
-Some actions require inputs that you must set using the with keyword. Review the action's README file to determine the inputs required.
-
-Actions are either JavaScript files or Docker containers. If the action you're using is a Docker container you must run the ジョブ in a Linux environment. For more details, see runs-on.
+### バージョン指定されたアクションを使う例
 
 ```yaml
-Example: Using versioned actions
 steps:
   # Reference a specific commit
   - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
@@ -1978,12 +1812,15 @@ steps:
   - uses: actions/checkout@v6.2.0
   # Reference a branch
   - uses: actions/checkout@main
-Example: Using a public action
 ```
 
-{owner}/{repo}@{ref}
+### パブリック アクションを使う例
 
-次のことができます specify a ブランチ, ref, or SHA in a public GitHub repository.
+```yaml
+{owner}/{repo}@{ref}
+```
+
+パブリック GitHub リポジトリ内のブランチ、ref、または SHA を指定できます。
 
 ```yaml
 jobs:
@@ -1995,12 +1832,15 @@ jobs:
       - name: My second step
         # Uses a specific version tag of a public repository
         uses: actions/aws@v2.0.1
-Example: Using a public action in a subdirectory
 ```
 
-{owner}/{repo}/{path}@{ref}
+### サブディレクトリ内のパブリック アクションを使う例
 
-A subdirectory in a public GitHub repository at a specific ブランチ, ref, or SHA.
+```yaml
+{owner}/{repo}/{path}@{ref}
+```
+
+パブリック GitHub リポジトリ内の特定のブランチ、ref、または SHA にあるサブディレクトリです。
 
 ```yaml
 jobs:
@@ -2008,32 +1848,31 @@ jobs:
     steps:
       - name: My first step
         uses: actions/aws/ec2@main
-Example: Using an action in the same repository as the workflow
 ```
 
+### ワークフローと同じリポジトリ内のアクションを使う例
+
+```yaml
 ./path/to/dir
+```
 
-The path to the directory that contains the action in your ワークフロー's repository. You must check out your repository before using the action.
+ワークフローのリポジトリ内で、アクションを含むディレクトリへのパスです。アクションを使用する前に、リポジトリをチェックアウトする必要があります。
 
-### Example repository file structure:
+リポジトリ ファイル構造の例:
 
+```text
 |-- hello-world (repository)
+|   |__ .github
+|       └── workflows
+|           └── my-first-workflow.yml
+|       └── actions
+|           |__ hello-world-action
+|               └── action.yml
+```
 
-| |__ .github
+このパスは、既定の作業ディレクトリ（`github.workspace`、`$GITHUB_WORKSPACE`）からの相対パス（`./`）です。アクションがリポジトリをワークフローとは異なる場所にチェックアウトする場合、ローカル アクションに使用する相対パスを更新する必要があります。
 
-## | └── ワークフロー
-
-| └── my-first-ワークフロー.yml
-
-## | └── actions
-
-## | |__ hello-world-action
-
-| └── action.yml
-
-The path is relative (./) to the デフォルト working directory (github.workspace, $GITHUB_WORKSPACE). If the action checks out the repository to a location different than the ワークフロー, the relative path used for local actions must be updated.
-
-### Example ワークフロー file:
+ワークフロー ファイルの例:
 
 ```yaml
 jobs:
@@ -2046,11 +1885,15 @@ jobs:
       # This step references the directory that contains the action.
       - name: Use local hello-world-action
         uses: ./.github/actions/hello-world-action
-Example: Using a Docker Hub action
+```
+
+### Docker Hub アクションを使う例
+
+```yaml
 docker://{image}:{tag}
 ```
 
-A Docker image published on Docker Hub.
+Docker Hub に公開されている Docker イメージです。
 
 ```yaml
 jobs:
@@ -2058,11 +1901,15 @@ jobs:
     steps:
       - name: My first step
         uses: docker://alpine:3.8
-Example: Using the GitHub Packages Container registry
+```
+
+### GitHub Packages Container registry を使う例
+
+```yaml
 docker://{host}/{image}:{tag}
 ```
 
-A public Docker image in the GitHub Packages Container registry.
+GitHub Packages Container registry 内のパブリック Docker イメージです。
 
 ```yaml
 jobs:
@@ -2070,11 +1917,15 @@ jobs:
     steps:
       - name: My first step
         uses: docker://ghcr.io/OWNER/IMAGE_NAME
-Example: Using a Docker public registry action
+```
+
+### Docker パブリック レジストリ アクションを使う例
+
+```yaml
 docker://{host}/{image}:{tag}
 ```
 
-A Docker image in a public registry. This example uses the Google Container Registry at gcr.io.
+パブリック レジストリ内の Docker イメージです。この例では、`gcr.io` の Google Container Registry を使用します。
 
 ```yaml
 jobs:
@@ -2082,14 +1933,15 @@ jobs:
     steps:
       - name: My first step
         uses: docker://gcr.io/cloud-builders/gradle
-Example: Using an action inside a different private repository than the workflow
 ```
 
-If the action is in an internal repository, or in a private repository configured to allow access from your ワークフロー's repository, you can reference the action directly. 詳細については, see Managing GitHub Actions settings for a repository and Managing GitHub Actions settings for a repository.
+### ワークフローとは別のプライベート リポジトリ内のアクションを使う例
 
-If the action isn't in a repository configured to allow access, you need to check out the repository and reference the action locally. Generate a personal access token and add the token as a secret. The following example shows this method for referencing an action. 詳細については, see Managing your personal access tokens and Using secrets in GitHub Actions.
+アクションが内部リポジトリにある場合、またはワークフローのリポジトリからのアクセスを許可するように構成されたプライベート リポジトリにある場合は、そのアクションを直接参照できます。詳しくは、リポジトリの GitHub Actions 設定の管理、およびリポジトリの GitHub Actions 設定の管理を参照してください。
 
-Replace PERSONAL_ACCESS_TOKEN in the example with the name of your secret.
+アクションがアクセスを許可するように構成されたリポジトリ内にない場合は、リポジトリをチェックアウトして、ローカルでアクションを参照する必要があります。個人用アクセス トークンを生成し、そのトークンをシークレットとして追加します。次の例は、アクションを参照するためのこの方法を示しています。詳しくは、個人用アクセス トークンの管理、および GitHub Actions でのシークレットの使用を参照してください。
+
+例の `PERSONAL_ACCESS_TOKEN` は、使用するシークレットの名前に置き換えてください。
 
 ```yaml
 jobs:
@@ -2106,24 +1958,24 @@ jobs:
         uses: ./.github/actions/my-private-repo/my-action
 ```
 
-Alternatively, use a GitHub App instead of a personal access token in order to ensure your ワークフロー continues to run even if the personal access token owner leaves. 詳細については, see Making authenticated API requests with a GitHub App in a GitHub Actions ワークフロー.
+または、個人用アクセス トークンの所有者が離脱した場合でもワークフローが実行され続けるように、個人用アクセス トークンの代わりに GitHub App を使用してください。詳しくは、GitHub Actions ワークフローで GitHub App を使って認証済み API 要求を行う方法を参照してください。
 
-ジョブ.<ジョブ_id>.ステップ[*].run
+## `jobs.<job_id>.steps[*].run`
 
-Runs command-line programs that do not exceed 21,000 characters using the operating system's shell. もし do not provide a name, the ステップ name will デフォルト to the text specified in the run command.
+オペレーティング システムのシェルを使って、21,000 文字を超えないコマンド ライン プログラムを実行します。名前を指定しない場合、ステップ名は `run` コマンドで指定されたテキストが既定になります。
 
-Commands run using non-login shells by デフォルト. 次のことができます choose a different shell and customize the shell used to run commands. 詳細については, see ジョブ.<ジョブ_id>.ステップ[*].shell.
+既定では、コマンドは非ログイン シェルを使って実行されます。別のシェルを選択し、コマンドの実行に使うシェルをカスタマイズできます。詳しくは `jobs.<job_id>.steps[*].shell` を参照してください。
 
-Each run keyword represents a new process and shell in the runner environment. 〜する場合、 you provide multi-line commands, each line runs in the same shell. For example:
+各 `run` キーワードは、ランナー環境内の新しいプロセスとシェルを表します。複数行のコマンドを指定すると、各行は同じシェルで実行されます。例:
 
-A single-line command:
+1 行のコマンド:
 
 ```yaml
 - name: Install Dependencies
   run: npm install
 ```
 
-A multi-line command:
+複数行のコマンド:
 
 ```yaml
 - name: Clean install dependencies and build
@@ -2132,9 +1984,9 @@ A multi-line command:
     npm run build
 ```
 
-ジョブ.<ジョブ_id>.ステップ[*].working-directory
+## `jobs.<job_id>.steps[*].working-directory`
 
-Using the working-directory keyword, you can specify the working directory of where to run the command.
+`working-directory` キーワードを使うと、コマンドを実行する作業ディレクトリを指定できます。
 
 ```yaml
 - name: Clean temp directory
@@ -2142,56 +1994,66 @@ Using the working-directory keyword, you can specify the working directory of wh
   working-directory: ./temp
 ```
 
-Alternatively, you can specify a デフォルト working directory for all run ステップ in a ジョブ, or for all run ステップ in the entire ワークフロー. 詳細については, see デフォルトs.run.working-directory and ジョブ.<ジョブ_id>.デフォルトs.run.working-directory.
+または、ジョブ内のすべての `run` ステップ、もしくはワークフロー全体のすべての `run` ステップに対して、既定の作業ディレクトリを指定できます。詳しくは `defaults.run.working-directory` と `jobs.<job_id>.defaults.run.working-directory` を参照してください。
 
-次のことができます also use a run ステップ to run a script. 詳細については, see Adding scripts to your ワークフロー.
+`run` ステップを使ってスクリプトを実行することもできます。詳しくは、ワークフローへのスクリプトの追加を参照してください。
 
-ジョブ.<ジョブ_id>.ステップ[*].shell
+## `jobs.<job_id>.steps[*].shell`
 
-次のことができます override the デフォルト shell settings in the runner's operating system and the ジョブ's デフォルト using the shell keyword. 次のことができます use built-in shell keywords, or you can define a custom set of shell options. The shell command that is run internally executes a temporary file that contains the commands specified in the run keyword.
+`shell` キーワードを使うと、ランナーのオペレーティング システムとジョブの既定のシェル設定を上書きできます。組み込みのシェル キーワードを使うことも、独自のシェル オプション セットを定義することもできます。内部で実行されるシェル コマンドは、`run` キーワードで指定されたコマンドを含む一時ファイルを実行します。
 
-## Supported platform shell parameter Description Command run internally
+| サポートされるプラットフォーム | シェル パラメーター | 説明 | 内部で実行されるコマンド |
+| --- | --- | --- | --- |
+| Linux / macOS | unspecified | Windows 以外のプラットフォームにおける既定のシェルです。これは `bash` を明示的に指定した場合とは異なるコマンドを実行する点に注意してください。パス内に `bash` が見つからない場合、これは `sh` として扱われます。 | bash -e {0} |
+| All | bash | Windows 以外のプラットフォームでの既定のシェルで、`sh` へのフォールバックがあります。Windows で `bash` シェルを指定すると、Git for Windows に含まれる `bash` シェルが使用されます。 | bash --noprofile --norc -eo pipefail {0} |
+| All | pwsh | PowerShell Core です。GitHub はスクリプト名に拡張子 `.ps1` を追加します。 | pwsh -command ". '{0}'" |
+| All | python | `python` コマンドを実行します。 | python {0} |
+| Linux / macOS | sh | シェルが指定されておらず、パス内に `bash` が見つからない場合の、Windows 以外のプラットフォームにおけるフォールバック動作です。 | sh -e {0} |
+| Windows | cmd | GitHub はスクリプト名に拡張子 `.cmd` を追加し、`{0}` に代入します。 | %ComSpec% /D /E:ON /V:OFF /S /C "CALL "{0}"". |
+| Windows | pwsh | これは Windows で使用される既定のシェルです。PowerShell Core です。GitHub はスクリプト名に拡張子 `.ps1` を追加します。セルフホステッド Windows ランナーに PowerShell Core がインストールされていない場合は、代わりに PowerShell Desktop が使用されます。 | pwsh -command ". '{0}'". |
+| Windows | powershell | PowerShell Desktop です。GitHub はスクリプト名に拡張子 `.ps1` を追加します。 | powershell -command ". '{0}'". |
 
-Linux / macOS unspecified The デフォルト shell on non-Windows platforms. 注意: this runs a different command to when bash is specified explicitly. If bash is not found in the path, this is treated as sh. bash -e {0}
+または、ジョブ内のすべての `run` ステップ、もしくはワークフロー全体のすべての `run` ステップに対して、既定のシェルを指定できます。詳しくは `defaults.run.shell` と `jobs.<job_id>.defaults.run.shell` を参照してください。
 
-All bash The デフォルト shell on non-Windows platforms with a fallback to sh. 〜する場合、 specifying a bash shell on Windows, the bash shell included with Git for Windows is used. bash --noprofile --norc -eo pipefail {0}
-
-All pwsh The PowerShell Core. GitHub appends the extension .ps1 to your script name. pwsh -command ". '{0}'"
-
-All python Executes the python command. python {0}
-
-Linux / macOS sh The fallback behavior for non-Windows platforms if no shell is provided and bash is not found in the path. sh -e {0}
-
-Windows cmd GitHub appends the extension .cmd to your script name and substitutes for {0}. %ComSpec% /D /E:ON /V:OFF /S /C "CALL "{0}"".
-
-Windows pwsh This is the デフォルト shell used on Windows. The PowerShell Core. GitHub appends the extension .ps1 to your script name. もし r self-hosted Windows runner does not have PowerShell Core installed, then PowerShell Desktop is used instead. pwsh -command ". '{0}'".
-
-Windows powershell The PowerShell Desktop. GitHub appends the extension .ps1 to your script name. powershell -command ". '{0}'".
-
-Alternatively, you can specify a デフォルト shell for all run ステップ in a ジョブ, or for all run ステップ in the entire ワークフロー. 詳細については, see デフォルトs.run.shell and ジョブ.<ジョブ_id>.デフォルトs.run.shell.
+### Bash を使ってコマンドを実行する例
 
 ```yaml
-Example: Running a command using Bash
 steps:
   - name: Display the path
     shell: bash
     run: echo $PATH
-Example: Running a command using Windows cmd
+```
+
+### Windows cmd を使ってコマンドを実行する例
+
+```yaml
 steps:
   - name: Display the path
     shell: cmd
     run: echo %PATH%
-Example: Running a command using PowerShell Core
+```
+
+### PowerShell Core を使ってコマンドを実行する例
+
+```yaml
 steps:
   - name: Display the path
     shell: pwsh
     run: echo ${env:PATH}
-Example: Using PowerShell Desktop to run a command
+```
+
+### PowerShell Desktop を使ってコマンドを実行する例
+
+```yaml
 steps:
   - name: Display the path
     shell: powershell
     run: echo ${env:PATH}
-Example: Running an inline Python script
+```
+
+### インライン Python スクリプトを実行する例
+
+```yaml
 steps:
   - name: Display the path
     shell: python
@@ -2200,11 +2062,11 @@ steps:
       print(os.environ['PATH'])
 ```
 
-## Custom shell
+### カスタム シェル
 
-次のことができます set the shell value to a template string using command [options] {0} [more_options]. GitHub interprets the first whitespace-delimited word of the string as the command, and inserts the file name for the temporary script at {0}.
+`shell` の値は、`command [options] {0} [more_options]` を使ったテンプレート文字列に設定できます。GitHub は文字列のうち空白で区切られた最初の単語をコマンドとして解釈し、`{0}` の位置に一時スクリプトのファイル名を挿入します。
 
-For example:
+例:
 
 ```yaml
 steps:
@@ -2214,45 +2076,40 @@ steps:
       print %ENV
 ```
 
-The command used, perl in this example, must be installed on the runner.
+この例の `perl` のように、使用されるコマンドはランナーにインストールされている必要があります。
 
-For information about the software included on GitHub-hosted runners, see GitHub-hosted runners.
+GitHub ホステッド ランナーに含まれるソフトウェアについては、GitHub ホステッド ランナーを参照してください。
 
-## Exit codes and error action preference
+### 終了コードとエラー アクション設定
 
-For built-in shell keywords, we provide the following デフォルトs that are executed by GitHub-hosted runners. You should use these guidelines when running shell scripts.
+組み込みのシェル キーワードについては、GitHub ホステッド ランナーによって実行される次の既定値を提供しています。シェル スクリプトを実行するときは、これらのガイドラインを使用してください。
 
-bash/sh:
+**`bash`/`sh`**
 
-By デフォルト, fail-fast behavior is enforced using set -e for both sh and bash. 〜する場合、 shell: bash is specified, -o pipefail is also applied to enforce early exit from pipelines that generate a non-zero exit status.
+- 既定では、`sh` と `bash` の両方で `set -e` を使ってフェイルファスト動作が適用されます。`shell: bash` を指定した場合は、ゼロ以外の終了ステータスを生成するパイプラインから早期終了するように、`-o pipefail` も適用されます。
+- シェル オプションにテンプレート文字列を指定することで、シェル パラメーターを完全に制御できます。たとえば、`bash {0}` です。
+- `sh` に似たシェルは、スクリプトで最後に実行されたコマンドの終了コードで終了します。これはアクションの既定の動作でもあります。ランナーは、この終了コードに基づいてステップの状態を失敗または成功として報告します。
 
-次のことができます take full control over shell parameters by providing a template string to the shell options. 例えば、 bash {0}.
+**`powershell`/`pwsh`**
 
-sh-like shells exit with the exit code of the last command executed in a script, which is also the デフォルト behavior for actions. The runner will report the status of the ステップ as fail/succeed based on this exit code.
+- 可能な場合はフェイルファスト動作になります。`pwsh` と `powershell` の組み込みシェルでは、スクリプト内容の先頭に `$ErrorActionPreference = 'stop'` を追加します。
+- アクションの状態にスクリプトの最後の終了コードが反映されるように、PowerShell スクリプトには `if ((Test-Path -LiteralPath variable:\LASTEXITCODE)) { exit $LASTEXITCODE }` を追加します。
+- 必要に応じて、組み込みシェルを使わずに、`pwsh -File {0}` や `powershell -Command "& '{0}'"` のようなカスタム シェル オプションを指定することで、いつでもこの動作を無効にできます。
 
-powershell/pwsh
+**`cmd`**
 
-Fail-fast behavior when possible. For pwsh and powershell built-in shell, we will prepend $ErrorActionPreference = 'stop' to script contents.
+- 各エラー コードを確認して適切に応答するようにスクリプトを記述する以外に、フェイルファスト動作を完全に有効にする方法はないようです。既定ではその動作を実際に提供できないため、この動作をスクリプトに記述する必要があります。
+- `cmd.exe` は最後に実行したプログラムのエラー レベルで終了し、そのエラー コードをランナーに返します。この動作は、以前の `sh` および `pwsh` の既定の動作と内部的に一貫しており、`cmd.exe` の既定でもあるため、この動作はそのまま維持されます。
 
-We append if ((Test-Path -LiteralPath variable:\LASTEXITCODE)) { exit $LASTEXITCODE } to powershell scripts so action statuses reflect the script's last exit code.
+## `jobs.<job_id>.steps[*].with`
 
-Users can always opt out by not using the built-in shell, and providing a custom shell option like: pwsh -File {0}, or powershell -Command "& '{0}'", depending on need.
+アクションで定義された入力パラメーターのマップです。各入力パラメーターはキーと値のペアです。入力パラメーターは環境変数として設定されます。変数には `INPUT_` というプレフィックスが付き、大文字に変換されます。
 
-## `cmd`
+Docker コンテナ用に定義された入力パラメーターは、`args` を使う必要があります。詳しくは `jobs.<job_id>.steps[*].with.args` を参照してください。
 
-There doesn't seem to be a way to fully opt into fail-fast behavior other than writing your script to check each error code and respond accordingly. Because we can't actually provide that behavior by デフォルト, you need to write this behavior into your script.
+### `jobs.<job_id>.steps[*].with` の例
 
-cmd.exe will exit with the error level of the last program it executed, and it will return the error code to the runner. This behavior is internally consistent with the previous sh and pwsh デフォルト behavior and is the cmd.exe デフォルト, so this behavior remains intact.
-
-ジョブ.<ジョブ_id>.ステップ[*].with
-
-A map of the input parameters defined by the action. Each input parameter is a key/value pair. Input parameters are set as environment variables. The variable is prefixed with INPUT_ and converted to upper case.
-
-Input parameters defined for a Docker container must use args. 詳細については, see ジョブ.<ジョブ_id>.ステップ[*].with.args.
-
-### Example of ジョブ.<ジョブ_id>.ステップ[*].with
-
-Defines the three input parameters (first_name, middle_name, and last_name) defined by the hello_world action. These input variables will be accessible to the hello-world action as INPUT_FIRST_NAME, INPUT_MIDDLE_NAME, and INPUT_LAST_NAME environment variables.
+`hello_world` アクションで定義された 3 つの入力パラメーター（`first_name`、`middle_name`、`last_name`）を定義します。これらの入力変数は、`INPUT_FIRST_NAME`、`INPUT_MIDDLE_NAME`、`INPUT_LAST_NAME` 環境変数として `hello-world` アクションからアクセスできます。
 
 ```yaml
 jobs:
@@ -2266,11 +2123,11 @@ jobs:
           last_name: Octocat
 ```
 
-ジョブ.<ジョブ_id>.ステップ[*].with.args
+## `jobs.<job_id>.steps[*].with.args`
 
-A string that defines the inputs for a Docker container. GitHub passes the args to the container's ENTRYPOINT when the container starts up. An array of strings is not supported by this parameter. A single argument that includes spaces should be surrounded by double quotes "".
+Docker コンテナの入力を定義する文字列です。GitHub は、コンテナの起動時に `args` をコンテナの `ENTRYPOINT` に渡します。このパラメーターでは文字列の配列はサポートされていません。空白を含む単一の引数は、二重引用符 `""` で囲む必要があります。
 
-### Example of ジョブ.<ジョブ_id>.ステップ[*].with.args
+### `jobs.<job_id>.steps[*].with.args` の例
 
 ```yaml
 steps:
@@ -2281,19 +2138,17 @@ steps:
       args: The ${{ github.event_name }} event triggered this step.
 ```
 
-The args are used in place of the CMD instruction in a Dockerfile. もし use CMD in your Dockerfile, use the guidelines ordered by preference:
+`args` は Dockerfile の `CMD` 命令の代わりに使われます。Dockerfile で `CMD` を使う場合は、優先順に並べた次のガイドラインを使用してください。
 
-Document required arguments in the action's README and omit them from the CMD instruction.
+- アクションの README に必須の引数を記載し、`CMD` 命令からは省略します。
+- `args` を指定しなくてもアクションを使用できる既定値を使います。
+- アクションが `--help` フラグまたは類似のものを公開している場合は、アクションが自己文書化されるように、それを既定値として使います。
 
-Use デフォルトs that allow using the action without specifying any args.
+## `jobs.<job_id>.steps[*].with.entrypoint`
 
-If the action exposes a --help flag, or something similar, use that as the デフォルト to make your action self-documenting.
+Dockerfile の Docker `ENTRYPOINT` を上書きします。または、まだ指定されていない場合は設定します。シェル形式と exec 形式を持つ Docker `ENTRYPOINT` 命令とは異なり、`entrypoint` キーワードは、実行する実行可能ファイルを定義する単一の文字列だけを受け入れます。
 
-ジョブ.<ジョブ_id>.ステップ[*].with.entrypoint
-
-Overrides the Docker ENTRYPOINT in the Dockerfile, or sets it if one wasn't already specified. Unlike the Docker ENTRYPOINT instruction which has a shell and exec form, entrypoint keyword accepts only a single string defining the executable to be run.
-
-### Example of ジョブ.<ジョブ_id>.ステップ[*].with.entrypoint
+### `jobs.<job_id>.steps[*].with.entrypoint` の例
 
 ```yaml
 steps:
@@ -2303,17 +2158,17 @@ steps:
       entrypoint: /a/different/executable
 ```
 
-The entrypoint keyword is meant to be used with Docker container actions, but you can also use it with JavaScript actions that don't define any inputs.
+`entrypoint` キーワードは Docker コンテナ アクションで使うことを意図していますが、入力を定義していない JavaScript アクションでも使用できます。
 
-ジョブ.<ジョブ_id>.ステップ[*].env
+## `jobs.<job_id>.steps[*].env`
 
-Sets variables for ステップ to use in the runner environment. 次のことができます also set variables for the entire ワークフロー or a ジョブ. 詳細については, see env and ジョブ.<ジョブ_id>.env.
+ランナー環境でステップが使用する変数を設定します。ワークフロー全体またはジョブに変数を設定することもできます。詳しくは `env` と `jobs.<job_id>.env` を参照してください。
 
-〜する場合、 more than one environment variable is defined with the same name, GitHub uses the most specific variable. 例えば、 an environment variable defined in a ステップ will override ジョブ and ワークフロー environment variables with the same name, while the ステップ executes. An environment variable defined for a ジョブ will override a ワークフロー variable with the same name, while the ジョブ executes.
+同じ名前の環境変数が複数定義されている場合、GitHub は最も限定的な変数を使用します。たとえば、ステップで定義された環境変数は、そのステップの実行中、同じ名前のジョブおよびワークフローの環境変数を上書きします。ジョブに定義された環境変数は、そのジョブの実行中、同じ名前のワークフロー変数を上書きします。
 
-Public actions may specify expected variables in the README file. もし are setting a secret or sensitive value, such as a password or token, you must set secrets using the secrets コンテキスト. 詳細については, see Contexts reference.
+公開アクションでは、README ファイルで想定される変数が指定されている場合があります。パスワードやトークンなどのシークレットまたは機密値を設定する場合は、`secrets` コンテキストを使用してシークレットを設定する必要があります。詳しくはコンテキストのリファレンスを参照してください。
 
-### Example of ジョブ.<ジョブ_id>.ステップ[*].env
+### `jobs.<job_id>.steps[*].env` の例
 
 ```yaml
 steps:
@@ -2324,43 +2179,196 @@ steps:
       LAST_NAME: Octocat
 ```
 
-ジョブ.<ジョブ_id>.ステップ[*].continue-on-error
+## `jobs.<job_id>.steps[*].continue-on-error`
 
-Prイベント a ジョブ from failing when a ステップ fails. Set to true to allow a ジョブ to pass when this ステップ fails.
+ステップが失敗したときにジョブが失敗するのを防ぎます。このステップが失敗してもジョブを成功として扱えるようにするには、`true` に設定します。
 
-ジョブ.<ジョブ_id>.ステップ[*].timeout-minutes
+## `jobs.<job_id>.steps[*].timeout-minutes`
 
-The maximum number of minutes to run the ステップ before killing the process. Maximum: 360 for both GitHub-hosted and self-hosted runners.
+プロセスを強制終了するまでにステップを実行できる最大分数です。最大値: GitHub ホストランナーとセルフホストランナーのどちらも 360 です。
 
-Fractional values are not supported. timeout-minutes must be a positive integer.
+小数値はサポートされていません。`timeout-minutes` は正の整数である必要があります。
 
-ジョブ.<ジョブ_id>.timeout-minutes
+## `jobs.job_id.steps[].background`
 
-The maximum number of minutes to let a ジョブ run before GitHub automatically cancels it. Default: 360
+ステップを非同期で実行し、ジョブがその完了を待たずに次のステップへ進むようにします。データベース、サーバー、監視タスクなど、ほかのステップと並行して実行する必要がある長時間実行プロセスには `background true` を使用します。後で `wait` または `wait-all` を使用してバックグラウンドステップと同期するか、`cancel` で停止します。
 
-If the timeout exceeds the ジョブ execution time limit for the runner, the ジョブ will be canceled when the execution time limit is met instead. 詳細については about ジョブ execution time limits, see Billing and usage for GitHub-hosted runners and Actions limits for self-hosted runner usage limits.
+`run` または `uses` を使用するステップで `background` を使用できます。`wait` または `cancel` からバックグラウンドステップを参照するには、`id` を指定します。1 つのジョブで同時に実行できるバックグラウンドステップは最大 10 個です。追加のバックグラウンドステップは、空き枠ができるまでキューに入れられます。
 
-## メモ
+バックグラウンドステップからの出力と環境の変更は、そのステップを含む `wait` または `wait-all` ステップを実行した後にのみ使用できます。バックグラウンドステップが失敗した場合、そのステップを含む次の `wait` または `wait-all` でジョブが失敗します（そのステップに `continue-on-error` が設定されている場合を除きます）。ジョブ後のクリーンアップの前には、暗黙的な `wait-all` が実行されます。
 
-The GITHUB_TOKEN expires when a ジョブ finishes or after a maximum of 24 hours. For self-hosted runners, the token may be the limiting factor if the ジョブ timeout is greater than 24 hours. 詳細については on the GITHUB_TOKEN, see Use GITHUB_TOKEN for authentication in ワークフロー.
+後続のステップの実行中に稼働し続けるサーバーやデータベースのような長時間実行プロセスを開始する細かな制御、`wait` または `cancel` による特定のステップの参照、またはバックグラウンド作業とほかのステップの交互実行が必要な場合は、`background` を使用します。一方、ジョブが続行する前にすべて完了すべき自己完結したステップのグループがある場合は、`parallel` の方が便利な省略表現です。
 
-ジョブ.<ジョブ_id>.strategy
+> **メモ**
+>
+> コンポジットアクション内のステップでは `background` を使用できません。コンポジットアクション自体はバックグラウンドステップとして実行できますが、その内部でバックグラウンドステップを宣言することはできません。
 
-Use ジョブ.<ジョブ_id>.strategy to use a matrix strategy for your ジョブ. A matrix strategy lets you use variables in a single ジョブ definition to automatically create multiple ジョブ runs that are based on the combinations of the variables. 例えば、 you can use a matrix strategy to test your code in multiple versions of a language or on multiple operating systems. 詳細については, see Running variations of ジョブ in a ワークフロー.
+### 例: バックグラウンドでステップを実行する
 
-ジョブ.<ジョブ_id>.strategy.matrix
+```text
+steps
+  - name Start server
+    id server
+    run npm start
+    background true
 
-Use ジョブ.<ジョブ_id>.strategy.matrix to define a matrix of different ジョブ configurations. 詳細については, see Running variations of ジョブ in a ワークフロー.
+  - name Run tests against the server
+    run npm test
 
-A matrix will generate a maximum of 256 ジョブ per ワークフロー run. This limit applies to both GitHub-hosted and self-hosted runners.
+  - name Wait for the server step to finish
+    wait server
+```
 
-The variables that you define become properties in the matrix コンテキスト, and you can reference the property in other areas of your ワークフロー file. In this example, you can use matrix.version and matrix.os to access the current value of version and os that the ジョブ is using. 詳細については, see Contexts reference.
+## `jobs.job_id.steps[].wait`
 
-By デフォルト, GitHub will maximize the number of ジョブ run in parallel depending on runner availability. The order of the variables in the matrix determines the order in which the ジョブ are created. The first variable you define will be the first ジョブ that is created in your ワークフロー run.
+1 つ以上のバックグラウンドステップが完了するまでジョブを一時停止します。`wait` ステップ自体は作業を行わず、参照されたバックグラウンドステップが完了するまでブロックするだけです。単一のステップ `id` を文字列として指定するか、複数のステップ `id` を配列として指定します。
 
-## Using a single-dimension matrix
+`wait` ステップが完了すると、参照されたバックグラウンドステップの出力を後続のステップで使用できるようになります。参照されたバックグラウンドステップが失敗した場合、`wait` ステップも失敗します。
 
-The following ワークフロー defines the variable version with the values [10, 12, 14]. The ワークフロー will run three ジョブ, one for each value in the variable. Each ジョブ will access the version value through the matrix.version コンテキスト and pass the value as node-version to the actions/setup-node action.
+> **メモ**
+>
+> `wait` ステップは常に実行され、`if` 条件はサポートしません。
+
+### 例: 特定のバックグラウンドステップを待機する
+
+```text
+steps
+  - name Build frontend
+    id build-frontend
+    run npm run buildfrontend
+    background true
+
+  - name Build backend
+    id build-backend
+    run npm run buildbackend
+    background true
+
+  - name Run linter while builds run
+    run npm run lint
+
+  - name Wait for both builds to finish
+    wait [build-frontend, build-backend]
+
+  - name Run tests
+    run npm test
+```
+
+## `jobs.job_id.steps[].wait-all`
+
+アクティブなすべてのバックグラウンドステップが完了するまでジョブを一時停止します。複数のバックグラウンドステップが実行中で、続行する前にすべてを完了させたい場合に便利です。`wait` と同様に、`wait-all` ステップは、待機対象のバックグラウンドステップのいずれかが失敗した場合、`continue-on-error` を `true` に設定していない限り失敗します。
+
+`wait-all` キーワードは引数を取りません。
+
+> **メモ**
+>
+> `wait-all` ステップは常に実行され、`if` 条件はサポートしません。
+
+### 例: すべてのバックグラウンドステップを待機する
+
+```text
+steps
+  - name Start database
+    id db
+    run docker run -d postgres15
+    background true
+
+  - name Start cache
+    id cache
+    run docker run -d redis7
+    background true
+
+  - name Run integration tests
+    run npm run testintegration
+
+  - name Wait for all services to stop
+    wait-all
+```
+
+## `jobs.job_id.steps[].cancel`
+
+実行中のバックグラウンドステップを正常終了させます。ランナーはステップのプロセスに終了シグナル（SIGTERM）を送信してクリーンアップできるようにし、短い猶予期間内に終了しない場合は強制的に停止（SIGKILL）します。`cancel` キーワードは、単一のバックグラウンドステップをその `id` で対象にします。
+
+> **メモ**
+>
+> `cancel` ステップは常に実行され、`if` 条件はサポートしません。
+
+### 例: バックグラウンドステップをキャンセルする
+
+```text
+steps
+  - name Start long-running monitor
+    id monitor
+    run .scriptsmonitor.sh
+    background true
+
+  - name Run the main task
+    run npm test
+
+  - name Stop the monitor
+    cancel monitor
+```
+
+## `jobs.job_id.steps[].parallel`
+
+ステップのグループを同時に実行し、続行する前にそれらすべてが完了するまで待機します。`parallel` キーワードは、グループ内の各ステップをバックグラウンドステップとして実行し、グループの最後で暗黙的に待機するための省略表現です。同時に実行できる独立したステップのグループがあり、それらを個別に参照する必要がない場合に使用します。
+
+複数のコンポーネントを一度にビルドする場合など、ジョブが先に進む前にすべて完了すべき自己完結したステップのグループがある場合は、`parallel` を使用します。後続のステップの実行中に稼働し続けるサーバーやデータベースのような長時間実行プロセスを開始する細かな制御、`wait` または `cancel` による特定のステップの参照、またはバックグラウンド作業とほかのステップの交互実行が必要な場合は、`background` を使用します。要するに、`parallel` はより限定的ですが「このグループを一度に実行する」場合にはより便利であり、`background` は汎用的な基本機能です。
+
+グループ内の各ステップには、ほかのバックグラウンドステップと同じ 10 ステップの同時実行制限が適用されます。
+
+> **メモ**
+>
+> コンポジットアクション内では `parallel` を使用できません。
+
+### 例: ステップを並列に実行する
+
+```text
+steps
+  - uses actionscheckout@v6
+
+  - parallel
+      - name Build frontend
+        run npm run buildfrontend
+
+      - name Build backend
+        run npm run buildbackend
+
+      - name Build docs
+        run npm run builddocs
+
+  - name Run tests after all builds complete
+    run npm test
+```
+
+上記のグループは、各ステップに `background true` を指定して宣言し、その後に `wait` ステップを置くことと同等です。
+
+## `jobs.<job_id>.timeout-minutes`
+
+GitHub が自動的にジョブをキャンセルするまでにジョブを実行できる最大分数です。既定値: 360
+
+タイムアウトがランナーのジョブ実行時間制限を超えている場合は、代わりに実行時間制限に達した時点でジョブがキャンセルされます。ジョブ実行時間制限について詳しくは、GitHub ホストランナーの課金と使用状況、およびセルフホストランナーの使用制限に関する Actions の制限を参照してください。
+
+> **メモ**
+>
+> GITHUB_TOKEN は、ジョブが終了したとき、または最大 24 時間後に期限切れになります。セルフホストランナーでは、ジョブのタイムアウトが 24 時間を超える場合、トークンが制限要因になることがあります。GITHUB_TOKEN について詳しくは、ワークフローでの認証に GITHUB_TOKEN を使用する方法を参照してください。
+
+## `jobs.<job_id>.strategy`
+
+ジョブでマトリックス戦略を使用するには、`jobs.<job_id>.strategy` を使用します。マトリックス戦略を使用すると、単一のジョブ定義内で変数を使用し、その変数の組み合わせに基づいて複数のジョブ実行を自動的に作成できます。たとえば、マトリックス戦略を使用して、複数の言語バージョンや複数のオペレーティングシステムでコードをテストできます。詳しくは、ワークフローでジョブのバリエーションを実行する方法を参照してください。
+
+## `jobs.<job_id>.strategy.matrix`
+
+さまざまなジョブ構成のマトリックスを定義するには、`jobs.<job_id>.strategy.matrix` を使用します。詳しくは、ワークフローでジョブのバリエーションを実行する方法を参照してください。
+
+マトリックスでは、1 回のワークフロー実行につき最大 256 個のジョブが生成されます。この制限は、GitHub ホストランナーとセルフホストランナーの両方に適用されます。
+
+定義した変数は `matrix` コンテキストのプロパティになり、ワークフローファイルのほかの場所でそのプロパティを参照できます。この例では、`matrix.version` と `matrix.os` を使用して、ジョブが使用している `version` と `os` の現在値にアクセスできます。詳しくはコンテキストのリファレンスを参照してください。
+
+既定では、GitHub はランナーの可用性に応じて、並列に実行されるジョブ数を最大化します。マトリックス内の変数の順序によって、ジョブが作成される順序が決まります。最初に定義した変数が、ワークフロー実行で最初に作成されるジョブになります。
+
+### 単一次元のマトリックスを使用する
+
+次のワークフローでは、変数 `version` を値 `[10, 12, 14]` で定義しています。このワークフローは、変数内の各値に対して 1 つずつ、合計 3 つのジョブを実行します。各ジョブは `matrix.version` コンテキストを通じて `version` 値にアクセスし、その値を `actions/setup-node` アクションに `node-version` として渡します。
 
 ```yaml
 jobs:
@@ -2374,17 +2382,16 @@ jobs:
           node-version: ${{ matrix.version }}
 ```
 
-## Using a multi-dimensional matrix
+### 多次元のマトリックスを使用する
 
-Specify multiple variables to create a multi-dimensional matrix. A ジョブ will run for each possible combination of the variables.
+複数の変数を指定して、多次元のマトリックスを作成します。ジョブは、変数のすべての可能な組み合わせごとに実行されます。
 
-例えば、 the following ワークフロー specifies two variables:
+たとえば、次のワークフローでは 2 つの変数を指定しています。
 
-## Two operating systems specified in the os variable
+- `os` 変数に指定された 2 つのオペレーティングシステム
+- `version` 変数に指定された 3 つの Node.js バージョン
 
-Three Node.js versions specified in the version variable
-
-The ワークフロー will run six ジョブ, one for each combination of the os and version variables. Each ジョブ will set the runs-on value to the current os value and will pass the current version value to the actions/setup-node action.
+このワークフローは、`os` 変数と `version` 変数の各組み合わせに対して 1 つずつ、合計 6 つのジョブを実行します。各ジョブは `runs-on` の値を現在の `os` 値に設定し、現在の `version` 値を `actions/setup-node` アクションに渡します。
 
 ```yaml
 jobs:
@@ -2400,7 +2407,7 @@ jobs:
           node-version: ${{ matrix.version }}
 ```
 
-A variable configuration in a matrix can be an array of objects. 例えば、 the following matrix produces 4 ジョブ with corresponding コンテキストs.
+マトリックス内の変数構成は、オブジェクトの配列にすることができます。たとえば、次のマトリックスは対応するコンテキストを持つ 4 つのジョブを生成します。
 
 ```yaml
 matrix:
@@ -2413,7 +2420,7 @@ matrix:
       env: NODE_OPTIONS=--openssl-legacy-provider
 ```
 
-Each ジョブ in the matrix will have its own combination of os and node values, as shown below.
+マトリックス内の各ジョブは、次に示すように、`os` と `node` の値の独自の組み合わせを持ちます。
 
 ```yaml
 - matrix.os: ubuntu-latest
@@ -2428,15 +2435,13 @@ Each ジョブ in the matrix will have its own combination of os and node values
   matrix.node.env: NODE_OPTIONS=--openssl-legacy-provider
 ```
 
-ジョブ.<ジョブ_id>.strategy.matrix.include
+## `jobs.<job_id>.strategy.matrix.include`
 
-For each object in the include list, the key:value pairs in the object will be added to each of the matrix combinations if none of the key:value pairs overwrite any of the original matrix values. If the object cannot be added to any of the matrix combinations, a new matrix combination will be created instead. 注意: the original matrix values will not be overwritten, but added matrix values can be overwritten.
+`include` リスト内の各オブジェクトについて、そのオブジェクト内の `key:value` ペアは、元のマトリックス値のいずれも上書きしない場合に、各マトリックスの組み合わせへ追加されます。そのオブジェクトをどのマトリックスの組み合わせにも追加できない場合は、代わりに新しいマトリックスの組み合わせが作成されます。元のマトリックス値は上書きされませんが、追加されたマトリックス値は上書きされる可能性があることに注意してください。
 
-```yaml
-Example: Expanding configurations
-```
+### 例: 構成を展開する
 
-例えば、 the following ワークフロー will run four ジョブ, one for each combination of os and node. 〜する場合、 the ジョブ for the os value of windows-latest and node value of 16 runs, an additional variable called npm with the value of 6 will be included in the ジョブ.
+たとえば、次のワークフローは、`os` と `node` の各組み合わせに対して 1 つずつ、合計 4 つのジョブを実行します。`os` の値が `windows-latest`、`node` の値が `16` のジョブが実行されると、そのジョブには値 `6` を持つ `npm` という追加の変数が含まれます。
 
 ```yaml
 jobs:
@@ -2457,10 +2462,11 @@ jobs:
       - if: ${{ matrix.npm }}
         run: npm install -g npm@${{ matrix.npm }}
       - run: npm --version
-Example: Adding configurations
 ```
 
-例えば、 this matrix will run 10 ジョブ, one for each combination of os and version in the matrix, plus a ジョブ for the os value of windows-latest and version value of 17.
+### 例: 構成を追加する
+
+たとえば、このマトリックスは、マトリックス内の `os` と `version` の各組み合わせに対して 1 つずつ、さらに `os` の値が `windows-latest`、`version` の値が `17` のジョブを加えた、合計 10 個のジョブを実行します。
 
 ```yaml
 jobs:
@@ -2474,7 +2480,7 @@ jobs:
             version: 17
 ```
 
-もし don't specify any matrix variables, all configurations under include will run. 例えば、 the following ワークフロー would run two ジョブ, one for each include entry. This lets you take advanタグe of the matrix strategy without having a fully populated matrix.
+マトリックス変数を指定しない場合、`include` 配下のすべての構成が実行されます。たとえば、次のワークフローでは、各 `include` エントリに対して 1 つずつ、合計 2 つのジョブが実行されます。これにより、完全に入力されたマトリックスがなくてもマトリックス戦略を活用できます。
 
 ```yaml
 jobs:
@@ -2489,21 +2495,21 @@ jobs:
             datacenter: "site-b"
 ```
 
-ジョブ.<ジョブ_id>.strategy.matrix.exclude
+## `jobs.<job_id>.strategy.matrix.exclude`
 
-An excluded configuration only has to be a partial match for it to be excluded.
+除外される構成は、除外されるためには部分一致するだけでかまいません。
 
-All include combinations are processed after exclude. This allows you to use include to add back combinations that were previously excluded.
+すべての `include` の組み合わせは、`exclude` の後に処理されます。これにより、`include` を使用して、以前に除外された組み合わせを追加し直すことができます。
 
-ジョブ.<ジョブ_id>.strategy.fail-fast
+## `jobs.<job_id>.strategy.fail-fast`
 
-次のことができます control how ジョブ failures are handled with ジョブ.<ジョブ_id>.strategy.fail-fast and ジョブ.<ジョブ_id>.continue-on-error.
+ジョブの失敗をどのように処理するかは、`jobs.<job_id>.strategy.fail-fast` と `jobs.<job_id>.continue-on-error` で制御できます。
 
-ジョブ.<ジョブ_id>.strategy.fail-fast applies to the entire matrix. If ジョブ.<ジョブ_id>.strategy.fail-fast is set to true or its 式 evaluates to true, GitHub will cancel all in-progress and queued ジョブ in the matrix if any ジョブ in the matrix fails. This property デフォルトs to true.
+`jobs.<job_id>.strategy.fail-fast` はマトリックス全体に適用されます。`jobs.<job_id>.strategy.fail-fast` が `true` に設定されている場合、またはその式が `true` と評価される場合、マトリックス内のいずれかのジョブが失敗すると、GitHub はマトリックス内で進行中およびキューに入っているすべてのジョブをキャンセルします。このプロパティの既定値は `true` です。
 
-ジョブ.<ジョブ_id>.continue-on-error applies to a single ジョブ. If ジョブ.<ジョブ_id>.continue-on-error is true, other ジョブ in the matrix will continue running even if the ジョブ with ジョブ.<ジョブ_id>.continue-on-error: true fails.
+`jobs.<job_id>.continue-on-error` は単一のジョブに適用されます。`jobs.<job_id>.continue-on-error` が `true` の場合、`jobs.<job_id>.continue-on-error: true` が指定されたジョブが失敗しても、マトリックス内のほかのジョブは実行を続けます。
 
-次のことができます use ジョブ.<ジョブ_id>.strategy.fail-fast and ジョブ.<ジョブ_id>.continue-on-error together. 例えば、 the following ワークフロー will start four ジョブ. For each ジョブ, continue-on-error is determined by the value of matrix.experimental. If any of the ジョブ with continue-on-error: false fail, all ジョブ that are in progress or queued will be cancelled. If the ジョブ with continue-on-error: true fails, the other ジョブ will not be affected.
+`jobs.<job_id>.strategy.fail-fast` と `jobs.<job_id>.continue-on-error` は一緒に使用できます。たとえば、次のワークフローは 4 つのジョブを開始します。各ジョブでは、`continue-on-error` は `matrix.experimental` の値によって決まります。`continue-on-error: false` のジョブのいずれかが失敗すると、進行中またはキューに入っているすべてのジョブがキャンセルされます。`continue-on-error: true` のジョブが失敗しても、ほかのジョブには影響しません。
 
 ```yaml
 jobs:
@@ -2520,21 +2526,19 @@ jobs:
             experimental: true
 ```
 
-ジョブ.<ジョブ_id>.strategy.max-parallel
+## `jobs.<job_id>.strategy.max-parallel`
 
-By デフォルト, GitHub will maximize the number of ジョブ run in parallel depending on runner availability.
+既定では、GitHub はランナーの可用性に応じて、並列に実行されるジョブ数を最大化します。
 
-ジョブ.<ジョブ_id>.continue-on-error
+## `jobs.<job_id>.continue-on-error`
 
-ジョブ.<ジョブ_id>.continue-on-error applies to a single ジョブ. If ジョブ.<ジョブ_id>.continue-on-error is true, other ジョブ in the matrix will continue running even if the ジョブ with ジョブ.<ジョブ_id>.continue-on-error: true fails.
+`jobs.<job_id>.continue-on-error` は単一のジョブに適用されます。`jobs.<job_id>.continue-on-error` が `true` の場合、`jobs.<job_id>.continue-on-error: true` が指定されたジョブが失敗しても、マトリックス内のほかのジョブは実行を続けます。
 
-Prイベント a ワークフロー run from failing when a ジョブ fails. Set to true to allow a ワークフロー run to pass when this ジョブ fails.
+ジョブが失敗したときにワークフロー実行が失敗するのを防ぎます。このジョブが失敗してもワークフロー実行を成功として扱えるようにするには、`true` に設定します。
 
-```yaml
-Example: Preventing a specific failing matrix job from failing a workflow run
-```
+### 例: 特定の失敗したマトリックスジョブでワークフロー実行が失敗しないようにする
 
-次のことができます allow specific ジョブ in a ジョブ matrix to fail without failing the ワークフロー run. 例えば、 if you wanted to only allow an experimental ジョブ with node set to 15 to fail without failing the ワークフロー run.
+ジョブマトリックス内の特定のジョブが失敗しても、ワークフロー実行を失敗させないようにできます。たとえば、`node` が `15` に設定された実験的なジョブだけが失敗しても、ワークフロー実行を失敗させないようにしたい場合です。
 
 ```yaml
 runs-on: ${{ matrix.os }}
@@ -2551,30 +2555,26 @@ strategy:
         experimental: true
 ```
 
-ジョブ.<ジョブ_id>.container
+## `jobs.<job_id>.container`
 
-## メモ
+> **メモ**
+> 
+> ワークフローで Docker コンテナアクション、ジョブコンテナ、またはサービスコンテナを使用する場合は、Linux ランナーを使用する必要があります。
+> 
+> GitHub ホストランナーを使用している場合は、Ubuntu ランナーを使用する必要があります。
+> セルフホストランナーを使用している場合は、Linux マシンをランナーとして使用し、Docker がインストールされている必要があります。
 
-もし r ワークフロー use Docker container actions, ジョブ containers, or service containers, then you must use a Linux runner:
+`jobs.<job_id>.container` を使用すると、ジョブ内で、すでにコンテナを指定していない任意のステップを実行するためのコンテナを作成できます。スクリプトとコンテナアクションの両方を使用するステップがある場合、コンテナアクションは、同じネットワーク上で同じボリュームマウントを持つ兄弟コンテナとして実行されます。
 
-もし are using GitHub-hosted runners, you must use an Ubuntu runner.
+コンテナを設定しない場合、コンテナ内で実行するよう設定されたアクションをステップが参照していない限り、すべてのステップは `runs-on` で指定されたホスト上で直接実行されます。
 
-もし are using self-hosted runners, you must use a Linux machine as your runner and Docker must be installed.
+> **メモ**
+> 
+> コンテナ内の `run` ステップの既定のシェルは、`bash` ではなく `sh` です。これは `jobs.<job_id>.defaults.run` または `jobs.<job_id>.steps[*].shell` で上書きできます。
 
-Use ジョブ.<ジョブ_id>.container to create a container to run any ステップ in a ジョブ that don't already specify a container. もし have ステップ that use both script and container actions, the container actions will run as sibling containers on the same network with the same volume mounts.
-
-もし do not set a container, all ステップ will run directly on the host specified by runs-on unless a ステップ refers to an action configured to run in a container.
-
-## メモ
-
-The デフォルト shell for run ステップ inside a container is sh instead of bash. This can be overridden with ジョブ.<ジョブ_id>.デフォルトs.run or ジョブ.<ジョブ_id>.ステップ[*].shell.
-
-```yaml
-Example: Running a job within a container
-```
+### 例: コンテナ内でジョブを実行する
 
 ```yaml
-YAML
 name: CI
 on:
   push:
@@ -2596,7 +2596,7 @@ jobs:
         run: (ls /.dockerenv && echo Found dockerenv) || (echo No dockerenv)
 ```
 
-〜する場合、 you only specify a container image, you can omit the image keyword.
+コンテナイメージだけを指定する場合は、`image` キーワードを省略できます。
 
 ```yaml
 jobs:
@@ -2605,20 +2605,21 @@ jobs:
     container: node:18
 ```
 
-ジョブ.<ジョブ_id>.container.image
+## `jobs.<job_id>.container.image`
 
-Use ジョブ.<ジョブ_id>.container.image to define the Docker image to use as the container to run the action. The value can be the Docker Hub image name or a registry name.
+`jobs.<job_id>.container.image` を使用すると、アクションを実行するコンテナとして使用する Docker イメージを定義できます。値には Docker Hub のイメージ名またはレジストリ名を指定できます。
 
-## メモ
+> **メモ**
+> 
+> Docker Hub は通常、プッシュ操作とプル操作の両方にレート制限を課しており、これはセルフホストランナー上のジョブに影響します。ただし、GitHub と Docker の間の合意により、GitHub ホストランナーはこれらの制限の対象になりません。
 
-Docker Hub normally imposes rate limits on both push and pull operations which will affect ジョブ on self-hosted runners. However, GitHub-hosted runners are not subject to these limits based on an agreement between GitHub and Docker.
+## `jobs.<job_id>.container.credentials`
 
-ジョブ.<ジョブ_id>.container.credentials
+イメージのコンテナレジストリでイメージをプルするために認証が必要な場合は、`jobs.<job_id>.container.credentials` を使用して、ユーザー名とパスワードのマップを設定できます。認証情報は、`docker login` コマンドに指定する値と同じです。
 
-If the image's container registry requires authentication to pull the image, you can use ジョブ.<ジョブ_id>.container.credentials to set a map of the username and password. The credentials are the same values that you would provide to the docker login command.
+### 例: コンテナレジストリの認証情報を定義する
 
 ```yaml
-Example: Defining credentials for a container registry
 container:
   image: ghcr.io/owner/image
   credentials:
@@ -2626,62 +2627,61 @@ container:
      password: ${{ secrets.github_token }}
 ```
 
-ジョブ.<ジョブ_id>.container.env
+## `jobs.<job_id>.container.env`
 
-Use ジョブ.<ジョブ_id>.container.env to set a map of environment variables in the container.
+`jobs.<job_id>.container.env` を使用すると、コンテナ内の環境変数のマップを設定できます。
 
-ジョブ.<ジョブ_id>.container.ports
+## `jobs.<job_id>.container.ports`
 
-Use ジョブ.<ジョブ_id>.container.ports to set an array of ports to expose on the container.
+`jobs.<job_id>.container.ports` を使用すると、コンテナで公開するポートの配列を設定できます。
 
-ジョブ.<ジョブ_id>.container.volumes
+## `jobs.<job_id>.container.volumes`
 
-Use ジョブ.<ジョブ_id>.container.volumes to set an array of volumes for the container to use. 次のことができます use volumes to share data between services or other ステップ in a ジョブ. 次のことができます specify named Docker volumes, anonymous Docker volumes, or bind mounts on the host.
+`jobs.<job_id>.container.volumes` を使用すると、コンテナが使用するボリュームの配列を設定できます。ボリュームを使用して、サービス間またはジョブ内の他のステップとの間でデータを共有できます。名前付き Docker ボリューム、匿名 Docker ボリューム、またはホスト上のバインドマウントを指定できます。
 
-〜するには specify a volume, you specify the source and destination path:
+ボリュームを指定するには、ソースパスと宛先パスを指定します。
 
-<source>:<destinationPath>.
+`<source>:<destinationPath>`。
 
-The <source> is a volume name or an absolute path on the host machine, and <destinationPath> is an absolute path in the container.
+`<source>` はボリューム名またはホストマシン上の絶対パスで、`<destinationPath>` はコンテナ内の絶対パスです。
+
+### 例: コンテナでボリュームをマウントする
 
 ```yaml
-Example: Mounting volumes in a container
 volumes:
   - my_docker_volume:/volume_mount
   - /data/my_data
   - /source/directory:/destination/directory
 ```
 
-ジョブ.<ジョブ_id>.container.options
+## `jobs.<job_id>.container.options`
 
-Use ジョブ.<ジョブ_id>.container.options to configure additional Docker container resource options. For a list of options, see docker create options.
+`jobs.<job_id>.container.options` を使用すると、追加の Docker コンテナリソースオプションを構成できます。オプションの一覧については、`docker create` オプションを参照してください。
 
-## 警告
+> **警告**
+> 
+> `--network` オプションと `--entrypoint` オプションはサポートされていません。
 
-The --network and --entrypoint options are not supported.
+## `jobs.<job_id>.services`
 
-ジョブ.<ジョブ_id>.services
+> **メモ**
+> 
+> ワークフローで Docker コンテナアクション、ジョブコンテナ、またはサービスコンテナを使用する場合は、Linux ランナーを使用する必要があります。
+> 
+> GitHub ホストランナーを使用している場合は、Ubuntu ランナーを使用する必要があります。
+> セルフホストランナーを使用している場合は、Linux マシンをランナーとして使用し、Docker がインストールされている必要があります。
 
-## メモ
+ワークフロー内のジョブのサービスコンテナをホストするために使用します。サービスコンテナは、Redis のようなデータベースまたはキャッシュサービスを作成するのに役立ちます。ランナーは Docker ネットワークを自動的に作成し、サービスコンテナのライフサイクルを管理します。
 
-もし r ワークフロー use Docker container actions, ジョブ containers, or service containers, then you must use a Linux runner:
+ジョブをコンテナ内で実行するよう構成している場合、またはステップでコンテナアクションを使用している場合は、サービスまたはアクションにアクセスするためにポートをマップする必要はありません。Docker は、同じ Docker ユーザー定義ブリッジネットワーク上のコンテナ間ですべてのポートを自動的に公開します。サービスコンテナはホスト名で直接参照できます。ホスト名は、ワークフローでサービスに設定したラベル名に自動的にマップされます。
 
-もし are using GitHub-hosted runners, you must use an Ubuntu runner.
+ジョブをランナーマシン上で直接実行するよう構成していて、ステップでコンテナアクションを使用していない場合は、必要な Docker サービスコンテナのポートを Docker ホスト（ランナーマシン）にマップする必要があります。`localhost` とマップされたポートを使用して、サービスコンテナにアクセスできます。
 
-もし are using self-hosted runners, you must use a Linux machine as your runner and Docker must be installed.
+ネットワークサービスコンテナ間の違いについて詳しくは、「Docker サービスコンテナとの通信」を参照してください。
 
-Used to host service containers for a ジョブ in a ワークフロー. Service containers are useful for creating databases or cache services like Redis. The runner automatically creates a Docker network and manages the life cycle of the service containers.
+### 例: `localhost` を使用する
 
-もし configure your ジョブ to run in a container, or your ステップ uses container actions, you don't need to map ports to access the service or action. Docker automatically exposes all ports between containers on the same Docker user-defined bridge network. 次のことができます directly reference the service container by its hostname. The hostname is automatically mapped to the label name you configure for the service in the ワークフロー.
-
-もし configure the ジョブ to run directly on the runner machine and your ステップ doesn't use a container action, you must map any required Docker service container ports to the Docker host (the runner machine). 次のことができます access the service container using localhost and the mapped port.
-
-詳細については about the differences between networking service containers, see Communicating with Docker service containers.
-
-```yaml
-Example: Using localhost
-This example creates two services: nginx and redis. When you specify the container port but not the host port, the container port is randomly assigned to a free port on the host. GitHub sets the assigned host port in the ${{job.services.<service_name>.ports}} context. In this example, you can access the service host ports using the ${{ job.services.nginx.ports['80'] }} and ${{ job.services.redis.ports['6379'] }} contexts.
-```
+この例では、nginx と redis の 2 つのサービスを作成します。コンテナポートを指定し、ホストポートを指定しない場合、コンテナポートはホスト上の空きポートにランダムに割り当てられます。GitHub は、割り当てられたホストポートを `${{job.services.<service_name>.ports}}` コンテキストに設定します。この例では、`${{ job.services.nginx.ports['80'] }}` コンテキストと `${{ job.services.redis.ports['6379'] }}` コンテキストを使用して、サービスのホストポートにアクセスできます。
 
 ```yaml
 services:
@@ -2701,11 +2701,11 @@ steps:
       echo "Nginx available on 127.0.0.1:${{ job.services.nginx.ports['80'] }}"
 ```
 
-ジョブ.<ジョブ_id>.services.<service_id>.image
+## `jobs.<job_id>.services.<service_id>.image`
 
-The Docker image to use as the service container to run the action. The value can be the Docker Hub image name or a registry name.
+アクションを実行するサービスコンテナとして使用する Docker イメージです。値には Docker Hub のイメージ名またはレジストリ名を指定できます。
 
-If ジョブ.<ジョブ_id>.services.<service_id>.image is assigned an empty string, the service will not start. 次のことができます use this to set up conditional services, similar to the following example.
+`jobs.<job_id>.services.<service_id>.image` に空の文字列が割り当てられている場合、サービスは開始されません。これを使用して、次の例のように条件付きサービスを設定できます。
 
 ```yaml
 services:
@@ -2713,11 +2713,11 @@ services:
     image: ${{ options.nginx == true && 'nginx' || '' }}
 ```
 
-ジョブ.<ジョブ_id>.services.<service_id>.credentials
+## `jobs.<job_id>.services.<service_id>.credentials`
 
-If the image's container registry requires authentication to pull the image, you can use ジョブ.<ジョブ_id>.container.credentials to set a map of the username and password. The credentials are the same values that you would provide to the docker login command.
+イメージのコンテナレジストリでイメージをプルするために認証が必要な場合は、`jobs.<job_id>.container.credentials` を使用して、ユーザー名とパスワードのマップを設定できます。認証情報は、`docker login` コマンドに指定する値と同じです。
 
-### Example of ジョブ.<ジョブ_id>.services.<service_id>.credentials
+### `jobs.<job_id>.services.<service_id>.credentials` の例
 
 ```yaml
 services:
@@ -2733,25 +2733,25 @@ services:
       password: ${{ secrets.DOCKER_PASSWORD }}
 ```
 
-ジョブ.<ジョブ_id>.services.<service_id>.env
+## `jobs.<job_id>.services.<service_id>.env`
 
-Sets a map of environment variables in the service container.
+サービスコンテナ内の環境変数のマップを設定します。
 
-ジョブ.<ジョブ_id>.services.<service_id>.ports
+## `jobs.<job_id>.services.<service_id>.ports`
 
-Sets an array of ports to expose on the service container.
+サービスコンテナで公開するポートの配列を設定します。
 
-ジョブ.<ジョブ_id>.services.<service_id>.volumes
+## `jobs.<job_id>.services.<service_id>.volumes`
 
-Sets an array of volumes for the service container to use. 次のことができます use volumes to share data between services or other ステップ in a ジョブ. 次のことができます specify named Docker volumes, anonymous Docker volumes, or bind mounts on the host.
+サービスコンテナが使用するボリュームの配列を設定します。ボリュームを使用して、サービス間またはジョブ内の他のステップとの間でデータを共有できます。名前付き Docker ボリューム、匿名 Docker ボリューム、またはホスト上のバインドマウントを指定できます。
 
-〜するには specify a volume, you specify the source and destination path:
+ボリュームを指定するには、ソースパスと宛先パスを指定します。
 
-<source>:<destinationPath>.
+`<source>:<destinationPath>`。
 
-The <source> is a volume name or an absolute path on the host machine, and <destinationPath> is an absolute path in the container.
+`<source>` はボリューム名またはホストマシン上の絶対パスで、`<destinationPath>` はコンテナ内の絶対パスです。
 
-### Example of ジョブ.<ジョブ_id>.services.<service_id>.volumes
+### `jobs.<job_id>.services.<service_id>.volumes` の例
 
 ```yaml
 volumes:
@@ -2760,19 +2760,19 @@ volumes:
   - /source/directory:/destination/directory
 ```
 
-ジョブ.<ジョブ_id>.services.<service_id>.options
+## `jobs.<job_id>.services.<service_id>.options`
 
-Additional Docker container resource options. For a list of options, see docker create options.
+追加の Docker コンテナリソースオプションです。オプションの一覧については、`docker create` オプションを参照してください。
 
-## 警告
+> **警告**
+> 
+> `--network` オプションはサポートされていません。
 
-The --network option is not supported.
+## `jobs.<job_id>.services.<service_id>.command`
 
-ジョブ.<ジョブ_id>.services.<service_id>.command
+Docker イメージの既定のコマンド（`CMD`）を上書きします。この値は、`docker create` コマンドでイメージ名の後に引数として渡されます。`entrypoint` も指定した場合、`command` はその `entrypoint` への引数を提供します。
 
-Overrides the Docker image's デフォルト command (CMD). The value is passed as arguments after the image name in the docker create command. もし also specify entrypoint, command provides the arguments to that entrypoint.
-
-### Example of ジョブ.<ジョブ_id>.services.<service_id>.command
+### `jobs.<job_id>.services.<service_id>.command` の例
 
 ```yaml
 services:
@@ -2785,11 +2785,11 @@ services:
       - 3306:3306
 ```
 
-ジョブ.<ジョブ_id>.services.<service_id>.entrypoint
+## `jobs.<job_id>.services.<service_id>.entrypoint`
 
-Overrides the Docker image's デフォルト ENTRYPOINT. The value is a single string defining the executable to run. Use this when you need to replace the image's entrypoint entirely. 次のことができます combine entrypoint with command to pass arguments to the custom entrypoint.
+Docker イメージの既定の `ENTRYPOINT` を上書きします。この値は、実行する実行可能ファイルを定義する単一の文字列です。イメージのエントリーポイントを完全に置き換える必要がある場合に使用します。`entrypoint` と `command` を組み合わせると、カスタムエントリーポイントに引数を渡すことができます。
 
-### Example of ジョブ.<ジョブ_id>.services.<service_id>.entrypoint
+### `jobs.<job_id>.services.<service_id>.entrypoint` の例
 
 ```yaml
 services:
@@ -2803,19 +2803,18 @@ services:
       - 2379:2379
 ```
 
-ジョブ.<ジョブ_id>.uses
+## `jobs.<job_id>.uses`
 
-The location and version of a reusable ワークフロー file to run as a ジョブ. Use one of the following syntaxes:
+ジョブとして実行する再利用可能なワークフローファイルの場所とバージョンです。次のいずれかの構文を使用します。
 
-{owner}/{repo}/.github/ワークフロー/{filename}@{ref} for reusable ワークフロー in public and private repositories.
+`{owner}/{repo}/.github/workflows/{filename}@{ref}` は、パブリックリポジトリとプライベートリポジトリ内の再利用可能なワークフローに使用します。
+`./.github/workflows/{filename}` は、同じリポジトリ内の再利用可能なワークフローに使用します。
 
-./.github/ワークフロー/{filename} for reusable ワークフロー in the same repository.
+最初のオプションでは、`{ref}` に SHA、リリースタグ、またはブランチ名を指定できます。リリースタグとブランチが同じ名前の場合、リリースタグがブランチ名より優先されます。安定性とセキュリティのためには、コミット SHA を使用するのが最も安全なオプションです。詳しくは、「安全な使用のリファレンス」を参照してください。
 
-In the first option, {ref} can be a SHA, a release タグ, or a ブランチ name. If a release タグ and a ブランチ have the same name, the release タグ takes precedence over the ブランチ name. Using the commit SHA is the safest option for stability and security. 詳細については, see Secure use reference.
+2 番目の構文オプション（`{owner}/{repo}` と `@{ref}` を含まないもの）を使用する場合、呼び出されるワークフローは呼び出し元ワークフローと同じコミットから取得されます。`refs/heads` や `refs/tags` などの ref プレフィックスは許可されていません。このキーワードでは、コンテキストや式を使用できません。
 
-もし use the second syntax option (without {owner}/{repo} and @{ref}) the called ワークフロー is from the same commit as the caller ワークフロー. Ref prefixes such as refs/heads and refs/タグ are not allowed. 次のことができますnot use コンテキストs or 式s in this keyword.
-
-### Example of ジョブ.<ジョブ_id>.uses
+### `jobs.<job_id>.uses` の例
 
 ```yaml
 jobs:
@@ -2827,17 +2826,17 @@ jobs:
     uses: octo-org/another-repo/.github/workflows/workflow.yml@v1
 ```
 
-詳細については, see Reuse ワークフロー.
+詳しくは、「ワークフローの再利用」を参照してください。
 
-ジョブ.<ジョブ_id>.with
+## `jobs.<job_id>.with`
 
-〜する場合、 a ジョブ is used to call a reusable ワークフロー, you can use with to provide a map of inputs that are passed to the called ワークフロー.
+ジョブを使用して再利用可能なワークフローを呼び出す場合、`with` を使用して、呼び出されるワークフローに渡される入力のマップを指定できます。
 
-Any inputs that you pass must match the input specifications defined in the called ワークフロー.
+渡す入力は、呼び出されるワークフローで定義されている入力仕様と一致している必要があります。
 
-Unlike ジョブ.<ジョブ_id>.ステップ[*].with, the inputs you pass with ジョブ.<ジョブ_id>.with are not available as environment variables in the called ワークフロー. Instead, you can reference the inputs by using the inputs コンテキスト.
+`jobs.<job_id>.steps[*].with` とは異なり、`jobs.<job_id>.with` で渡す入力は、呼び出されるワークフロー内で環境変数として使用できません。代わりに、`inputs` コンテキストを使用して入力を参照できます。
 
-### Example of ジョブ.<ジョブ_id>.with
+### `jobs.<job_id>.with` の例
 
 ```yaml
 jobs:
@@ -2847,19 +2846,19 @@ jobs:
       username: mona
 ```
 
-ジョブ.<ジョブ_id>.with.<input_id>
+## `jobs.<job_id>.with.<input_id>`
 
-A pair consisting of a string identifier for the input and the value of the input. The identifier must match the name of an input defined by on.ワークフロー_call.inputs.<inputs_id> in the called ワークフロー. The data type of the value must match the type defined by on.ワークフロー_call.inputs.<input_id>.type in the called ワークフロー.
+入力の文字列識別子と入力の値で構成されるペアです。識別子は、呼び出されるワークフローの `on.workflow_call.inputs.<inputs_id>` で定義された入力の名前と一致している必要があります。値のデータ型は、呼び出されるワークフローの `on.workflow_call.inputs.<input_id>.type` で定義された型と一致している必要があります。
 
-Allowed 式 コンテキストs: github, and needs.
+許可される式コンテキスト: `github`、`needs`。
 
-ジョブ.<ジョブ_id>.secrets
+## `jobs.<job_id>.secrets`
 
-〜する場合、 a ジョブ is used to call a reusable ワークフロー, you can use secrets to provide a map of secrets that are passed to the called ワークフロー.
+ジョブを使用して再利用可能なワークフローを呼び出す場合、`secrets` を使用して、呼び出されるワークフローに渡されるシークレットのマップを指定できます。
 
-Any secrets that you pass must match the names defined in the called ワークフロー.
+渡すシークレットは、呼び出されるワークフローで定義されている名前と一致している必要があります。
 
-### Example of ジョブ.<ジョブ_id>.secrets
+### `jobs.<job_id>.secrets` の例
 
 ```yaml
 jobs:
@@ -2869,27 +2868,26 @@ jobs:
       access-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 ```
 
-ジョブ.<ジョブ_id>.secrets.inherit
+## `jobs.<job_id>.secrets.inherit`
 
-Use the inherit keyword to pass all the calling ワークフロー's secrets to the called ワークフロー. This includes all secrets the calling ワークフロー has access to, namely organization, repository, and environment secrets. The inherit keyword can be used to pass secrets across repositories within the same organization, or across organizations within the same enterprise.
+`inherit` キーワードを使用すると、呼び出し元ワークフローのすべてのシークレットを、呼び出されるワークフローに渡すことができます。これには、呼び出し元ワークフローがアクセスできるすべてのシークレット、つまり組織、リポジトリ、環境のシークレットが含まれます。`inherit` キーワードは、同じ組織内のリポジトリ間、または同じ Enterprise 内の組織間でシークレットを渡すために使用できます。
 
-### Example of ジョブ.<ジョブ_id>.secrets.inherit
+### `jobs.<job_id>.secrets.inherit` の例
 
 ```yaml
 on:
   workflow_dispatch:
-```
 
-```yaml
 jobs:
   pass-secrets-to-workflow:
     uses: ./.github/workflows/called-workflow.yml
     secrets: inherit
-on:
-  workflow_call:
 ```
 
 ```yaml
+on:
+  workflow_call:
+
 jobs:
   pass-secret-to-action:
     runs-on: ubuntu-latest
@@ -2898,186 +2896,76 @@ jobs:
         run: echo ${{ secrets.CALLING_WORKFLOW_SECRET }}
 ```
 
-ジョブ.<ジョブ_id>.secrets.<secret_id>
+## `jobs.<job_id>.secrets.<secret_id>`
 
-A pair consisting of a string identifier for the secret and the value of the secret. The identifier must match the name of a secret defined by on.ワークフロー_call.secrets.<secret_id> in the called ワークフロー.
+シークレットの文字列識別子とシークレットの値で構成されるペアです。識別子は、呼び出されるワークフローの `on.workflow_call.secrets.<secret_id>` で定義されたシークレットの名前と一致している必要があります。
 
-Allowed 式 コンテキストs: github, needs, and secrets.
+許可される式コンテキスト: `github`、`needs`、`secrets`。
 
-## Filter pattern cheat sheet
+## フィルターパターンのチートシート
 
-次のことができます use special characters in path, ブランチ, and タグ フィルターs.
+パス、ブランチ、タグのフィルターでは特殊文字を使用できます。
 
-*: Matches zero or more characters, but does not match the / character. 例えば、 Octo* matches Octocat.
+- `*`: 0 個以上の文字に一致しますが、`/` 文字には一致しません。たとえば、`Octo*` は `Octocat` に一致します。
+- `**`: 任意の文字 0 個以上に一致します。
+- `?`: 直前の文字 0 個または 1 個に一致します。
+- `+`: 直前の文字 1 個以上に一致します。
+- `[]`: 角かっこ内に列挙された、または範囲に含まれる英数字 1 文字に一致します。範囲には `a-z`、`A-Z`、`0-9` のみを含めることができます。たとえば、範囲 `[0-9a-z]` は任意の数字または小文字に一致します。たとえば、`[CB]at` は `Cat` または `Bat` に一致し、`[1-2]00` は `100` と `200` に一致します。
+- `!`: パターンの先頭にある場合、以前の肯定パターンを否定します。最初の文字でない場合、特別な意味はありません。
 
-**: Matches zero or more of any character.
-
-?: Matches zero or one of the preceding character.
-
-+: Matches one or more of the preceding character.
-
-[] Matches one alphanumeric character listed in the brackets or included in ranges. Ranges can only include a-z, A-Z, and 0-9. 例えば、 the range[0-9a-z] matches any digit or lowercase letter. 例えば、 [CB]at matches Cat or Bat and [1-2]00 matches 100 and 200.
-
-!: At the start of a pattern makes it negate previous positive patterns. It has no special meaning if not the first character.
-
-The characters *, [, and ! are special characters in YAML. もし start a pattern with *, [, or !, you must enclose the pattern in quotes. Also, if you use a flow sequence with a pattern containing [ and/or ], the pattern must be enclosed in quotes.
-
-## # Valid
+`*`、`[`、`!` の文字は YAML の特殊文字です。パターンを `*`、`[`、または `!` で始める場合は、パターンを引用符で囲む必要があります。また、`[` や `]` を含むパターンをフローシーケンスで使用する場合も、パターンを引用符で囲む必要があります。
 
 ```yaml
+# Valid
 paths:
   - '**/README.md'
-```
 
-## # Invalid - creates a parse error that
-
-# prイベント your ワークフロー from running.
-
-```yaml
+# Invalid - creates a parse error that
+# prevents your workflow from running.
 paths:
   - **/README.md
-```
 
-## # Valid
-
-```yaml
+# Valid
 branches: [ main, 'release/v[0-9].[0-9]' ]
-```
 
-## # Invalid - creates a parse error
-
-```yaml
+# Invalid - creates a parse error
 branches: [ main, release/v[0-9].[0-9] ]
 ```
 
-詳細については about ブランチ, タグ, and path フィルター syntax, see on.<push>.<ブランチ|タグ>, on.<pull_request>.<ブランチ|タグ>, and on.<push|pull_request>.paths.
+ブランチ、タグ、パスのフィルター構文について詳しくは、`on.<push>.<branches|tags>`、`on.<pull_request>.<branches|tags>`、`on.<push|pull_request>.paths` を参照してください。
+
+### ブランチとタグに一致するパターン
+
+| パターン | 説明 | 一致例 |
+|---|---|---|
+| `feature/*` | `*` ワイルドカードは任意の文字に一致しますが、スラッシュ（`/`）には一致しません。 | `feature/my-branch`<br>`feature/your-branch` |
+| `feature/**` | `**` ワイルドカードは、ブランチ名とタグ名の中でスラッシュ（`/`）を含む任意の文字に一致します。 | `feature/beta-a/my-branch`<br>`feature/your-branch`<br>`feature/mona/the/octocat` |
+| `main`<br><br>`releases/mona-the-octocat` | ブランチ名またはタグ名の正確な名前に一致します。 | `main`<br>`releases/mona-the-octocat` |
+| `'*'` | スラッシュ（`/`）を含まないすべてのブランチ名とタグ名に一致します。`*` 文字は YAML の特殊文字です。パターンを `*` で始める場合は、引用符を使用する必要があります。 | `main`<br>`releases` |
+| `'**'` | すべてのブランチ名とタグ名に一致します。これは、`branches` または `tags` フィルターを使用しない場合の既定の動作です。 | `all/the/branches`<br>`every/tag` |
+| `'*feature'` | `*` 文字は YAML の特殊文字です。パターンを `*` で始める場合は、引用符を使用する必要があります。 | `mona-feature`<br>`feature`<br>`ver-10-feature` |
+| `v2*` | `v2` で始まるブランチ名とタグ名に一致します。 | `v2`<br>`v2.0`<br>`v2.9` |
+| `v[12].[0-9]+.[0-9]+` | メジャーバージョンが 1 または 2 のすべてのセマンティックバージョニングのブランチとタグに一致します。 | `v1.10.1`<br>`v2.0.0` |
+
+### ファイルパスに一致するパターン
+
+パスパターンはパス全体に一致する必要があり、リポジトリのルートから始まります。
+
+| パターン | 一致内容の説明 | 一致例 |
+|---|---|---|
+| `'*'` | `*` ワイルドカードは任意の文字に一致しますが、スラッシュ（`/`）には一致しません。`*` 文字は YAML の特殊文字です。パターンを `*` で始める場合は、引用符を使用する必要があります。 | `README.md`<br>`server.rb` |
+| `'*.jsx?'` | `?` 文字は、直前の文字 0 個または 1 個に一致します。 | `page.js`<br>`page.jsx` |
+| `'**'` | `**` ワイルドカードはスラッシュ（`/`）を含む任意の文字に一致します。これは、パスフィルターを使用しない場合の既定の動作です。 | `all/the/files.md` |
+| `'*.js'` | `*` ワイルドカードは任意の文字に一致しますが、スラッシュ（`/`）には一致しません。リポジトリのルートにあるすべての `.js` ファイルに一致します。 | `app.js`<br>`index.js` |
+| `'**.js'` | リポジトリ内のすべての `.js` ファイルに一致します。 | `index.js`<br>`js/index.js`<br>`src/js/app.js` |
+| `docs/*` | リポジトリのルートにある `docs` ディレクトリ直下のすべてのファイルにのみ一致します。 | `docs/README.md`<br>`docs/file.txt` |
+| `docs/**` | リポジトリのルートにある `docs` ディレクトリとそのサブディレクトリ内の任意のファイルに一致します。 | `docs/README.md`<br>`docs/mona/octocat.txt` |
+| `docs/**/*.md` | `docs` ディレクトリ内の任意の場所にある `.md` サフィックスを持つファイルに一致します。 | `docs/README.md`<br>`docs/mona/hello-world.md`<br>`docs/a/markdown/file.md` |
+| `'**/docs/**'` | リポジトリ内の任意の場所にある `docs` ディレクトリ内の任意のファイルに一致します。 | `docs/hello.md`<br>`dir/docs/my-file.txt`<br>`space/docs/plan/space.doc` |
+| `'**/README.md'` | リポジトリ内の任意の場所にある `README.md` ファイルに一致します。 | `README.md`<br>`js/README.md` |
+| `'**/*src/**'` | リポジトリ内の任意の場所にある `src` サフィックスを持つフォルダー内の任意のファイルに一致します。 | `a/src/app.js`<br>`my-src/code/js/app.js` |
+| `'**/*-post.md'` | リポジトリ内の任意の場所にある `-post.md` サフィックスを持つファイルに一致します。 | `my-post.md`<br>`path/their-post.md` |
+| `'**/migrate-*.sql'` | リポジトリ内の任意の場所にある `migrate-` プレフィックスと `.sql` サフィックスを持つファイルに一致します。 | `migrate-10909.sql`<br>`db/migrate-v1.0.sql`<br>`db/sept/migrate-v1.sql` |
+| `'*.md'`<br><br>`'!README.md'` | パターンの前に感嘆符（`!`）を使用すると、そのパターンが否定されます。ファイルがあるパターンに一致し、さらにファイル内で後に定義された否定パターンにも一致する場合、そのファイルは含まれません。 | `hello.md`<br><br>一致しない<br><br>`README.md`<br>`docs/hello.md` |
+| `'*.md'`<br><br>`'!README.md'`<br><br>`README*` | パターンは順番にチェックされます。前のパターンを否定するパターンによって、ファイルパスが再び含められます。 | `hello.md`<br>`README.md`<br>`README.doc` |
 
-## ブランチとタグに一致させるパターン
-
-## Pattern Description Example matches
-
-feature/* The * wildcard matches any character, but does not match slash (/). feature/my-ブランチ
-
-feature/your-ブランチ
-
-feature/** The ** wildcard matches any character including slash (/) in ブランチ and タグ names. feature/beta-a/my-ブランチ
-
-feature/your-ブランチ
-
-feature/mona/the/octocat
-
-## `main`
-
-releases/mona-the-octocat Matches the exact name of a ブランチ or タグ name. main
-
-releases/mona-the-octocat
-
-'*' Matches all ブランチ and タグ names that don't contain a slash (/). The * character is a special character in YAML. 〜する場合、 you start a pattern with *, you must use quotes. main
-
-## `releases`
-
-'**' Matches all ブランチ and タグ names. This is the デフォルト behavior when you don't use a ブランチ or タグ フィルター. all/the/ブランチ
-
-every/タグ
-
-'*feature' The * character is a special character in YAML. 〜する場合、 you start a pattern with *, you must use quotes. mona-feature
-
-## `feature`
-
-## `ver-10-feature`
-
-v2* Matches ブランチ and タグ names that start with v2. v2
-
-## `v2.0`
-
-## `v2.9`
-
-v[12].[0-9]+.[0-9]+ Matches all semantic versioning ブランチ and タグ with major version 1 or 2. v1.10.1
-
-## `v2.0.0`
-
-## ファイルパスに一致させるパターン
-
-Path patterns must match the whole path, and start from the repository's root.
-
-## パターン 一致内容の説明 一致例
-
-'*' The * wildcard matches any character, but does not match slash (/). The * character is a special character in YAML. 〜する場合、 you start a pattern with *, you must use quotes. README.md
-
-## `server.rb`
-
-'*.jsx?' The ? character matches zero or one of the preceding character. page.js
-
-## `page.jsx`
-
-'**' The ** wildcard matches any character including slash (/). This is the デフォルト behavior when you don't use a path フィルター. all/the/files.md
-
-'*.js' The * wildcard matches any character, but does not match slash (/). Matches all .js files at the root of the repository. app.js
-
-## `index.js`
-
-'**.js' Matches all .js files in the repository. index.js
-
-js/index.js
-
-src/js/app.js
-
-docs/* All files within the root of the docs directory only, at the root of the repository. docs/README.md
-
-docs/file.txt
-
-docs/** Any files in the docs directory and its subdirectories at the root of the repository. docs/README.md
-
-docs/mona/octocat.txt
-
-docs/**/*.md A file with a .md suffix anywhere in the docs directory. docs/README.md
-
-docs/mona/hello-world.md
-
-docs/a/markdown/file.md
-
-'**/docs/**' Any files in a docs directory anywhere in the repository. docs/hello.md
-
-dir/docs/my-file.txt
-
-space/docs/plan/space.doc
-
-'**/README.md' A README.md file anywhere in the repository. README.md
-
-js/README.md
-
-'**/*src/**' Any file in a folder with a src suffix anywhere in the repository. a/src/app.js
-
-my-src/code/js/app.js
-
-'**/*-post.md' A file with the suffix -post.md anywhere in the repository. my-post.md
-
-path/their-post.md
-
-'**/migrate-*.sql' A file with the prefix migrate- and suffix .sql anywhere in the repository. migrate-10909.sql
-
-db/migrate-v1.0.sql
-
-db/sept/migrate-v1.sql
-
-'*.md'
-
-'!README.md' Using an exclamation mark (!) in front of a pattern negates it. 〜する場合、 a file matches a pattern and also matches a negative pattern defined later in the file, the file will not be included. hello.md
-
-## 一致しない例
-
-## `README.md`
-
-docs/hello.md
-
-'*.md'
-
-'!README.md'
-
-README* Patterns are checked sequentially. A pattern that negates a previous pattern will re-include file paths. hello.md
-
-## `README.md`
-
-## `README.doc`
-
-## ヘルプとサポート
