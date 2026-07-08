@@ -1,0 +1,2265 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>GitHub Actions ワークフロー構文（全文）</title>
+  <style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;line-height:1.6;max-width:1100px;margin:2rem auto;padding:0 1rem;}pre{background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:.6rem;overflow:auto;}p{margin:.45rem 0;}h1{margin-bottom:1rem;}</style>
+</head>
+<body>
+<h1>GitHub Actions ワークフロー構文（日本語）</h1>
+<p>日本語訳: ワークフロー向け YAML 構文について</p>
+<p>日本語訳: ワークフローファイルは YAML 構文を使用し、拡張子は .yml または .yaml のいずれかである必要があります。 YAML が初めてで詳しく学びたい場合は、Learn YAML in Y minutes を参照してください。</p>
+<p></p>
+<p>日本語訳: ワークフローファイルはリポジトリの .github/ワークフローs ディレクトリに保存する必要があります。</p>
+<p></p>
+<pre><code>name</code></pre>
+<p>日本語訳: ワークフローの名前です。 GitHub displays the names of your ワークフローs under your repository&#x27;s &quot;Actions&quot; tab. もし  omit name, GitHub displays the ワークフロー file path relative to the root of the repository.</p>
+<p></p>
+<pre><code>run-name</code></pre>
+<p>日本語訳: The name for ワークフロー runs generated from the ワークフロー. GitHub displays the ワークフロー run name in the list of ワークフロー runs on your repository&#x27;s &quot;Actions&quot; tab. If run-name is omitted or is only whitespace, then the run name is set to イベント-specific information for the ワークフロー run. 例えば、 for a ワークフロー triggered by a push or pull_request イベント, it is set as the commit message or the title of the pull request.</p>
+<p></p>
+<p>日本語訳: この値には式を含めることができ、github および inputs コンテキストを参照できます。</p>
+<p></p>
+<p>日本語訳: run-name の例</p>
+<pre><code>run-name: Deploy to ${{ inputs.deploy_target }} by @${{ github.actor }}</code></pre>
+<pre><code>on</code></pre>
+<p>日本語訳: 〜するには automatically trigger a ワークフロー, use on to define which イベントs can cause the ワークフロー to run. For a list of available イベントs, see Events that trigger ワークフローs.</p>
+<p></p>
+<p>日本語訳: 次のことができます define single or multiple イベントs that can trigger a ワークフロー, or set a time schedule. 次のことができます also restrict the execution of a ワークフロー to only occur for specific files, タグs, or ブランチ changes. These options are described in the following sections.</p>
+<p></p>
+<p>日本語訳: 単一イベントの使用</p>
+<p>日本語訳: 例えば、 a ワークフロー with the following on value will run when a push is made to any ブランチ in the ワークフロー&#x27;s repository:</p>
+<p></p>
+<pre><code>on: push</code></pre>
+<p>日本語訳: 複数イベントの使用</p>
+<p>日本語訳: 次のことができます specify a single イベント or multiple イベントs. 例えば、 a ワークフロー with the following on value will run when a push is made to any ブランチ in the repository or when someone forks the repository:</p>
+<p></p>
+<pre><code>on: [push, fork]</code></pre>
+<p>日本語訳: もし  specify multiple イベントs, only one of those イベントs needs to occur to trigger your ワークフロー. If multiple triggering イベントs for your ワークフロー occur at the same time, multiple ワークフロー runs will be triggered.</p>
+<p></p>
+<p>日本語訳: アクティビティタイプの使用</p>
+<p>日本語訳: Some イベントs have activity types that give you more control over when your ワークフロー should run. Use on.&lt;イベント_name&gt;.types to define the type of イベント activity that will trigger a ワークフロー run.</p>
+<p></p>
+<p>日本語訳: 例えば、 the issue_comment イベント has the created, edited, and deleted activity types. もし r ワークフロー triggers on the label イベント, it will run whenever a label is created, edited, or deleted. もし  specify the created activity type for the label イベント, your ワークフロー will run when a label is created but not when a label is edited or deleted.</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  label:</code></pre>
+<pre><code>    types:</code></pre>
+<pre><code>      - created</code></pre>
+<p>日本語訳: もし  specify multiple activity types, only one of those イベント activity types needs to occur to trigger your ワークフロー. If multiple triggering イベント activity types for your ワークフロー occur at the same time, multiple ワークフロー runs will be triggered. 例えば、 the following ワークフロー triggers when an issue is opened or labeled. If an issue with two labels is opened, three ワークフロー runs will start: one for the issue opened イベント and two for the two issue labeled イベントs.</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  issues:</code></pre>
+<pre><code>    types:</code></pre>
+<pre><code>      - opened</code></pre>
+<pre><code>      - labeled</code></pre>
+<p>日本語訳: 詳細については about each イベント and their activity types, see Events that trigger ワークフローs.</p>
+<p></p>
+<p>日本語訳: フィルターの使用</p>
+<p>日本語訳: Some イベントs have フィルターs that give you more control over when your ワークフロー should run.</p>
+<p></p>
+<p>日本語訳: 例えば、 the push イベント has a ブランチes フィルター that causes your ワークフロー to run only when a push to a ブランチ that matches the ブランチes フィルター occurs, instead of when any push occurs.</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  push:</code></pre>
+<pre><code>    branches:</code></pre>
+<pre><code>      - main</code></pre>
+<pre><code>      - &#x27;releases/**&#x27;</code></pre>
+<p>日本語訳: 複数イベントでのアクティビティタイプとフィルターの併用</p>
+<p>日本語訳: もし  specify activity types or フィルターs for an イベント and your ワークフロー triggers on multiple イベントs, you must configure each イベント separately. You must append a colon (:) to all イベントs, including イベントs without configuration.</p>
+<p></p>
+<p>日本語訳: 例えば、 a ワークフロー with the following on value will run when:</p>
+<p></p>
+<p>日本語訳: A label is created</p>
+<p>日本語訳: A push is made to the main ブランチ in the repository</p>
+<p>日本語訳: A push is made to a GitHub Pages-enabled ブランチ</p>
+<pre><code>on:</code></pre>
+<pre><code>  label:</code></pre>
+<pre><code>    types:</code></pre>
+<pre><code>      - created</code></pre>
+<pre><code>  push:</code></pre>
+<pre><code>    branches:</code></pre>
+<pre><code>      - main</code></pre>
+<pre><code>  page_build:</code></pre>
+<p>日本語訳: on.&lt;イベント_name&gt;.types</p>
+<p>日本語訳: Use on.&lt;イベント_name&gt;.types to define the type of activity that will trigger a ワークフロー run. Most GitHub イベントs are triggered by more than one type of activity. 例えば、 the label is triggered when a label is created, edited, or deleted. The types keyword enables you to narrow down activity that causes the ワークフロー to run. 〜する場合、 only one activity type triggers a webhook イベント, the types keyword is unnecessary.</p>
+<p></p>
+<p>日本語訳: 次のことができます use an array of イベント types. 詳細については about each イベント and their activity types, see Events that trigger ワークフローs.</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  label:</code></pre>
+<pre><code>    types: [created, edited]</code></pre>
+<p>日本語訳: on.&lt;pull_request|pull_request_target&gt;.&lt;ブランチes|ブランチes-ignore&gt;</p>
+<p>日本語訳: 〜する場合、 using the pull_request and pull_request_target イベントs, you can configure a ワークフロー to run only for pull requests that target specific ブランチes.</p>
+<p></p>
+<p>日本語訳: Use the ブランチes フィルター when you want to include ブランチ name patterns or when you want to both include and exclude ブランチ names patterns. Use the ブランチes-ignore フィルター when you only want to exclude ブランチ name patterns. 次のことができますnot use both the ブランチes and ブランチes-ignore フィルターs for the same イベント in a ワークフロー.</p>
+<p></p>
+<p>日本語訳: もし  define both ブランチes/ブランチes-ignore and paths/paths-ignore, the ワークフロー will only run when both フィルターs are satisfied.</p>
+<p></p>
+<p>日本語訳: The ブランチes and ブランチes-ignore keywords accept glob patterns that use characters like *, **, +, ?, ! and others to match more than one ブランチ name. If a name contains any of these characters and you want a literal match, you need to escape each of these special characters with \. 詳細については about glob patterns, see the Workflow syntax for GitHub Actions.</p>
+<p></p>
+<pre><code>Example: Including branches</code></pre>
+<p>日本語訳: The patterns defined in ブランチes are evaluated against the Git ref&#x27;s name. 例えば、 the following ワークフロー would run whenever there is a pull_request イベント for a pull request targeting:</p>
+<p></p>
+<p>日本語訳: A ブランチ named main (refs/heads/main)</p>
+<p>日本語訳: A ブランチ named mona/octocat (refs/heads/mona/octocat)</p>
+<p>日本語訳: A ブランチ whose name starts with releases/, like releases/10 (refs/heads/releases/10)</p>
+<pre><code>on:</code></pre>
+<pre><code>  pull_request:</code></pre>
+<pre><code>    # Sequence of patterns matched against refs/heads</code></pre>
+<pre><code>    branches:</code></pre>
+<pre><code>      - main</code></pre>
+<pre><code>      - &#x27;mona/octocat&#x27;</code></pre>
+<pre><code>      - &#x27;releases/**&#x27;</code></pre>
+<p>日本語訳: If a ワークフロー is skipped due to ブランチ フィルターing, path フィルターing, or a commit message, then checks associated with that ワークフロー will remain in a &quot;Pending&quot; state. A pull request that requires those checks to be successful will be blocked from merging.</p>
+<p></p>
+<pre><code>Example: Excluding branches</code></pre>
+<p>日本語訳: 〜する場合、 a pattern matches the ブランチes-ignore pattern, the ワークフロー will not run. The patterns defined in ブランチes-ignore are evaluated against the Git ref&#x27;s name. 例えば、 the following ワークフロー would run whenever there is a pull_request イベント unless the pull request is targeting:</p>
+<p></p>
+<p>日本語訳: A ブランチ named mona/octocat (refs/heads/mona/octocat)</p>
+<p>日本語訳: A ブランチ whose name matches releases/**-alpha, like releases/beta/3-alpha (refs/heads/releases/beta/3-alpha)</p>
+<pre><code>on:</code></pre>
+<pre><code>  pull_request:</code></pre>
+<pre><code>    # Sequence of patterns matched against refs/heads</code></pre>
+<pre><code>    branches-ignore:</code></pre>
+<pre><code>      - &#x27;mona/octocat&#x27;</code></pre>
+<pre><code>      - &#x27;releases/**-alpha&#x27;</code></pre>
+<pre><code>Example: Including and excluding branches</code></pre>
+<p>日本語訳: 次のことができますnot use ブランチes and ブランチes-ignore to フィルター the same イベント in a single ワークフロー. もし  want to both include and exclude ブランチ patterns for a single イベント, use the ブランチes フィルター along with the ! character to indicate which ブランチes should be excluded.</p>
+<p></p>
+<p>日本語訳: もし  define a ブランチ with the ! character, you must also define at least one ブランチ without the ! character. もし  only want to exclude ブランチes, use ブランチes-ignore instead.</p>
+<p></p>
+<p>日本語訳: The order that you define patterns matters.</p>
+<p></p>
+<p>日本語訳: A matching negative pattern (prefixed with !) after a positive match will exclude the Git ref.</p>
+<p>日本語訳: A matching positive pattern after a negative match will include the Git ref again.</p>
+<p>日本語訳: The following ワークフロー will run on pull_request イベントs for pull requests that target releases/10 or releases/beta/mona, but not for pull requests that target releases/10-alpha or releases/beta/3-alpha because the negative pattern !releases/**-alpha follows the positive pattern.</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  pull_request:</code></pre>
+<pre><code>    branches:</code></pre>
+<pre><code>      - &#x27;releases/**&#x27;</code></pre>
+<pre><code>      - &#x27;!releases/**-alpha&#x27;</code></pre>
+<p>日本語訳: on.push.&lt;ブランチes|タグs|ブランチes-ignore|タグs-ignore&gt;</p>
+<p>日本語訳: 〜する場合、 using the push イベント, you can configure a ワークフロー to run on specific ブランチes or タグs.</p>
+<p></p>
+<p>日本語訳: Use the ブランチes フィルター when you want to include ブランチ name patterns or when you want to both include and exclude ブランチ names patterns. Use the ブランチes-ignore フィルター when you only want to exclude ブランチ name patterns. 次のことができますnot use both the ブランチes and ブランチes-ignore フィルターs for the same イベント in a ワークフロー.</p>
+<p></p>
+<p>日本語訳: Use the タグs フィルター when you want to include タグ name patterns or when you want to both include and exclude タグ names patterns. Use the タグs-ignore フィルター when you only want to exclude タグ name patterns. 次のことができますnot use both the タグs and タグs-ignore フィルターs for the same イベント in a ワークフロー.</p>
+<p></p>
+<p>日本語訳: もし  define only タグs/タグs-ignore or only ブランチes/ブランチes-ignore, the ワークフロー won&#x27;t run for イベントs affecting the undefined Git ref. もし  define neither タグs/タグs-ignore or ブランチes/ブランチes-ignore, the ワークフロー will run for イベントs affecting either ブランチes or タグs. もし  define both ブランチes/ブランチes-ignore and paths/paths-ignore, the ワークフロー will only run when both フィルターs are satisfied.</p>
+<p></p>
+<p>日本語訳: The ブランチes, ブランチes-ignore, タグs, and タグs-ignore keywords accept glob patterns that use characters like *, **, +, ?, ! and others to match more than one ブランチ or タグ name. If a name contains any of these characters and you want a literal match, you need to escape each of these special characters with \. 詳細については about glob patterns, see the Workflow syntax for GitHub Actions.</p>
+<p></p>
+<pre><code>Example: Including branches and tags</code></pre>
+<p>日本語訳: The patterns defined in ブランチes and タグs are evaluated against the Git ref&#x27;s name. 例えば、 the following ワークフロー would run whenever there is a push イベント to:</p>
+<p></p>
+<p>日本語訳: A ブランチ named main (refs/heads/main)</p>
+<p>日本語訳: A ブランチ named mona/octocat (refs/heads/mona/octocat)</p>
+<p>日本語訳: A ブランチ whose name starts with releases/, like releases/10 (refs/heads/releases/10)</p>
+<p>日本語訳: A タグ named v2 (refs/タグs/v2)</p>
+<p>日本語訳: A タグ whose name starts with v1., like v1.9.1 (refs/タグs/v1.9.1)</p>
+<pre><code>on:</code></pre>
+<pre><code>  push:</code></pre>
+<pre><code>    # Sequence of patterns matched against refs/heads</code></pre>
+<pre><code>    branches:</code></pre>
+<pre><code>      - main</code></pre>
+<pre><code>      - &#x27;mona/octocat&#x27;</code></pre>
+<pre><code>      - &#x27;releases/**&#x27;</code></pre>
+<pre><code>    # Sequence of patterns matched against refs/tags</code></pre>
+<pre><code>    tags:</code></pre>
+<pre><code>      - v2</code></pre>
+<pre><code>      - v1.*</code></pre>
+<pre><code>Example: Excluding branches and tags</code></pre>
+<p>日本語訳: 〜する場合、 a pattern matches the ブランチes-ignore or タグs-ignore pattern, the ワークフロー will not run. The patterns defined in ブランチes and タグs are evaluated against the Git ref&#x27;s name. 例えば、 the following ワークフロー would run whenever there is a push イベント, unless the push イベント is to:</p>
+<p></p>
+<p>日本語訳: A ブランチ named mona/octocat (refs/heads/mona/octocat)</p>
+<p>日本語訳: A ブランチ whose name matches releases/**-alpha, like releases/beta/3-alpha (refs/heads/releases/beta/3-alpha)</p>
+<p>日本語訳: A タグ named v2 (refs/タグs/v2)</p>
+<p>日本語訳: A タグ whose name starts with v1., like v1.9 (refs/タグs/v1.9)</p>
+<pre><code>on:</code></pre>
+<pre><code>  push:</code></pre>
+<pre><code>    # Sequence of patterns matched against refs/heads</code></pre>
+<pre><code>    branches-ignore:</code></pre>
+<pre><code>      - &#x27;mona/octocat&#x27;</code></pre>
+<pre><code>      - &#x27;releases/**-alpha&#x27;</code></pre>
+<pre><code>    # Sequence of patterns matched against refs/tags</code></pre>
+<pre><code>    tags-ignore:</code></pre>
+<pre><code>      - v2</code></pre>
+<pre><code>      - v1.*</code></pre>
+<pre><code>Example: Including and excluding branches and tags</code></pre>
+<p>日本語訳: 次のことができます&#x27;t use ブランチes and ブランチes-ignore to フィルター the same イベント in a single ワークフロー. Similarly, you can&#x27;t use タグs and タグs-ignore to フィルター the same イベント in a single ワークフロー. もし  want to both include and exclude ブランチ or タグ patterns for a single イベント, use the ブランチes or タグs フィルター along with the ! character to indicate which ブランチes or タグs should be excluded.</p>
+<p></p>
+<p>日本語訳: もし  define a ブランチ with the ! character, you must also define at least one ブランチ without the ! character. もし  only want to exclude ブランチes, use ブランチes-ignore instead. Similarly, if you define a タグ with the ! character, you must also define at least one タグ without the ! character. もし  only want to exclude タグs, use タグs-ignore instead.</p>
+<p></p>
+<p>日本語訳: The order that you define patterns matters.</p>
+<p></p>
+<p>日本語訳: A matching negative pattern (prefixed with !) after a positive match will exclude the Git ref.</p>
+<p>日本語訳: A matching positive pattern after a negative match will include the Git ref again.</p>
+<p>日本語訳: The following ワークフロー will run on pushes to releases/10 or releases/beta/mona, but not on releases/10-alpha or releases/beta/3-alpha because the negative pattern !releases/**-alpha follows the positive pattern.</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  push:</code></pre>
+<pre><code>    branches:</code></pre>
+<pre><code>      - &#x27;releases/**&#x27;</code></pre>
+<pre><code>      - &#x27;!releases/**-alpha&#x27;</code></pre>
+<p>日本語訳: on.&lt;push|pull_request|pull_request_target&gt;.&lt;paths|paths-ignore&gt;</p>
+<p>日本語訳: 〜する場合、 using the push and pull_request イベントs, you can configure a ワークフロー to run based on what file paths are changed. Path フィルターs are not evaluated for pushes of タグs.</p>
+<p></p>
+<p>日本語訳: Use the paths フィルター when you want to include file path patterns or when you want to both include and exclude file path patterns. Use the paths-ignore フィルター when you only want to exclude file path patterns. 次のことができますnot use both the paths and paths-ignore フィルターs for the same イベント in a ワークフロー. もし  want to both include and exclude path patterns for a single イベント, use the paths フィルター prefixed with the ! character to indicate which paths should be excluded.</p>
+<p></p>
+<p>日本語訳: メモ</p>
+<p></p>
+<p>日本語訳: The order that you define paths patterns matters:</p>
+<p></p>
+<p>日本語訳: A matching negative pattern (prefixed with !) after a positive match will exclude the path.</p>
+<p>日本語訳: A matching positive pattern after a negative match will include the path again.</p>
+<p>日本語訳: もし  define both ブランチes/ブランチes-ignore and paths/paths-ignore, the ワークフロー will only run when both フィルターs are satisfied.</p>
+<p></p>
+<p>日本語訳: The paths and paths-ignore keywords accept glob patterns that use the * and ** wildcard characters to match more than one path name. 詳細については, see the Workflow syntax for GitHub Actions.</p>
+<p></p>
+<pre><code>Example: Including paths</code></pre>
+<p>日本語訳: If at least one path matches a pattern in the paths フィルター, the ワークフロー runs. 例えば、 the following ワークフロー would run anytime you push a JavaScript file (.js).</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  push:</code></pre>
+<pre><code>    paths:</code></pre>
+<pre><code>      - &#x27;**.js&#x27;</code></pre>
+<p>日本語訳: If a ワークフロー is skipped due to path フィルターing, ブランチ フィルターing, or a commit message, then checks associated with that ワークフロー will remain in a &quot;Pending&quot; state. A pull request that requires those checks to be successful will be blocked from merging.</p>
+<p></p>
+<pre><code>Example: Excluding paths</code></pre>
+<p>日本語訳: 〜する場合、 all the path names match patterns in paths-ignore, the ワークフロー will not run. If any path names do not match patterns in paths-ignore, even if some path names match the patterns, the ワークフロー will run.</p>
+<p></p>
+<p>日本語訳: A ワークフロー with the following path フィルター will only run on push イベントs that include at least one file outside the docs directory at the root of the repository.</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  push:</code></pre>
+<pre><code>    paths-ignore:</code></pre>
+<pre><code>      - &#x27;docs/**&#x27;</code></pre>
+<pre><code>Example: Including and excluding paths</code></pre>
+<p>日本語訳: 次のことができますnot use paths and paths-ignore to フィルター the same イベント in a single ワークフロー. もし  want to both include and exclude path patterns for a single イベント, use the paths フィルター prefixed with the ! character to indicate which paths should be excluded.</p>
+<p></p>
+<p>日本語訳: もし  define a path with the ! character, you must also define at least one path without the ! character. もし  only want to exclude paths, use paths-ignore instead.</p>
+<p></p>
+<p>日本語訳: The order that you define paths patterns matters:</p>
+<p></p>
+<p>日本語訳: A matching negative pattern (prefixed with !) after a positive match will exclude the path.</p>
+<p>日本語訳: A matching positive pattern after a negative match will include the path again.</p>
+<p>日本語訳: This example runs anytime the push イベント includes a file in the sub-project directory or its subdirectories, unless the file is in the sub-project/docs directory. 例えば、 a push that changed sub-project/index.js or sub-project/src/index.js will trigger a ワークフロー run, but a push changing only sub-project/docs/readme.md will not.</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  push:</code></pre>
+<pre><code>    paths:</code></pre>
+<pre><code>      - &#x27;sub-project/**&#x27;</code></pre>
+<pre><code>      - &#x27;!sub-project/docs/**&#x27;</code></pre>
+<p>日本語訳: Git diff comparisons</p>
+<p>日本語訳: メモ</p>
+<p></p>
+<p>日本語訳: もし  push more than 1,000 commits, or if GitHub does not generate the diff due to a timeout, the ワークフロー will always run.</p>
+<p></p>
+<p>日本語訳: The フィルター determines if a ワークフロー should run by evaluating the changed files and running them against the paths-ignore or paths list. If there are no files changed, the ワークフロー will not run.</p>
+<p></p>
+<p>日本語訳: GitHub generates the list of changed files using two-dot diffs for pushes and three-dot diffs for pull requests:</p>
+<p></p>
+<p>日本語訳: Pull requests: Three-dot diffs are a comparison between the most recent version of the topic ブランチ and the commit where the topic ブランチ was last synced with the base ブランチ.</p>
+<p>日本語訳: Pushes to existing ブランチes: A two-dot diff compares the head and base SHAs directly with each other.</p>
+<p>日本語訳: Pushes to new ブランチes: A two-dot diff against the parent of the ancestor of the deepest commit pushed.</p>
+<p>日本語訳: メモ</p>
+<p></p>
+<p>日本語訳: Diffs are limited to 300 files. If there are files changed that aren&#x27;t matched in the first 300 files returned by the フィルター, the ワークフロー will not run. You may need to create more specific フィルターs so that the ワークフロー will run automatically.</p>
+<p></p>
+<p>日本語訳: 詳細については, see About comparing ブランチes in pull requests.</p>
+<p></p>
+<pre><code>on.schedule</code></pre>
+<p>日本語訳: 次のことができます use on.schedule to define a time schedule for your ワークフローs.</p>
+<p></p>
+<p>日本語訳: Use POSIX cron syntax to schedule ワークフローs to run at specific times. By デフォルト, scheduled ワークフローs run in UTC. 次のことができます optionally specify a timezone using an IANA timezone string for timezone-aware scheduling. Scheduled ワークフローs run on the latest commit on the デフォルト ブランチ. The shortest interval you can run scheduled ワークフローs is once every 5 minutes.</p>
+<p></p>
+<p>日本語訳: メモ</p>
+<p></p>
+<p>日本語訳: For schedules that set timezone to a time zone that observes daylight saving time (DST), during DST spring-forward transitions, scheduled ワークフローs in skipped hours advance to the next valid time. 例えば、 a 2:30 AM schedule advances to 3:00 AM.</p>
+<p></p>
+<p>日本語訳: Cron syntax has five fields separated by a space, and each field represents a unit of time.</p>
+<p></p>
+<p>日本語訳: ┌───────────── minute (0 - 59)</p>
+<p>日本語訳: │ ┌───────────── hour (0 - 23)</p>
+<p>日本語訳: │ │ ┌───────────── day of the month (1 - 31)</p>
+<p>日本語訳: │ │ │ ┌───────────── month (1 - 12 or JAN-DEC)</p>
+<p>日本語訳: │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)</p>
+<p>日本語訳: │ │ │ │ │</p>
+<p>日本語訳: * * * * *</p>
+<p>日本語訳: 次のことができます use these operators in any of the five fields:</p>
+<p></p>
+<p>日本語訳: Operator	Description	Example</p>
+<p>日本語訳: *	Any value	15 * * * * runs at every minute 15 of every hour of every day.</p>
+<p>日本語訳: ,	Value list separator	2,10 4,5 * * * runs at minute 2 and 10 of the 4th and 5th hour of every day.</p>
+<p>日本語訳: -	Range of values	30 4-6 * * * runs at minute 30 of the 4th, 5th, and 6th hour.</p>
+<p>日本語訳: /	Step values	20/15 * * * * runs every 15 minutes starting from minute 20 through 59 (minutes 20, 35, and 50).</p>
+<p>日本語訳: This example triggers the ワークフロー to run at 5:30 AM in the America/New_York timezone every Monday through Friday:</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  schedule:</code></pre>
+<pre><code>    - cron: &#x27;30 5 * * 1-5&#x27;</code></pre>
+<pre><code>      timezone: &quot;America/New_York&quot;</code></pre>
+<p>日本語訳: A single ワークフロー can be triggered by multiple schedule イベントs. Access the schedule イベント that triggered the ワークフロー through the github.イベント.schedule コンテキスト. This example triggers the ワークフロー to run at 5:30 UTC every Monday-Thursday, and 17:30 UTC on Tuesdays and Thursdays, but skips the Not on Monday or Wednesday ステップ on Monday and Wednesday.</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  schedule:</code></pre>
+<pre><code>    - cron: &#x27;30 5 * * 1,3&#x27;</code></pre>
+<pre><code>    - cron: &#x27;30 5,17 * * 2,4&#x27;</code></pre>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  test_schedule:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - name: Not on Monday or Wednesday</code></pre>
+<pre><code>        if: github.event.schedule != &#x27;30 5 * * 1,3&#x27;</code></pre>
+<pre><code>        run: echo &quot;This step will be skipped on Monday and Wednesday&quot;</code></pre>
+<pre><code>      - name: Every time</code></pre>
+<pre><code>        run: echo &quot;This step will always run&quot;</code></pre>
+<p>日本語訳: 詳細については about schedule イベントs, see Events that trigger ワークフローs.</p>
+<p></p>
+<pre><code>on.workflow_call</code></pre>
+<p>日本語訳: Use on.ワークフロー_call to define the inputs and outputs for a reusable ワークフロー. 次のことができます also map the secrets that are available to the called ワークフロー. 詳細については on reusable ワークフローs, see Reuse ワークフローs.</p>
+<p></p>
+<pre><code>on.workflow_call.inputs</code></pre>
+<p>日本語訳: 〜する場合、 using the ワークフロー_call keyword, you can optionally specify inputs that are passed to the called ワークフロー from the caller ワークフロー. 詳細については about the ワークフロー_call keyword, see Events that trigger ワークフローs.</p>
+<p></p>
+<p>日本語訳: In addition to the standard input parameters that are available, on.ワークフロー_call.inputs requires a type parameter. 詳細については, see on.ワークフロー_call.inputs.&lt;input_id&gt;.type.</p>
+<p></p>
+<p>日本語訳: If a デフォルト parameter is not set, the デフォルト value of the input is false for a boolean, 0 for a number, and &quot;&quot; for a string.</p>
+<p></p>
+<p>日本語訳: Within the called ワークフロー, you can use the inputs コンテキスト to refer to an input. 詳細については, see Contexts reference.</p>
+<p></p>
+<p>日本語訳: If a caller ワークフロー passes an input that is not specified in the called ワークフロー, this results in an error.</p>
+<p></p>
+<p>日本語訳: Example of on.ワークフロー_call.inputs</p>
+<pre><code>on:</code></pre>
+<pre><code>  workflow_call:</code></pre>
+<pre><code>    inputs:</code></pre>
+<pre><code>      username:</code></pre>
+<pre><code>        description: &#x27;A username passed from the caller workflow&#x27;</code></pre>
+<pre><code>        default: &#x27;john-doe&#x27;</code></pre>
+<pre><code>        required: false</code></pre>
+<pre><code>        type: string</code></pre>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  print-username:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<p></p>
+<pre><code>    steps:</code></pre>
+<pre><code>      - name: Print the input name to STDOUT</code></pre>
+<pre><code>        run: echo The username is ${{ inputs.username }}</code></pre>
+<p>日本語訳: 詳細については, see Reuse ワークフローs.</p>
+<p></p>
+<p>日本語訳: on.ワークフロー_call.inputs.&lt;input_id&gt;.type</p>
+<p>日本語訳: Required if input is defined for the on.ワークフロー_call keyword. The value of this parameter is a string specifying the data type of the input. This must be one of: boolean, number, or string.</p>
+<p></p>
+<pre><code>on.workflow_call.outputs</code></pre>
+<p>日本語訳: A map of outputs for a called ワークフロー. Called ワークフロー outputs are available to all downstream ジョブs in the caller ワークフロー. Each output has an identifier, an optional description, and a value. The value must be set to the value of an output from a ジョブ within the called ワークフロー.</p>
+<p></p>
+<p>日本語訳: In the example below, two outputs are defined for this reusable ワークフロー: ワークフロー_output1 and ワークフロー_output2. These are mapped to outputs called ジョブ_output1 and ジョブ_output2, both from a ジョブ called my_ジョブ.</p>
+<p></p>
+<p>日本語訳: Example of on.ワークフロー_call.outputs</p>
+<pre><code>on:</code></pre>
+<pre><code>  workflow_call:</code></pre>
+<pre><code>    # Map the workflow outputs to job outputs</code></pre>
+<pre><code>    outputs:</code></pre>
+<pre><code>      workflow_output1:</code></pre>
+<pre><code>        description: &quot;The first job output&quot;</code></pre>
+<pre><code>        value: ${{ jobs.my_job.outputs.job_output1 }}</code></pre>
+<pre><code>      workflow_output2:</code></pre>
+<pre><code>        description: &quot;The second job output&quot;</code></pre>
+<pre><code>        value: ${{ jobs.my_job.outputs.job_output2 }}</code></pre>
+<p>日本語訳: For information on how to reference a ジョブ output, see ジョブs.&lt;ジョブ_id&gt;.outputs. 詳細については, see Reuse ワークフローs.</p>
+<p></p>
+<pre><code>on.workflow_call.secrets</code></pre>
+<p>日本語訳: A map of the secrets that can be used in the called ワークフロー.</p>
+<p></p>
+<p>日本語訳: Within the called ワークフロー, you can use the secrets コンテキスト to refer to a secret.</p>
+<p></p>
+<p>日本語訳: メモ</p>
+<p></p>
+<p>日本語訳: もし  are passing the secret to a nested reusable ワークフロー, then you must use ジョブs.&lt;ジョブ_id&gt;.secrets again to pass the secret. 詳細については, see Reuse ワークフローs.</p>
+<p></p>
+<p>日本語訳: If a caller ワークフロー passes a secret that is not specified in the called ワークフロー, this results in an error.</p>
+<p></p>
+<p>日本語訳: Example of on.ワークフロー_call.secrets</p>
+<pre><code>on:</code></pre>
+<pre><code>  workflow_call:</code></pre>
+<pre><code>    secrets:</code></pre>
+<pre><code>      access-token:</code></pre>
+<pre><code>        description: &#x27;A token passed from the caller workflow&#x27;</code></pre>
+<pre><code>        required: false</code></pre>
+<p></p>
+<pre><code>jobs:</code></pre>
+<p></p>
+<pre><code>  pass-secret-to-action:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>    # passing the secret to an action</code></pre>
+<pre><code>      - name: Pass the received secret to an action</code></pre>
+<pre><code>        uses: ./.github/actions/my-action</code></pre>
+<pre><code>        with:</code></pre>
+<pre><code>          token: ${{ secrets.access-token }}</code></pre>
+<p></p>
+<pre><code>  # passing the secret to a nested reusable workflow</code></pre>
+<pre><code>  pass-secret-to-workflow:</code></pre>
+<pre><code>    uses: ./.github/workflows/my-workflow</code></pre>
+<pre><code>    secrets:</code></pre>
+<pre><code>       token: ${{ secrets.access-token }}</code></pre>
+<p>日本語訳: on.ワークフロー_call.secrets.&lt;secret_id&gt;</p>
+<p>日本語訳: A string identifier to associate with the secret.</p>
+<p></p>
+<p>日本語訳: on.ワークフロー_call.secrets.&lt;secret_id&gt;.required</p>
+<p>日本語訳: A boolean specifying whether the secret must be supplied.</p>
+<p></p>
+<p>日本語訳: on.ワークフロー_run.&lt;ブランチes|ブランチes-ignore&gt;</p>
+<p>日本語訳: 〜する場合、 using the ワークフロー_run イベント, you can specify what ブランチes the triggering ワークフロー must run on in order to trigger your ワークフロー.</p>
+<p></p>
+<p>日本語訳: The ブランチes and ブランチes-ignore フィルターs accept glob patterns that use characters like *, **, +, ?, ! and others to match more than one ブランチ name. If a name contains any of these characters and you want a literal match, you need to escape each of these special characters with \. 詳細については about glob patterns, see the Workflow syntax for GitHub Actions.</p>
+<p></p>
+<p>日本語訳: 例えば、 a ワークフロー with the following trigger will only run when the ワークフロー named Build runs on a ブランチ whose name starts with releases/:</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  workflow_run:</code></pre>
+<pre><code>    workflows: [&quot;Build&quot;]</code></pre>
+<pre><code>    types: [requested]</code></pre>
+<pre><code>    branches:</code></pre>
+<pre><code>      - &#x27;releases/**&#x27;</code></pre>
+<p>日本語訳: A ワークフロー with the following trigger will only run when the ワークフロー named Build runs on a ブランチ that is not named canary:</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  workflow_run:</code></pre>
+<pre><code>    workflows: [&quot;Build&quot;]</code></pre>
+<pre><code>    types: [requested]</code></pre>
+<pre><code>    branches-ignore:</code></pre>
+<pre><code>      - &quot;canary&quot;</code></pre>
+<p>日本語訳: 次のことができますnot use both the ブランチes and ブランチes-ignore フィルターs for the same イベント in a ワークフロー. もし  want to both include and exclude ブランチ patterns for a single イベント, use the ブランチes フィルター along with the ! character to indicate which ブランチes should be excluded.</p>
+<p></p>
+<p>日本語訳: The order that you define patterns matters.</p>
+<p></p>
+<p>日本語訳: A matching negative pattern (prefixed with !) after a positive match will exclude the ブランチ.</p>
+<p>日本語訳: A matching positive pattern after a negative match will include the ブランチ again.</p>
+<p>日本語訳: 例えば、 a ワークフロー with the following trigger will run when the ワークフロー named Build runs on a ブランチ that is named releases/10 or releases/beta/mona but will not releases/10-alpha, releases/beta/3-alpha, or main.</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  workflow_run:</code></pre>
+<pre><code>    workflows: [&quot;Build&quot;]</code></pre>
+<pre><code>    types: [requested]</code></pre>
+<pre><code>    branches:</code></pre>
+<pre><code>      - &#x27;releases/**&#x27;</code></pre>
+<pre><code>      - &#x27;!releases/**-alpha&#x27;</code></pre>
+<pre><code>on.workflow_dispatch</code></pre>
+<p>日本語訳: 〜する場合、 using the ワークフロー_dispatch イベント, you can optionally specify inputs that are passed to the ワークフロー.</p>
+<p></p>
+<p>日本語訳: This trigger only receives イベントs when the ワークフロー file is on the デフォルト ブランチ.</p>
+<p></p>
+<pre><code>on.workflow_dispatch.inputs</code></pre>
+<p>日本語訳: The triggered ワークフロー receives the inputs in the inputs コンテキスト. 詳細については, see Contexts.</p>
+<p></p>
+<p>日本語訳: メモ</p>
+<p></p>
+<p>日本語訳: The ワークフロー will also receive the inputs in the github.イベント.inputs コンテキスト. The information in the inputs コンテキスト and github.イベント.inputs コンテキスト is identical except that the inputs コンテキスト preserves Boolean values as Booleans instead of converting them to strings. The choice type resolves to a string and is a single selectable option.</p>
+<p>日本語訳: The maximum number of top-level properties for inputs is 25 .</p>
+<p>日本語訳: The maximum payload for inputs is 65,535 characters.</p>
+<p>日本語訳: Example of on.ワークフロー_dispatch.inputs</p>
+<pre><code>on:</code></pre>
+<pre><code>  workflow_dispatch:</code></pre>
+<pre><code>    inputs:</code></pre>
+<pre><code>      logLevel:</code></pre>
+<pre><code>        description: &#x27;Log level&#x27;</code></pre>
+<pre><code>        required: true</code></pre>
+<pre><code>        default: &#x27;warning&#x27;</code></pre>
+<pre><code>        type: choice</code></pre>
+<pre><code>        options:</code></pre>
+<pre><code>          - info</code></pre>
+<pre><code>          - warning</code></pre>
+<pre><code>          - debug</code></pre>
+<pre><code>      print_tags:</code></pre>
+<pre><code>        description: &#x27;True to print to STDOUT&#x27;</code></pre>
+<pre><code>        required: true</code></pre>
+<pre><code>        type: boolean</code></pre>
+<pre><code>      tags:</code></pre>
+<pre><code>        description: &#x27;Test scenario tags&#x27;</code></pre>
+<pre><code>        required: true</code></pre>
+<pre><code>        type: string</code></pre>
+<pre><code>      environment:</code></pre>
+<pre><code>        description: &#x27;Environment to run tests against&#x27;</code></pre>
+<pre><code>        type: environment</code></pre>
+<pre><code>        required: true</code></pre>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  print-tag:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    if: ${{ inputs.print_tags }} </code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - name: Print the input tag to STDOUT</code></pre>
+<pre><code>        run: echo  The tags are ${{ inputs.tags }} </code></pre>
+<p>日本語訳: on.ワークフロー_dispatch.inputs.&lt;input_id&gt;.required</p>
+<p>日本語訳: A boolean specifying whether the input must be supplied.</p>
+<p></p>
+<p>日本語訳: on.ワークフロー_dispatch.inputs.&lt;input_id&gt;.type</p>
+<p>日本語訳: The value of this parameter is a string specifying the data type of the input. This must be one of: boolean, choice, number, environment or string.</p>
+<p></p>
+<pre><code>permissions</code></pre>
+<p>日本語訳: 次のことができます use 権限 to modify the デフォルト 権限 granted to the GITHUB_TOKEN, adding or removing access as required, so that you only allow the minimum required access. 詳細については, see Use GITHUB_TOKEN for authentication in ワークフローs.</p>
+<p></p>
+<p>日本語訳: 次のことができます use 権限 either as a top-level key, to apply to all ジョブs in the ワークフロー, or within specific ジョブs. 〜する場合、 you add the 権限 key within a specific ジョブ, all actions and run commands within that ジョブ that use the GITHUB_TOKEN gain the access rights you specify. 詳細については, see ジョブs.&lt;ジョブ_id&gt;.権限.</p>
+<p></p>
+<p>日本語訳: Owners of an organization can restrict write access for the GITHUB_TOKEN at the repository level. 詳細については, see Disabling or limiting GitHub Actions for your organization.</p>
+<p></p>
+<p>日本語訳: 〜する場合、 a ワークフロー is triggered by the pull_request_target イベント, the GITHUB_TOKEN is granted read/write repository permission, even when it is triggered from a public fork. 詳細については, see Events that trigger ワークフローs.</p>
+<p></p>
+<p>日本語訳: For each of the available 権限, shown in the table below, you can assign one of the access levels: read (if applicable), write, or none. write includes read. もし  specify the access for any of these 権限, all of those that are not specified are set to none.</p>
+<p></p>
+<p>日本語訳: Available 権限 and details of what each allows an action to do:</p>
+<p></p>
+<p>日本語訳: Permission	Allows an action using GITHUB_TOKEN to</p>
+<p>日本語訳: actions	Work with GitHub Actions. 例えば、 actions: write permits an action to cancel a ワークフロー run. 詳細については, see Permissions required for GitHub Apps.</p>
+<p>日本語訳: artifact-metadata	Work with artifact metadata. 例えば、 artifact-metadata: write permits an action to create storage records on behalf of a build artifact. 詳細については, see REST API endpoints for artifact metadata.</p>
+<p>日本語訳: attestations	Work with artifact attestations. 例えば、 attestations: write permits an action to generate an artifact attestation for a build. 詳細については, see Using artifact attestations to establish provenance for builds</p>
+<p>日本語訳: checks	Work with check runs and check suites. 例えば、 checks: write permits an action to create a check run. 詳細については, see Permissions required for GitHub Apps.</p>
+<p>日本語訳: code-quality	Work with code quality. 例えば、 code-quality: write permits an action to upload code coverage reports. 詳細については, see About GitHub Code Quality.</p>
+<p>日本語訳: contents	Work with the contents of the repository. 例えば、 contents: read permits an action to list the commits, and contents: write allows the action to create a release. 詳細については, see Permissions required for GitHub Apps.</p>
+<p>日本語訳: deployments	Work with deployments. 例えば、 deployments: write permits an action to create a new deployment. 詳細については, see Permissions required for GitHub Apps.</p>
+<p>日本語訳: discussions	Work with GitHub Discussions. 例えば、 discussions: write permits an action to close or delete a discussion. 詳細については, see Using the GraphQL API for Discussions.</p>
+<p>日本語訳: id-token	Fetch an OpenID Connect (OIDC) token. This requires id-token: write. 詳細については, see OpenID Connect</p>
+<p>日本語訳: issues	Work with issues. 例えば、 issues: write permits an action to add a comment to an issue. 詳細については, see Permissions required for GitHub Apps.</p>
+<p>日本語訳: models	Generate AI inference responses with GitHub Models. 例えば、 models: read permits an action to use the GitHub Models inference API. See Prototyping with AI models.</p>
+<p>日本語訳: packages	Work with GitHub Packages. 例えば、 packages: write permits an action to upload and publish packages on GitHub Packages. 詳細については, see About 権限 for GitHub Packages.</p>
+<p>日本語訳: pages	Work with GitHub Pages. 例えば、 pages: write permits an action to request a GitHub Pages build. 詳細については, see Permissions required for GitHub Apps.</p>
+<p>日本語訳: pull-requests	Work with pull requests. 例えば、 pull-requests: write permits an action to add a label to a pull request. 詳細については, see Permissions required for GitHub Apps.</p>
+<p>日本語訳: security-イベントs	Work with GitHub code scanning alerts. 例えば、 security-イベントs: read permits an action to list the code scanning alerts for the repository, and security-イベントs: write allows an action to update the status of a code scanning alert. 詳細については, see Repository 権限 for &quot;Code scanning alerts&quot;.</p>
+<p></p>
+<p>日本語訳: For Dependabot alerts, use the vulnerability-alerts permission. Secret scanning alerts cannot be read with this permission and require a GitHub App or a personal access token. 詳細については, see Repository 権限 for &quot;Secret scanning alerts&quot; in &quot;Permissions required for GitHub Apps.&quot;</p>
+<p>日本語訳: statuses	Work with commit statuses. 例えば、 statuses:read permits an action to list the commit statuses for a given reference. 詳細については, see Permissions required for GitHub Apps.</p>
+<p>日本語訳: vulnerability-alerts	Read Dependabot alerts. 例えば、 vulnerability-alerts: read permits an action to list Dependabot alerts for the repository. Only read and none are supported; write is not valid. 〜する場合、 write-all or read-all is used, vulnerability-alerts is automatically included as read. 詳細については, see Repository 権限 for &quot;Dependabot alerts&quot;.</p>
+<p>日本語訳: Defining access for the GITHUB_TOKEN scopes</p>
+<p>日本語訳: 次のことができます define the access that the GITHUB_TOKEN will permit by specifying read, write, or none as the value of the available 権限 within the 権限 key.</p>
+<p></p>
+<pre><code>permissions:</code></pre>
+<pre><code>  actions: read|write|none</code></pre>
+<pre><code>  artifact-metadata: read|write|none</code></pre>
+<pre><code>  attestations: read|write|none</code></pre>
+<pre><code>  checks: read|write|none</code></pre>
+<pre><code>  code-quality: read|write|none</code></pre>
+<pre><code>  contents: read|write|none</code></pre>
+<pre><code>  deployments: read|write|none</code></pre>
+<pre><code>  id-token: write|none</code></pre>
+<pre><code>  issues: read|write|none</code></pre>
+<pre><code>  models: read|none</code></pre>
+<pre><code>  discussions: read|write|none</code></pre>
+<pre><code>  packages: read|write|none</code></pre>
+<pre><code>  pages: read|write|none</code></pre>
+<pre><code>  pull-requests: read|write|none</code></pre>
+<p></p>
+<pre><code>  security-events: read|write|none</code></pre>
+<pre><code>  statuses: read|write|none</code></pre>
+<pre><code>  vulnerability-alerts: read|none</code></pre>
+<p>日本語訳: もし  specify the access for any of these 権限, all of those that are not specified are set to none.</p>
+<p></p>
+<p>日本語訳: 次のことができます use the following syntax to define one of read-all or write-all access for all of the available 権限:</p>
+<p></p>
+<pre><code>permissions: read-all</code></pre>
+<pre><code>permissions: write-all</code></pre>
+<p>日本語訳: 次のことができます use the following syntax to disable 権限 for all of the available 権限:</p>
+<p></p>
+<pre><code>permissions: {}</code></pre>
+<p>日本語訳: Changing the 権限 in a forked repository</p>
+<p>日本語訳: 次のことができます use the 権限 key to add and remove read 権限 for forked repositories, but typically you can&#x27;t grant write access. The exception to this behavior is where an admin user has selected the Send write tokens to ワークフローs from pull requests option in the GitHub Actions settings. 詳細については, see Managing GitHub Actions settings for a repository.</p>
+<p></p>
+<p>日本語訳: How 権限 are calculated for a ワークフロー ジョブ</p>
+<p>日本語訳: The 権限 for the GITHUB_TOKEN are initially set to the デフォルト setting for the enterprise, organization, or repository. If the デフォルト is set to the restricted 権限 at any of these levels then this will apply to the relevant repositories. 例えば、 if you choose the restricted デフォルト at the organization level then all repositories in that organization will use the restricted 権限 as the デフォルト. The 権限 are then adjusted based on any configuration within the ワークフロー file, first at the ワークフロー level and then at the ジョブ level. Finally, if the ワークフロー was triggered by a pull request イベント other than pull_request_target from a forked repository, and the Send write tokens to ワークフローs from pull requests setting is not selected, the 権限 are adjusted to change any write 権限 to read only.</p>
+<p></p>
+<p>日本語訳: Setting the GITHUB_TOKEN 権限 for all ジョブs in a ワークフロー</p>
+<p>日本語訳: 次のことができます specify 権限 at the top level of a ワークフロー, so that the setting applies to all ジョブs in the ワークフロー.</p>
+<p></p>
+<pre><code>Example: Setting the GITHUB_TOKEN permissions for an entire workflow</code></pre>
+<p>日本語訳: This example shows 権限 being set for the GITHUB_TOKEN that will apply to all ジョブs in the ワークフロー. All 権限 are granted read access.</p>
+<p></p>
+<pre><code>name: &quot;My workflow&quot;</code></pre>
+<p></p>
+<pre><code>on: [ push ]</code></pre>
+<p></p>
+<pre><code>permissions: read-all</code></pre>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  ...</code></pre>
+<p>日本語訳: Using the 権限 key for forked repositories</p>
+<p>日本語訳: 次のことができます use the 権限 key to add and remove read 権限 for forked repositories, but typically you can&#x27;t grant write access. The exception to this behavior is where an admin user has selected the Send write tokens to ワークフローs from pull requests option in the GitHub Actions settings. 詳細については, see Managing GitHub Actions settings for a repository.</p>
+<p></p>
+<p>日本語訳: Permissions for ワークフロー runs triggered by Dependabot</p>
+<p>日本語訳: Workflow runs triggered by Dependabot pull requests run as if they are from a forked repository, and therefore use a read-only GITHUB_TOKEN. These ワークフロー runs cannot access any secrets. For information about strategies to keep these ワークフローs secure, see Secure use reference.</p>
+<p></p>
+<pre><code>env</code></pre>
+<p>日本語訳: A map of variables that are available to the ステップs of all ジョブs in the ワークフロー. 次のことができます also set variables that are only available to the ステップs of a single ジョブ or to a single ステップ. 詳細については, see ジョブs.&lt;ジョブ_id&gt;.env and ジョブs.&lt;ジョブ_id&gt;.ステップs[*].env.</p>
+<p></p>
+<p>日本語訳: Variables in the env map cannot be defined in terms of other variables in the map.</p>
+<p></p>
+<p>日本語訳: 〜する場合、 more than one environment variable is defined with the same name, GitHub uses the most specific variable. 例えば、 an environment variable defined in a ステップ will override ジョブ and ワークフロー environment variables with the same name, while the ステップ executes. An environment variable defined for a ジョブ will override a ワークフロー variable with the same name, while the ジョブ executes.</p>
+<p></p>
+<p>日本語訳: Example of env</p>
+<pre><code>env:</code></pre>
+<pre><code>  SERVER: production</code></pre>
+<pre><code>defaults</code></pre>
+<p>日本語訳: Use デフォルトs to create a map of デフォルト settings that will apply to all ジョブs in the ワークフロー. 次のことができます also set デフォルト settings that are only available to a ジョブ. 詳細については, see ジョブs.&lt;ジョブ_id&gt;.デフォルトs.</p>
+<p></p>
+<p>日本語訳: 〜する場合、 more than one デフォルト setting is defined with the same name, GitHub uses the most specific デフォルト setting. 例えば、 a デフォルト setting defined in a ジョブ will override a デフォルト setting that has the same name defined in a ワークフロー.</p>
+<p></p>
+<pre><code>defaults.run</code></pre>
+<p>日本語訳: 次のことができます use デフォルトs.run to provide デフォルト shell and working-directory options for all run ステップs in a ワークフロー. 次のことができます also set デフォルト settings for run that are only available to a ジョブ. 詳細については, see ジョブs.&lt;ジョブ_id&gt;.デフォルトs.run. 次のことができますnot use コンテキストs or 式s in this keyword.</p>
+<p></p>
+<p>日本語訳: 〜する場合、 more than one デフォルト setting is defined with the same name, GitHub uses the most specific デフォルト setting. 例えば、 a デフォルト setting defined in a ジョブ will override a デフォルト setting that has the same name defined in a ワークフロー.</p>
+<p></p>
+<pre><code>Example: Set the default shell and working directory</code></pre>
+<pre><code>defaults:</code></pre>
+<pre><code>  run:</code></pre>
+<pre><code>    shell: bash</code></pre>
+<pre><code>    working-directory: ./scripts</code></pre>
+<pre><code>defaults.run.shell</code></pre>
+<p>日本語訳: Use shell to define the shell for a ステップ. This keyword can reference several コンテキストs. 詳細については, see Contexts.</p>
+<p></p>
+<p>日本語訳: Supported platform	shell parameter	Description	Command run internally</p>
+<p>日本語訳: Linux / macOS	unspecified	The デフォルト shell on non-Windows platforms. 注意: this runs a different command to when bash is specified explicitly. If bash is not found in the path, this is treated as sh.	bash -e {0}</p>
+<p>日本語訳: All	bash	The デフォルト shell on non-Windows platforms with a fallback to sh. 〜する場合、 specifying a bash shell on Windows, the bash shell included with Git for Windows is used.	bash --noprofile --norc -eo pipefail {0}</p>
+<p>日本語訳: All	pwsh	The PowerShell Core. GitHub appends the extension .ps1 to your script name.	pwsh -command &quot;. &#x27;{0}&#x27;&quot;</p>
+<p>日本語訳: All	python	Executes the python command.	python {0}</p>
+<p>日本語訳: Linux / macOS	sh	The fallback behavior for non-Windows platforms if no shell is provided and bash is not found in the path.	sh -e {0}</p>
+<p>日本語訳: Windows	cmd	GitHub appends the extension .cmd to your script name and substitutes for {0}.	%ComSpec% /D /E:ON /V:OFF /S /C &quot;CALL &quot;{0}&quot;&quot;.</p>
+<p>日本語訳: Windows	pwsh	This is the デフォルト shell used on Windows. The PowerShell Core. GitHub appends the extension .ps1 to your script name. もし r self-hosted Windows runner does not have PowerShell Core installed, then PowerShell Desktop is used instead.	pwsh -command &quot;. &#x27;{0}&#x27;&quot;.</p>
+<p>日本語訳: Windows	powershell	The PowerShell Desktop. GitHub appends the extension .ps1 to your script name.	powershell -command &quot;. &#x27;{0}&#x27;&quot;.</p>
+<p>日本語訳: 〜する場合、 more than one デフォルト setting is defined with the same name, GitHub uses the most specific デフォルト setting. 例えば、 a デフォルト setting defined in a ジョブ will override a デフォルト setting that has the same name defined in a ワークフロー.</p>
+<p></p>
+<pre><code>defaults.run.working-directory</code></pre>
+<p>日本語訳: Use working-directory to define the working directory for the shell for a ステップ. This keyword can reference several コンテキストs. 詳細については, see Contexts.</p>
+<p></p>
+<p>日本語訳: ヒント</p>
+<p></p>
+<p>日本語訳: Ensure the working-directory you assign exists on the runner before you run your shell in it. 〜する場合、 more than one デフォルト setting is defined with the same name, GitHub uses the most specific デフォルト setting. 例えば、 a デフォルト setting defined in a ジョブ will override a デフォルト setting that has the same name defined in a ワークフロー.</p>
+<p></p>
+<pre><code>concurrency</code></pre>
+<p>日本語訳: Use 同時実行制御 to ensure that only a single ジョブ or ワークフロー using the same 同時実行制御 group will run at a time. A 同時実行制御 group can be any string or 式. The 式 can only use github, inputs and vars コンテキストs. 詳細については about 式s, see Evaluate 式s in ワークフローs and actions.</p>
+<p></p>
+<p>日本語訳: 次のことができます also specify 同時実行制御 at the ジョブ level. 詳細については, see ジョブs.&lt;ジョブ_id&gt;.同時実行制御.</p>
+<p></p>
+<p>日本語訳: This means that there can be at most one running ジョブ or ワークフロー in a 同時実行制御 group at any time. 〜する場合、 a concurrent ジョブ or ワークフロー is queued, if another ジョブ or ワークフロー using the same 同時実行制御 group in the repository is in progress, the queued ジョブ or ワークフロー will be pending. By デフォルト, any existing pending ジョブ or ワークフロー in the same 同時実行制御 group will be canceled and the new queued ジョブ or ワークフロー will take its place.</p>
+<p></p>
+<p>日本語訳: 〜するには also cancel any currently running ジョブ or ワークフロー in the same 同時実行制御 group, specify cancel-in-progress: true. 〜するには conditionally cancel currently running ジョブs or ワークフローs in the same 同時実行制御 group, you can specify cancel-in-progress as an 式 with any of the allowed 式 コンテキストs.</p>
+<p></p>
+<p>日本語訳: 〜するには allow more than one pending ジョブ or ワークフロー run to wait in the same 同時実行制御 group, use the optional queue property. The queue property accepts the following values:</p>
+<p></p>
+<p>日本語訳: single (デフォルト): At most one ジョブ or ワークフロー run can be pending in the 同時実行制御 group. 〜する場合、 a new ジョブ or ワークフロー run is queued, any existing pending ジョブ or ワークフロー run in the same group is canceled and replaced.</p>
+<pre><code>max: Up to 100 jobs or workflow runs can be pending in the concurrency group. When the queue is full, any additional jobs or workflow runs are canceled.</code></pre>
+<p>日本語訳: The combination of queue: max and cancel-in-progress: true is not allowed and will result in a ワークフロー validation error.</p>
+<p></p>
+<p>日本語訳: メモ</p>
+<p></p>
+<p>日本語訳: The 同時実行制御 group name is case insensitive. 例えば、 prod and Prod will be treated as the same 同時実行制御 group.</p>
+<p>日本語訳: Jobs or ワークフロー runs in the same 同時実行制御 group are processed in first-in-first-out (FIFO) order according to the time each one started waiting on the 同時実行制御 group, not the time each ワークフロー was dispatched. Since the actual start time of a ジョブ or run may vary, ordering is not guaranteed.</p>
+<pre><code>Example: Using concurrency and the default behavior</code></pre>
+<p>日本語訳: The デフォルト behavior of GitHub Actions is to allow multiple ジョブs or ワークフロー runs to run concurrently. The 同時実行制御 keyword allows you to control the 同時実行制御 of ワークフロー runs.</p>
+<p></p>
+<p>日本語訳: 例えば、 you can use the 同時実行制御 keyword immediately after where trigger conditions are defined to limit the 同時実行制御 of entire ワークフロー runs for a specific ブランチ:</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  push:</code></pre>
+<pre><code>    branches:</code></pre>
+<pre><code>      - main</code></pre>
+<p></p>
+<pre><code>concurrency:</code></pre>
+<pre><code>  group: ${{ github.workflow }}-${{ github.ref }}</code></pre>
+<pre><code>  cancel-in-progress: true</code></pre>
+<p>日本語訳: 次のことができます also limit the 同時実行制御 of ジョブs within a ワークフロー by using the 同時実行制御 keyword at the ジョブ level:</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  push:</code></pre>
+<pre><code>    branches:</code></pre>
+<pre><code>      - main</code></pre>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  job-1:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    concurrency:</code></pre>
+<pre><code>      group: example-group</code></pre>
+<pre><code>      cancel-in-progress: true</code></pre>
+<pre><code>Example: Concurrency groups</code></pre>
+<p>日本語訳: Concurrency groups provide a way to manage and limit the execution of ワークフロー runs or ジョブs that share the same 同時実行制御 key.</p>
+<p></p>
+<p>日本語訳: The 同時実行制御 key is used to group ワークフローs or ジョブs together into a 同時実行制御 group. 〜する場合、 you define a 同時実行制御 key, GitHub Actions ensures that only one ワークフロー or ジョブ with that key runs at any given time. If a new ワークフロー run or ジョブ starts with the same 同時実行制御 key, GitHub Actions will cancel any ワークフロー or ジョブ already running with that key. The 同時実行制御 key can be a hard-coded string, or it can be a dynamic 式 that includes コンテキスト variables.</p>
+<p></p>
+<p>日本語訳: It is possible to define 同時実行制御 conditions in your ワークフロー so that the ワークフロー or ジョブ is part of a 同時実行制御 group.</p>
+<p></p>
+<p>日本語訳: This means that when a ワークフロー run or ジョブ starts, GitHub will cancel any ワークフロー runs or ジョブs that are already in progress in the same 同時実行制御 group. This is useful in scenarios where you want to prイベント parallel runs for a certain set of a ワークフローs or ジョブs, such as the ones used for deployments to a sタグing environment, in order to prイベント actions that could cause conflicts or consume more resources than necessary.</p>
+<p></p>
+<p>日本語訳: In this example, ジョブ-1 is part of a 同時実行制御 group named sタグing_environment. This means that if a new run of ジョブ-1 is triggered, any runs of the same ジョブ in the sタグing_environment 同時実行制御 group that are already in progress will be cancelled.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  job-1:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    concurrency:</code></pre>
+<pre><code>      group: staging_environment</code></pre>
+<pre><code>      cancel-in-progress: true</code></pre>
+<pre><code>Alternatively, using a dynamic expression such as concurrency: ci-${{ github.ref }} in your workflow means that the workflow or job would be part of a concurrency group named ci- followed by the reference of the branch or tag that triggered the workflow. In this example, if a new commit is pushed to the main branch while a previous run is still in progress, the previous run will be cancelled and the new one will start:</code></pre>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  push:</code></pre>
+<pre><code>    branches:</code></pre>
+<pre><code>      - main</code></pre>
+<p></p>
+<pre><code>concurrency:</code></pre>
+<pre><code>  group: ci-${{ github.ref }}</code></pre>
+<pre><code>  cancel-in-progress: true</code></pre>
+<pre><code>Example: Queueing multiple pending runs</code></pre>
+<p>日本語訳: By デフォルト, only one ジョブ or ワークフロー run can be pending in a 同時実行制御 group at a time. 〜するには allow multiple runs to queue instead of being canceled, set queue: max. With queue: max, up to 100 ジョブs or ワークフロー runs can wait in the 同時実行制御 group; once the queue is full, any additional runs are canceled.</p>
+<p></p>
+<p>日本語訳: 例えば、 the following ワークフロー queues deployments to the production environment, processing them one at a time in order based on when each run started waiting on the 同時実行制御 group:</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  push:</code></pre>
+<pre><code>    branches:</code></pre>
+<pre><code>      - main</code></pre>
+<p></p>
+<pre><code>concurrency:</code></pre>
+<pre><code>  group: production-deploy</code></pre>
+<pre><code>  queue: max</code></pre>
+<p>日本語訳: 注意: queue: max cannot be combined with cancel-in-progress: true, because the two options describe conflicting behaviors for handling in-progress runs.</p>
+<p></p>
+<pre><code>Example: Using concurrency to cancel any in-progress job or run</code></pre>
+<p>日本語訳: 〜するには use 同時実行制御 to cancel any in-progress ジョブ or run in GitHub Actions, you can use the 同時実行制御 key with the cancel-in-progress option set to true:</p>
+<p></p>
+<pre><code>concurrency:</code></pre>
+<pre><code>  group: ${{ github.ref }}</code></pre>
+<pre><code>  cancel-in-progress: true</code></pre>
+<p>日本語訳: 注意: in this example, without defining a particular 同時実行制御 group, GitHub Actions will cancel any in-progress run of the ジョブ or ワークフロー.</p>
+<p></p>
+<pre><code>Example: Using a fallback value</code></pre>
+<p>日本語訳: もし  build the group name with a property that is only defined for specific イベントs, you can use a fallback value. 例えば、 github.head_ref is only defined on pull_request イベントs. もし r ワークフロー responds to other イベントs in addition to pull_request イベントs, you will need to provide a fallback to avoid a syntax error. The following 同時実行制御 group cancels in-progress ジョブs or runs on pull_request イベントs only; if github.head_ref is undefined, the 同時実行制御 group will fallback to the run ID, which is guaranteed to be both unique and defined for the run.</p>
+<p></p>
+<pre><code>concurrency:</code></pre>
+<pre><code>  group: ${{ github.head_ref || github.run_id }}</code></pre>
+<pre><code>  cancel-in-progress: true</code></pre>
+<pre><code>Example: Only cancel in-progress jobs or runs for the current workflow</code></pre>
+<p>日本語訳: もし  have multiple ワークフローs in the same repository, 同時実行制御 group names must be unique across ワークフローs to avoid canceling in-progress ジョブs or runs from other ワークフローs. Otherwise, any previously in-progress or pending ジョブ will be canceled, regardless of the ワークフロー.</p>
+<p></p>
+<p>日本語訳: 〜するには only cancel in-progress runs of the same ワークフロー, you can use the github.ワークフロー property to build the 同時実行制御 group:</p>
+<p></p>
+<pre><code>concurrency:</code></pre>
+<pre><code>  group: ${{ github.workflow }}-${{ github.ref }}</code></pre>
+<pre><code>  cancel-in-progress: true</code></pre>
+<pre><code>Example: Only cancel in-progress jobs on specific branches</code></pre>
+<p>日本語訳: もし  would like to cancel in-progress ジョブs on certain ブランチes but not on others, you can use conditional 式s with cancel-in-progress. 例えば、 you can do this if you would like to cancel in-progress ジョブs on development ブランチes but not on release ブランチes.</p>
+<p></p>
+<p>日本語訳: 〜するには only cancel in-progress runs of the same ワークフロー when not running on a release ブランチ, you can set cancel-in-progress to an 式 similar to the following:</p>
+<p></p>
+<pre><code>concurrency:</code></pre>
+<pre><code>  group: ${{ github.workflow }}-${{ github.ref }}</code></pre>
+<pre><code>  cancel-in-progress: ${{ !contains(github.ref, &#x27;release/&#x27;)}}</code></pre>
+<p>日本語訳: In this example, multiple pushes to a release/1.2.3 ブランチ would not cancel in-progress runs. Pushes to another ブランチ, such as main, would cancel in-progress runs.</p>
+<p></p>
+<pre><code>jobs</code></pre>
+<p>日本語訳: A ワークフロー run is made up of one or more ジョブs, which run in parallel by デフォルト. 〜するには run ジョブs sequentially, you can define dependencies on other ジョブs using the ジョブs.&lt;ジョブ_id&gt;.needs keyword.</p>
+<p></p>
+<p>日本語訳: Each ジョブ runs in a runner environment specified by runs-on.</p>
+<p></p>
+<p>日本語訳: 次のことができます run an unlimited number of ジョブs as long as you are within the ワークフロー usage limits. 詳細については, see Billing and usage for GitHub-hosted runners and Actions limits for self-hosted runner usage limits.</p>
+<p></p>
+<p>日本語訳: もし  need to find the unique identifier of a ジョブ running in a ワークフロー run, you can use the GitHub API. 詳細については, see REST API endpoints for GitHub Actions.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;</p>
+<p>日本語訳: Use ジョブs.&lt;ジョブ_id&gt; to give your ジョブ a unique identifier. The key ジョブ_id is a string and its value is a map of the ジョブ&#x27;s configuration data. You must replace &lt;ジョブ_id&gt; with a string that is unique to the ジョブs object. The &lt;ジョブ_id&gt; must start with a letter or _ and contain only alphanumeric characters, -, or _.</p>
+<p></p>
+<pre><code>Example: Creating jobs</code></pre>
+<p>日本語訳: In this example, two ジョブs have been created, and their ジョブ_id values are my_first_ジョブ and my_second_ジョブ.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  my_first_job:</code></pre>
+<pre><code>    name: My first job</code></pre>
+<pre><code>  my_second_job:</code></pre>
+<pre><code>    name: My second job</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.name</p>
+<p>日本語訳: Use ジョブs.&lt;ジョブ_id&gt;.name to set a name for the ジョブ, which is displayed in the GitHub UI.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.権限</p>
+<p>日本語訳: For a specific ジョブ, you can use ジョブs.&lt;ジョブ_id&gt;.権限 to modify the デフォルト 権限 granted to the GITHUB_TOKEN, adding or removing access as required, so that you only allow the minimum required access. 詳細については, see Use GITHUB_TOKEN for authentication in ワークフローs.</p>
+<p></p>
+<p>日本語訳: By specifying the permission within a ジョブ definition, you can configure a different set of 権限 for the GITHUB_TOKEN for each ジョブ, if required. Alternatively, you can specify the 権限 for all ジョブs in the ワークフロー. For information on defining 権限 at the ワークフロー level, see 権限.</p>
+<p></p>
+<p>日本語訳: For each of the available 権限, shown in the table below, you can assign one of the access levels: read (if applicable), write, or none. write includes read. もし  specify the access for any of these 権限, all of those that are not specified are set to none.</p>
+<p></p>
+<p>日本語訳: Available 権限 and details of what each allows an action to do:</p>
+<p></p>
+<p>日本語訳: Permission	Allows an action using GITHUB_TOKEN to</p>
+<p>日本語訳: actions	Work with GitHub Actions. 例えば、 actions: write permits an action to cancel a ワークフロー run. 詳細については, see Permissions required for GitHub Apps.</p>
+<p>日本語訳: artifact-metadata	Work with artifact metadata. 例えば、 artifact-metadata: write permits an action to create storage records on behalf of a build artifact. 詳細については, see REST API endpoints for artifact metadata.</p>
+<p>日本語訳: attestations	Work with artifact attestations. 例えば、 attestations: write permits an action to generate an artifact attestation for a build. 詳細については, see Using artifact attestations to establish provenance for builds</p>
+<p>日本語訳: checks	Work with check runs and check suites. 例えば、 checks: write permits an action to create a check run. 詳細については, see Permissions required for GitHub Apps.</p>
+<p>日本語訳: code-quality	Work with code quality. 例えば、 code-quality: write permits an action to upload code coverage reports. 詳細については, see About GitHub Code Quality.</p>
+<p>日本語訳: contents	Work with the contents of the repository. 例えば、 contents: read permits an action to list the commits, and contents: write allows the action to create a release. 詳細については, see Permissions required for GitHub Apps.</p>
+<p>日本語訳: deployments	Work with deployments. 例えば、 deployments: write permits an action to create a new deployment. 詳細については, see Permissions required for GitHub Apps.</p>
+<p>日本語訳: discussions	Work with GitHub Discussions. 例えば、 discussions: write permits an action to close or delete a discussion. 詳細については, see Using the GraphQL API for Discussions.</p>
+<p>日本語訳: id-token	Fetch an OpenID Connect (OIDC) token. This requires id-token: write. 詳細については, see OpenID Connect</p>
+<p>日本語訳: issues	Work with issues. 例えば、 issues: write permits an action to add a comment to an issue. 詳細については, see Permissions required for GitHub Apps.</p>
+<p>日本語訳: models	Generate AI inference responses with GitHub Models. 例えば、 models: read permits an action to use the GitHub Models inference API. See Prototyping with AI models.</p>
+<p>日本語訳: packages	Work with GitHub Packages. 例えば、 packages: write permits an action to upload and publish packages on GitHub Packages. 詳細については, see About 権限 for GitHub Packages.</p>
+<p>日本語訳: pages	Work with GitHub Pages. 例えば、 pages: write permits an action to request a GitHub Pages build. 詳細については, see Permissions required for GitHub Apps.</p>
+<p>日本語訳: pull-requests	Work with pull requests. 例えば、 pull-requests: write permits an action to add a label to a pull request. 詳細については, see Permissions required for GitHub Apps.</p>
+<p>日本語訳: security-イベントs	Work with GitHub code scanning alerts. 例えば、 security-イベントs: read permits an action to list the code scanning alerts for the repository, and security-イベントs: write allows an action to update the status of a code scanning alert. 詳細については, see Repository 権限 for &quot;Code scanning alerts&quot;.</p>
+<p></p>
+<p>日本語訳: For Dependabot alerts, use the vulnerability-alerts permission. Secret scanning alerts cannot be read with this permission and require a GitHub App or a personal access token. 詳細については, see Repository 権限 for &quot;Secret scanning alerts&quot; in &quot;Permissions required for GitHub Apps.&quot;</p>
+<p>日本語訳: statuses	Work with commit statuses. 例えば、 statuses:read permits an action to list the commit statuses for a given reference. 詳細については, see Permissions required for GitHub Apps.</p>
+<p>日本語訳: vulnerability-alerts	Read Dependabot alerts. 例えば、 vulnerability-alerts: read permits an action to list Dependabot alerts for the repository. Only read and none are supported; write is not valid. 〜する場合、 write-all or read-all is used, vulnerability-alerts is automatically included as read. 詳細については, see Repository 権限 for &quot;Dependabot alerts&quot;.</p>
+<p>日本語訳: Defining access for the GITHUB_TOKEN scopes</p>
+<p>日本語訳: 次のことができます define the access that the GITHUB_TOKEN will permit by specifying read, write, or none as the value of the available 権限 within the 権限 key.</p>
+<p></p>
+<pre><code>permissions:</code></pre>
+<pre><code>  actions: read|write|none</code></pre>
+<pre><code>  artifact-metadata: read|write|none</code></pre>
+<pre><code>  attestations: read|write|none</code></pre>
+<pre><code>  checks: read|write|none</code></pre>
+<pre><code>  code-quality: read|write|none</code></pre>
+<pre><code>  contents: read|write|none</code></pre>
+<pre><code>  deployments: read|write|none</code></pre>
+<pre><code>  id-token: write|none</code></pre>
+<pre><code>  issues: read|write|none</code></pre>
+<pre><code>  models: read|none</code></pre>
+<pre><code>  discussions: read|write|none</code></pre>
+<pre><code>  packages: read|write|none</code></pre>
+<pre><code>  pages: read|write|none</code></pre>
+<pre><code>  pull-requests: read|write|none</code></pre>
+<p></p>
+<pre><code>  security-events: read|write|none</code></pre>
+<pre><code>  statuses: read|write|none</code></pre>
+<pre><code>  vulnerability-alerts: read|none</code></pre>
+<p>日本語訳: もし  specify the access for any of these 権限, all of those that are not specified are set to none.</p>
+<p></p>
+<p>日本語訳: 次のことができます use the following syntax to define one of read-all or write-all access for all of the available 権限:</p>
+<p></p>
+<pre><code>permissions: read-all</code></pre>
+<pre><code>permissions: write-all</code></pre>
+<p>日本語訳: 次のことができます use the following syntax to disable 権限 for all of the available 権限:</p>
+<p></p>
+<pre><code>permissions: {}</code></pre>
+<p>日本語訳: Changing the 権限 in a forked repository</p>
+<p>日本語訳: 次のことができます use the 権限 key to add and remove read 権限 for forked repositories, but typically you can&#x27;t grant write access. The exception to this behavior is where an admin user has selected the Send write tokens to ワークフローs from pull requests option in the GitHub Actions settings. 詳細については, see Managing GitHub Actions settings for a repository.</p>
+<p></p>
+<pre><code>Example: Setting the GITHUB_TOKEN permissions for one job in a workflow</code></pre>
+<p>日本語訳: This example shows 権限 being set for the GITHUB_TOKEN that will only apply to the ジョブ named stale. Write access is granted for the issues and pull-requests 権限. All other 権限 will have no access.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  stale:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<p></p>
+<pre><code>    permissions:</code></pre>
+<pre><code>      issues: write</code></pre>
+<pre><code>      pull-requests: write</code></pre>
+<p></p>
+<pre><code>    steps:</code></pre>
+<pre><code>      - uses: actions/stale@v10</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.needs</p>
+<p>日本語訳: Use ジョブs.&lt;ジョブ_id&gt;.needs to identify any ジョブs that must complete successfully before this ジョブ will run. It can be a string or array of strings. If a ジョブ fails or is skipped, all ジョブs that need it are skipped unless the ジョブs use a conditional 式 that causes the ジョブ to continue. If a run contains a series of ジョブs that need each other, a failure or skip applies to all ジョブs in the dependency chain from the point of failure or skip onwards. もし  would like a ジョブ to run even if a ジョブ it is dependent on did not succeed, use the always() conditional 式 in ジョブs.&lt;ジョブ_id&gt;.if.</p>
+<p></p>
+<pre><code>Example: Requiring successful dependent jobs</code></pre>
+<pre><code>jobs:</code></pre>
+<pre><code>  job1:</code></pre>
+<pre><code>  job2:</code></pre>
+<pre><code>    needs: job1</code></pre>
+<pre><code>  job3:</code></pre>
+<pre><code>    needs: [job1, job2]</code></pre>
+<p>日本語訳: In this example, ジョブ1 must complete successfully before ジョブ2 begins, and ジョブ3 waits for both ジョブ1 and ジョブ2 to complete.</p>
+<p></p>
+<p>日本語訳: The ジョブs in this example run sequentially:</p>
+<p></p>
+<pre><code>job1</code></pre>
+<pre><code>job2</code></pre>
+<pre><code>job3</code></pre>
+<pre><code>Example: Not requiring successful dependent jobs</code></pre>
+<pre><code>jobs:</code></pre>
+<pre><code>  job1:</code></pre>
+<pre><code>  job2:</code></pre>
+<pre><code>    needs: job1</code></pre>
+<pre><code>  job3:</code></pre>
+<pre><code>    if: ${{ always() }}</code></pre>
+<pre><code>    needs: [job1, job2]</code></pre>
+<p>日本語訳: In this example, ジョブ3 uses the always() conditional 式 so that it always runs after ジョブ1 and ジョブ2 have completed, regardless of whether they were successful. 詳細については, see Evaluate 式s in ワークフローs and actions.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.if</p>
+<p>日本語訳: 次のことができます use the ジョブs.&lt;ジョブ_id&gt;.if conditional to prイベント a ジョブ from running unless a condition is met. 次のことができます use any supported コンテキスト and 式 to create a conditional. 詳細については on which コンテキストs are supported in this key, see Contexts reference.</p>
+<p></p>
+<p>日本語訳: メモ</p>
+<p></p>
+<p>日本語訳: The ジョブs.&lt;ジョブ_id&gt;.if condition is evaluated before ジョブs.&lt;ジョブ_id&gt;.strategy.matrix is applied.</p>
+<p></p>
+<pre><code>When you use expressions in an if conditional, you can, optionally, omit the ${{ }} expression syntax because GitHub Actions automatically evaluates the if conditional as an expression. However, this exception does not apply everywhere.</code></pre>
+<p></p>
+<pre><code>You must always use the ${{ }} expression syntax or escape with &#x27;&#x27;, &quot;&quot;, or () when the expression starts with !, since ! is reserved notation in YAML format. For example:</code></pre>
+<p></p>
+<pre><code>if: ${{ ! startsWith(github.ref, &#x27;refs/tags/&#x27;) }}</code></pre>
+<p>日本語訳: 詳細については, see Evaluate 式s in ワークフローs and actions.</p>
+<p></p>
+<pre><code>Example: Only run job for specific repository</code></pre>
+<p>日本語訳: This example uses if to control when the production-deploy ジョブ can run. It will only run if the repository is named octo-repo-prod and is within the octo-org organization. Otherwise, the ジョブ will be marked as skipped.</p>
+<p></p>
+<pre><code>YAML</code></pre>
+<pre><code>name: example-workflow</code></pre>
+<pre><code>on: [push]</code></pre>
+<pre><code>jobs:</code></pre>
+<pre><code>  production-deploy:</code></pre>
+<pre><code>    if: github.repository == &#x27;octo-org/octo-repo-prod&#x27;</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - uses: actions/checkout@v6</code></pre>
+<pre><code>      - uses: actions/setup-node@v4</code></pre>
+<pre><code>        with:</code></pre>
+<pre><code>          node-version: &#x27;14&#x27;</code></pre>
+<pre><code>      - run: npm install -g bats</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.runs-on</p>
+<p>日本語訳: Use ジョブs.&lt;ジョブ_id&gt;.runs-on to define the type of machine to run the ジョブ on.</p>
+<p></p>
+<p>日本語訳: The destination machine can be either a GitHub-hosted runner, larger runner, or a self-hosted runner.</p>
+<p></p>
+<p>日本語訳: 次のことができます target runners based on the labels assigned to them, or their group membership, or a combination of these.</p>
+<p></p>
+<p>日本語訳: 次のことができます provide runs-on as:</p>
+<p></p>
+<p>日本語訳: A single string</p>
+<p>日本語訳: A single variable containing a string</p>
+<p>日本語訳: An array of strings, variables containing strings, or a combination of both</p>
+<p>日本語訳: A key: value pair using the group or labels keys</p>
+<p>日本語訳: もし  specify an array of strings or variables, your ワークフロー will execute on any runner that matches all of the specified runs-on values. 例えば、 here the ジョブ will only run on a self-hosted runner that has the labels linux, x64, and gpu:</p>
+<p></p>
+<pre><code>runs-on: [self-hosted, linux, x64, gpu]</code></pre>
+<p>日本語訳: 詳細については, see Choosing self-hosted runners.</p>
+<p></p>
+<p>日本語訳: 次のことができます mix strings and variables in an array. For example:</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  workflow_dispatch:</code></pre>
+<pre><code>    inputs:</code></pre>
+<pre><code>      chosen-os:</code></pre>
+<pre><code>        required: true</code></pre>
+<pre><code>        type: choice</code></pre>
+<pre><code>        options:</code></pre>
+<pre><code>        - Ubuntu</code></pre>
+<pre><code>        - macOS</code></pre>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  test:</code></pre>
+<pre><code>    runs-on: [self-hosted, &quot;${{ inputs.chosen-os }}&quot;]</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>    - run: echo Hello world!</code></pre>
+<p>日本語訳: もし  would like to run your ワークフロー on multiple machines, use ジョブs.&lt;ジョブ_id&gt;.strategy.</p>
+<p></p>
+<p>日本語訳: メモ</p>
+<p></p>
+<pre><code>Quotation marks are not required around simple strings like self-hosted, but they are required for expressions like &quot;${{ inputs.chosen-os }}&quot;.</code></pre>
+<p></p>
+<p>日本語訳: Choosing GitHub-hosted runners</p>
+<p>日本語訳: もし  use a GitHub-hosted runner, each ジョブ runs in a fresh instance of a runner image specified by runs-on.</p>
+<p></p>
+<p>日本語訳: The value for runs-on, when you are using a GitHub-hosted runner, is a runner label or the name of a runner group. The labels for the standard GitHub-hosted runners are shown in the following tables.</p>
+<p></p>
+<p>日本語訳: 詳細については, see GitHub-hosted runners.</p>
+<p></p>
+<p>日本語訳: Standard GitHub-hosted runners for public repositories</p>
+<p>日本語訳: For public repositories, ジョブs using the ワークフロー labels shown in the table below will run with the associated specifications. With the exception of single-CPU runners, each GitHub-hosted runner is a new virtual machine (VM) hosted by GitHub. Single-CPU runners are hosted in a container on a shared VM—see GitHub-hosted runners reference. Use of the standard GitHub-hosted runners is free and unlimited on public repositories.</p>
+<p></p>
+<p>日本語訳: Virtual machine / container	Processor (CPU)	Memory (RAM)	Storage (SSD)	Architecture	Workflow label</p>
+<p>日本語訳: Linux	1	5 GB	14 GB	x64	ubuntu-slim</p>
+<p>日本語訳: Linux	4	16 GB	14 GB	x64	ubuntu-latest, ubuntu-24.04, ubuntu-22.04</p>
+<p>日本語訳: Windows	4	16 GB	14 GB	x64	windows-latest, windows-2025, windows-2025-vs2026, windows-2022</p>
+<p>日本語訳: Linux	4	16 GB	14 GB	arm64	ubuntu-24.04-arm, ubuntu-22.04-arm</p>
+<p>日本語訳: Windows	4	16 GB	14 GB	arm64	windows-11-arm</p>
+<p>日本語訳: macOS	4	14 GB	14 GB	Intel	macos-15-intel, macos-26-intel</p>
+<p>日本語訳: macOS	3 (M1)	7 GB	14 GB	arm64	macos-latest, macos-14, macos-15, macos-26</p>
+<p>日本語訳: Standard GitHub-hosted runners for private repositories</p>
+<p>日本語訳: For private repositories, ジョブs using the ワークフロー labels shown in the table below will run on virtual machines with the associated specifications. These runners use your GitHub account&#x27;s allotment of free minutes, and are then charged at the per minute rates. See Actions runner pricing.</p>
+<p></p>
+<p>日本語訳: Virtual Machine	Processor (CPU)	Memory (RAM)	Storage (SSD)	Architecture	Workflow label</p>
+<p>日本語訳: Linux	1	5 GB	14 GB	x64	ubuntu-slim</p>
+<p>日本語訳: Linux	2	8 GB	14 GB	x64	ubuntu-latest, ubuntu-24.04, ubuntu-22.04</p>
+<p>日本語訳: Windows	2	8 GB	14 GB	x64	windows-latest, windows-2025, windows-2022</p>
+<p>日本語訳: Linux	2	8 GB	14 GB	arm64	ubuntu-24.04-arm, ubuntu-22.04-arm</p>
+<p>日本語訳: Windows	2	8 GB	14 GB	arm64	windows-11-arm</p>
+<p>日本語訳: macOS	4	14 GB	14 GB	Intel	macos-15-intel, macos-26-intel</p>
+<p>日本語訳: macOS	3 (M1)	7 GB	14 GB	arm64	macos-latest, macos-14, macos-15, macos-26</p>
+<p>日本語訳: In addition to the standard GitHub-hosted runners, GitHub offers customers on GitHub Team and GitHub Enterprise Cloud plans a range of managed virtual machines with advanced features - for example, more cores and disk space, GPU-powered machines, and ARM-powered machines. 詳細については, see Larger runners.</p>
+<p></p>
+<p>日本語訳: メモ</p>
+<p></p>
+<p>日本語訳: The -latest runner images are the latest stable images that GitHub provides, and might not be the most recent version of the operating system available from the operating system vendor.</p>
+<p></p>
+<p>日本語訳: 警告</p>
+<p></p>
+<p>日本語訳: Beta and Deprecated Images are provided &quot;as-is&quot;, &quot;with all faults&quot; and &quot;as available&quot; and are excluded from the service level agreement and warranty. Beta Images may not be covered by customer support.</p>
+<p></p>
+<pre><code>Example: Specifying an operating system</code></pre>
+<pre><code>runs-on: ubuntu-latest</code></pre>
+<p>日本語訳: 詳細については, see GitHub-hosted runners.</p>
+<p></p>
+<p>日本語訳: Choosing self-hosted runners</p>
+<p>日本語訳: 〜するには specify a self-hosted runner for your ジョブ, configure runs-on in your ワークフロー file with self-hosted runner labels.</p>
+<p></p>
+<p>日本語訳: Self-hosted runners may have the self-hosted label. 〜する場合、 setting up a self-hosted runner, by デフォルト we will include the label self-hosted. You may pass in the --no-デフォルト-labels flag to prイベント the self-hosted label from being applied. Labels can be used to create targeting options for runners, such as operating system or architecture, we recommend providing an array of labels that begins with self-hosted (this must be listed first) and then includes additional labels as needed. 〜する場合、 you specify an array of labels, ジョブs will be queued on runners that have all the labels that you specify.</p>
+<p></p>
+<p>日本語訳: メモ</p>
+<p></p>
+<p>日本語訳: Actions Runner Controller does not support the self-hosted label.</p>
+<p></p>
+<pre><code>Example: Using labels for runner selection</code></pre>
+<pre><code>runs-on: [self-hosted, linux]</code></pre>
+<p>日本語訳: 詳細については, see Self-hosted runners and Using self-hosted runners in a ワークフロー.</p>
+<p></p>
+<p>日本語訳: Choosing runners in a group</p>
+<p>日本語訳: 次のことができます use runs-on to target runner groups, so that the ジョブ will execute on any runner that is a member of that group. For more granular control, you can also combine runner groups with labels.</p>
+<p></p>
+<p>日本語訳: Runner groups can only have larger runners or self-hosted runners as members.</p>
+<p></p>
+<pre><code>Example: Using groups to control where jobs are run</code></pre>
+<p>日本語訳: In this example, Ubuntu runners have been added to a group called ubuntu-runners. The runs-on key sends the ジョブ to any available runner in the ubuntu-runners group:</p>
+<p></p>
+<pre><code>name: learn-github-actions</code></pre>
+<pre><code>on: [push]</code></pre>
+<pre><code>jobs:</code></pre>
+<pre><code>  check-bats-version:</code></pre>
+<pre><code>    runs-on: </code></pre>
+<pre><code>      group: ubuntu-runners</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - uses: actions/checkout@v6</code></pre>
+<pre><code>      - uses: actions/setup-node@v4</code></pre>
+<pre><code>        with:</code></pre>
+<pre><code>          node-version: &#x27;14&#x27;</code></pre>
+<pre><code>      - run: npm install -g bats</code></pre>
+<pre><code>      - run: bats -v</code></pre>
+<pre><code>Example: Combining groups and labels</code></pre>
+<p>日本語訳: 〜する場合、 you combine groups and labels, the runner must meet both requirements to be eligible to run the ジョブ.</p>
+<p></p>
+<p>日本語訳: In this example, a runner group called ubuntu-runners is populated with Ubuntu runners, which have also been assigned the label ubuntu-24.04-16core. The runs-on key combines group and labels so that the ジョブ is routed to any available runner within the group that also has a matching label:</p>
+<p></p>
+<pre><code>name: learn-github-actions</code></pre>
+<pre><code>on: [push]</code></pre>
+<pre><code>jobs:</code></pre>
+<pre><code>  check-bats-version:</code></pre>
+<pre><code>    runs-on:</code></pre>
+<pre><code>      group: ubuntu-runners</code></pre>
+<pre><code>      labels: ubuntu-24.04-16core</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - uses: actions/checkout@v6</code></pre>
+<pre><code>      - uses: actions/setup-node@v4</code></pre>
+<pre><code>        with:</code></pre>
+<pre><code>          node-version: &#x27;14&#x27;</code></pre>
+<pre><code>      - run: npm install -g bats</code></pre>
+<pre><code>      - run: bats -v</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.snapshot</p>
+<p>日本語訳: 次のことができます use ジョブs.&lt;ジョブ_id&gt;.snapshot to generate a custom image.</p>
+<p></p>
+<p>日本語訳: Add the snapshot keyword to the ジョブ, using either the string syntax or mapping syntax as shown in Generating a custom image.</p>
+<p></p>
+<p>日本語訳: Each ジョブ that includes the snapshot keyword creates a separate image. 〜するには generate only one image or image version, include all ワークフロー ステップs in a single ジョブ. Each successful run of a ジョブ that includes the snapshot keyword creates a new version of that image.</p>
+<p></p>
+<p>日本語訳: 詳細については, see Using custom images.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.environment</p>
+<p>日本語訳: Use ジョブs.&lt;ジョブ_id&gt;.environment to define the environment that the ジョブ references.</p>
+<p></p>
+<p>日本語訳: 次のことができます provide the environment as only the environment name, or as an environment object with the name and url. The URL maps to environment_url in the deployments API. 詳細については about the deployments API, see REST API endpoints for repositories.</p>
+<p></p>
+<p>日本語訳: メモ</p>
+<p></p>
+<p>日本語訳: All deployment protection rules must pass before a ジョブ referencing the environment is sent to a runner. 詳細については, see Managing environments for deployment.</p>
+<p></p>
+<pre><code>Example: Using a single environment name</code></pre>
+<pre><code>environment: staging_environment</code></pre>
+<pre><code>Example: Using environment name and URL</code></pre>
+<pre><code>environment:</code></pre>
+<pre><code>  name: production_environment</code></pre>
+<pre><code>  url: https://github.com</code></pre>
+<p>日本語訳: The value of url can be an 式. Allowed 式 コンテキストs: github, inputs, vars, needs, strategy, matrix, ジョブ, runner, env, and ステップs. 詳細については about 式s, see Evaluate 式s in ワークフローs and actions.</p>
+<p></p>
+<pre><code>Example: Using output as URL</code></pre>
+<pre><code>environment:</code></pre>
+<pre><code>  name: production_environment</code></pre>
+<pre><code>  url: ${{ steps.step_id.outputs.url_output }}</code></pre>
+<p>日本語訳: The value of name can be an 式. Allowed 式 コンテキストs: github, inputs, vars, needs, strategy, and matrix. 詳細については about 式s, see Evaluate 式s in ワークフローs and actions.</p>
+<p></p>
+<pre><code>Example: Using an expression as environment name</code></pre>
+<pre><code>environment:</code></pre>
+<pre><code>  name: ${{ github.ref_name }}</code></pre>
+<pre><code>Example: Using an environment without creating a deployment</code></pre>
+<p>日本語訳: Set deployment to false to use an environment&#x27;s secrets and variables without creating a deployment object.</p>
+<p></p>
+<pre><code>environment:</code></pre>
+<pre><code>  name: testing</code></pre>
+<pre><code>  deployment: false</code></pre>
+<p>日本語訳: Setting deployment: false is not compatible with custom deployment protection rules. 詳細については, see Deploying with GitHub Actions.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.同時実行制御</p>
+<p>日本語訳: 次のことができます use ジョブs.&lt;ジョブ_id&gt;.同時実行制御 to ensure that only a single ジョブ or ワークフロー using the same 同時実行制御 group will run at a time. A 同時実行制御 group can be any string or 式. Allowed 式 コンテキストs: github, inputs, vars, needs, strategy, and matrix. 詳細については about 式s, see Evaluate 式s in ワークフローs and actions.</p>
+<p></p>
+<p>日本語訳: 次のことができます also specify 同時実行制御 at the ワークフロー level. 詳細については, see 同時実行制御.</p>
+<p></p>
+<p>日本語訳: This means that there can be at most one running ジョブ or ワークフロー in a 同時実行制御 group at any time. 〜する場合、 a concurrent ジョブ or ワークフロー is queued, if another ジョブ or ワークフロー using the same 同時実行制御 group in the repository is in progress, the queued ジョブ or ワークフロー will be pending. By デフォルト, any existing pending ジョブ or ワークフロー in the same 同時実行制御 group will be canceled and the new queued ジョブ or ワークフロー will take its place.</p>
+<p></p>
+<p>日本語訳: 〜するには also cancel any currently running ジョブ or ワークフロー in the same 同時実行制御 group, specify cancel-in-progress: true. 〜するには conditionally cancel currently running ジョブs or ワークフローs in the same 同時実行制御 group, you can specify cancel-in-progress as an 式 with any of the allowed 式 コンテキストs.</p>
+<p></p>
+<p>日本語訳: 〜するには allow more than one pending ジョブ or ワークフロー run to wait in the same 同時実行制御 group, use the optional queue property. The queue property accepts the following values:</p>
+<p></p>
+<p>日本語訳: single (デフォルト): At most one ジョブ or ワークフロー run can be pending in the 同時実行制御 group. 〜する場合、 a new ジョブ or ワークフロー run is queued, any existing pending ジョブ or ワークフロー run in the same group is canceled and replaced.</p>
+<pre><code>max: Up to 100 jobs or workflow runs can be pending in the concurrency group. When the queue is full, any additional jobs or workflow runs are canceled.</code></pre>
+<p>日本語訳: The combination of queue: max and cancel-in-progress: true is not allowed and will result in a ワークフロー validation error.</p>
+<p></p>
+<p>日本語訳: メモ</p>
+<p></p>
+<p>日本語訳: The 同時実行制御 group name is case insensitive. 例えば、 prod and Prod will be treated as the same 同時実行制御 group.</p>
+<p>日本語訳: Jobs or ワークフロー runs in the same 同時実行制御 group are processed in first-in-first-out (FIFO) order according to the time each one started waiting on the 同時実行制御 group, not the time each ワークフロー was dispatched. Since the actual start time of a ジョブ or run may vary, ordering is not guaranteed.</p>
+<pre><code>Example: Using concurrency and the default behavior</code></pre>
+<p>日本語訳: The デフォルト behavior of GitHub Actions is to allow multiple ジョブs or ワークフロー runs to run concurrently. The 同時実行制御 keyword allows you to control the 同時実行制御 of ワークフロー runs.</p>
+<p></p>
+<p>日本語訳: 例えば、 you can use the 同時実行制御 keyword immediately after where trigger conditions are defined to limit the 同時実行制御 of entire ワークフロー runs for a specific ブランチ:</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  push:</code></pre>
+<pre><code>    branches:</code></pre>
+<pre><code>      - main</code></pre>
+<p></p>
+<pre><code>concurrency:</code></pre>
+<pre><code>  group: ${{ github.workflow }}-${{ github.ref }}</code></pre>
+<pre><code>  cancel-in-progress: true</code></pre>
+<p>日本語訳: 次のことができます also limit the 同時実行制御 of ジョブs within a ワークフロー by using the 同時実行制御 keyword at the ジョブ level:</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  push:</code></pre>
+<pre><code>    branches:</code></pre>
+<pre><code>      - main</code></pre>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  job-1:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    concurrency:</code></pre>
+<pre><code>      group: example-group</code></pre>
+<pre><code>      cancel-in-progress: true</code></pre>
+<pre><code>Example: Concurrency groups</code></pre>
+<p>日本語訳: Concurrency groups provide a way to manage and limit the execution of ワークフロー runs or ジョブs that share the same 同時実行制御 key.</p>
+<p></p>
+<p>日本語訳: The 同時実行制御 key is used to group ワークフローs or ジョブs together into a 同時実行制御 group. 〜する場合、 you define a 同時実行制御 key, GitHub Actions ensures that only one ワークフロー or ジョブ with that key runs at any given time. If a new ワークフロー run or ジョブ starts with the same 同時実行制御 key, GitHub Actions will cancel any ワークフロー or ジョブ already running with that key. The 同時実行制御 key can be a hard-coded string, or it can be a dynamic 式 that includes コンテキスト variables.</p>
+<p></p>
+<p>日本語訳: It is possible to define 同時実行制御 conditions in your ワークフロー so that the ワークフロー or ジョブ is part of a 同時実行制御 group.</p>
+<p></p>
+<p>日本語訳: This means that when a ワークフロー run or ジョブ starts, GitHub will cancel any ワークフロー runs or ジョブs that are already in progress in the same 同時実行制御 group. This is useful in scenarios where you want to prイベント parallel runs for a certain set of a ワークフローs or ジョブs, such as the ones used for deployments to a sタグing environment, in order to prイベント actions that could cause conflicts or consume more resources than necessary.</p>
+<p></p>
+<p>日本語訳: In this example, ジョブ-1 is part of a 同時実行制御 group named sタグing_environment. This means that if a new run of ジョブ-1 is triggered, any runs of the same ジョブ in the sタグing_environment 同時実行制御 group that are already in progress will be cancelled.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  job-1:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    concurrency:</code></pre>
+<pre><code>      group: staging_environment</code></pre>
+<pre><code>      cancel-in-progress: true</code></pre>
+<pre><code>Alternatively, using a dynamic expression such as concurrency: ci-${{ github.ref }} in your workflow means that the workflow or job would be part of a concurrency group named ci- followed by the reference of the branch or tag that triggered the workflow. In this example, if a new commit is pushed to the main branch while a previous run is still in progress, the previous run will be cancelled and the new one will start:</code></pre>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  push:</code></pre>
+<pre><code>    branches:</code></pre>
+<pre><code>      - main</code></pre>
+<p></p>
+<pre><code>concurrency:</code></pre>
+<pre><code>  group: ci-${{ github.ref }}</code></pre>
+<pre><code>  cancel-in-progress: true</code></pre>
+<pre><code>Example: Queueing multiple pending runs</code></pre>
+<p>日本語訳: By デフォルト, only one ジョブ or ワークフロー run can be pending in a 同時実行制御 group at a time. 〜するには allow multiple runs to queue instead of being canceled, set queue: max. With queue: max, up to 100 ジョブs or ワークフロー runs can wait in the 同時実行制御 group; once the queue is full, any additional runs are canceled.</p>
+<p></p>
+<p>日本語訳: 例えば、 the following ワークフロー queues deployments to the production environment, processing them one at a time in order based on when each run started waiting on the 同時実行制御 group:</p>
+<p></p>
+<pre><code>on:</code></pre>
+<pre><code>  push:</code></pre>
+<pre><code>    branches:</code></pre>
+<pre><code>      - main</code></pre>
+<p></p>
+<pre><code>concurrency:</code></pre>
+<pre><code>  group: production-deploy</code></pre>
+<pre><code>  queue: max</code></pre>
+<p>日本語訳: 注意: queue: max cannot be combined with cancel-in-progress: true, because the two options describe conflicting behaviors for handling in-progress runs.</p>
+<p></p>
+<pre><code>Example: Using concurrency to cancel any in-progress job or run</code></pre>
+<p>日本語訳: 〜するには use 同時実行制御 to cancel any in-progress ジョブ or run in GitHub Actions, you can use the 同時実行制御 key with the cancel-in-progress option set to true:</p>
+<p></p>
+<pre><code>concurrency:</code></pre>
+<pre><code>  group: ${{ github.ref }}</code></pre>
+<pre><code>  cancel-in-progress: true</code></pre>
+<p>日本語訳: 注意: in this example, without defining a particular 同時実行制御 group, GitHub Actions will cancel any in-progress run of the ジョブ or ワークフロー.</p>
+<p></p>
+<pre><code>Example: Using a fallback value</code></pre>
+<p>日本語訳: もし  build the group name with a property that is only defined for specific イベントs, you can use a fallback value. 例えば、 github.head_ref is only defined on pull_request イベントs. もし r ワークフロー responds to other イベントs in addition to pull_request イベントs, you will need to provide a fallback to avoid a syntax error. The following 同時実行制御 group cancels in-progress ジョブs or runs on pull_request イベントs only; if github.head_ref is undefined, the 同時実行制御 group will fallback to the run ID, which is guaranteed to be both unique and defined for the run.</p>
+<p></p>
+<pre><code>concurrency:</code></pre>
+<pre><code>  group: ${{ github.head_ref || github.run_id }}</code></pre>
+<pre><code>  cancel-in-progress: true</code></pre>
+<pre><code>Example: Only cancel in-progress jobs or runs for the current workflow</code></pre>
+<p>日本語訳: もし  have multiple ワークフローs in the same repository, 同時実行制御 group names must be unique across ワークフローs to avoid canceling in-progress ジョブs or runs from other ワークフローs. Otherwise, any previously in-progress or pending ジョブ will be canceled, regardless of the ワークフロー.</p>
+<p></p>
+<p>日本語訳: 〜するには only cancel in-progress runs of the same ワークフロー, you can use the github.ワークフロー property to build the 同時実行制御 group:</p>
+<p></p>
+<pre><code>concurrency:</code></pre>
+<pre><code>  group: ${{ github.workflow }}-${{ github.ref }}</code></pre>
+<pre><code>  cancel-in-progress: true</code></pre>
+<pre><code>Example: Only cancel in-progress jobs on specific branches</code></pre>
+<p>日本語訳: もし  would like to cancel in-progress ジョブs on certain ブランチes but not on others, you can use conditional 式s with cancel-in-progress. 例えば、 you can do this if you would like to cancel in-progress ジョブs on development ブランチes but not on release ブランチes.</p>
+<p></p>
+<p>日本語訳: 〜するには only cancel in-progress runs of the same ワークフロー when not running on a release ブランチ, you can set cancel-in-progress to an 式 similar to the following:</p>
+<p></p>
+<pre><code>concurrency:</code></pre>
+<pre><code>  group: ${{ github.workflow }}-${{ github.ref }}</code></pre>
+<pre><code>  cancel-in-progress: ${{ !contains(github.ref, &#x27;release/&#x27;)}}</code></pre>
+<p>日本語訳: In this example, multiple pushes to a release/1.2.3 ブランチ would not cancel in-progress runs. Pushes to another ブランチ, such as main, would cancel in-progress runs.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.outputs</p>
+<p>日本語訳: 次のことができます use ジョブs.&lt;ジョブ_id&gt;.outputs to create a map of outputs for a ジョブ. Job outputs are available to all downstream ジョブs that depend on this ジョブ. 詳細については on defining ジョブ dependencies, see ジョブs.&lt;ジョブ_id&gt;.needs.</p>
+<p></p>
+<p>日本語訳: Outputs can be a maximum of 1 MB per ジョブ. The total of all outputs in a ワークフロー run can be a maximum of 50 MB. Size is approximated based on UTF-16 encoding.</p>
+<p></p>
+<p>日本語訳: Job outputs containing 式s are evaluated on the runner at the end of each ジョブ. Outputs containing secrets are redacted on the runner and not sent to GitHub Actions.</p>
+<p></p>
+<p>日本語訳: If an output is skipped because it may contain a secret, you will see the following warning message: &quot;Skip output {output.Key} since it may contain secret.&quot; 詳細については on how to handle secrets, please refer to the 例: Masking and passing a secret between ジョブs or ワークフローs.</p>
+<p></p>
+<p>日本語訳: 〜するには use ジョブ outputs in a dependent ジョブ, you can use the needs コンテキスト. 詳細については, see Contexts reference.</p>
+<p></p>
+<pre><code>Example: Defining outputs for a job</code></pre>
+<pre><code>jobs:</code></pre>
+<pre><code>  job1:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    # Map a step output to a job output</code></pre>
+<pre><code>    outputs:</code></pre>
+<pre><code>      output1: ${{ steps.step1.outputs.test }}</code></pre>
+<pre><code>      output2: ${{ steps.step2.outputs.test }}</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - id: step1</code></pre>
+<pre><code>        run: echo &quot;test=hello&quot; &gt;&gt; &quot;$GITHUB_OUTPUT&quot;</code></pre>
+<pre><code>      - id: step2</code></pre>
+<pre><code>        run: echo &quot;test=world&quot; &gt;&gt; &quot;$GITHUB_OUTPUT&quot;</code></pre>
+<pre><code>  job2:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    needs: job1</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - env:</code></pre>
+<pre><code>          OUTPUT1: ${{needs.job1.outputs.output1}}</code></pre>
+<pre><code>          OUTPUT2: ${{needs.job1.outputs.output2}}</code></pre>
+<pre><code>        run: echo &quot;$OUTPUT1 $OUTPUT2&quot;</code></pre>
+<p>日本語訳: Using Job Outputs in a Matrix Job</p>
+<p>日本語訳: Matrices can be used to generate multiple outputs of different names. 〜する場合、 using a matrix, ジョブ outputs will be combined from all ジョブs inside the matrix.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  job1:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    outputs:</code></pre>
+<pre><code>      output_1: ${{ steps.gen_output.outputs.output_1 }}</code></pre>
+<pre><code>      output_2: ${{ steps.gen_output.outputs.output_2 }}</code></pre>
+<pre><code>      output_3: ${{ steps.gen_output.outputs.output_3 }}</code></pre>
+<pre><code>    strategy:</code></pre>
+<pre><code>      matrix:</code></pre>
+<pre><code>        version: [1, 2, 3]</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - name: Generate output</code></pre>
+<pre><code>        id: gen_output</code></pre>
+<pre><code>        run: |</code></pre>
+<pre><code>          version=&quot;${{ matrix.version }}&quot;</code></pre>
+<pre><code>          echo &quot;output_${version}=${version}&quot; &gt;&gt; &quot;$GITHUB_OUTPUT&quot;</code></pre>
+<pre><code>  job2:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    needs: [job1]</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      # Will show</code></pre>
+<pre><code>      # {</code></pre>
+<pre><code>      #   &quot;output_1&quot;: &quot;1&quot;,</code></pre>
+<pre><code>      #   &quot;output_2&quot;: &quot;2&quot;,</code></pre>
+<pre><code>      #   &quot;output_3&quot;: &quot;3&quot;</code></pre>
+<pre><code>      # }</code></pre>
+<pre><code>      - run: echo &#x27;${{ toJSON(needs.job1.outputs) }}&#x27;</code></pre>
+<p>日本語訳: 警告</p>
+<p></p>
+<p>日本語訳: Actions does not guarantee the order that matrix ジョブs will run in. Ensure that the output name is unique, otherwise the last matrix ジョブ that runs will override the output value.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.env</p>
+<p>日本語訳: A map of variables that are available to all ステップs in the ジョブ. 次のことができます set variables for the entire ワークフロー or an individual ステップ. 詳細については, see env and ジョブs.&lt;ジョブ_id&gt;.ステップs[*].env.</p>
+<p></p>
+<p>日本語訳: 〜する場合、 more than one environment variable is defined with the same name, GitHub uses the most specific variable. 例えば、 an environment variable defined in a ステップ will override ジョブ and ワークフロー environment variables with the same name, while the ステップ executes. An environment variable defined for a ジョブ will override a ワークフロー variable with the same name, while the ジョブ executes.</p>
+<p></p>
+<p>日本語訳: Example of ジョブs.&lt;ジョブ_id&gt;.env</p>
+<pre><code>jobs:</code></pre>
+<pre><code>  job1:</code></pre>
+<pre><code>    env:</code></pre>
+<pre><code>      FIRST_NAME: Mona</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.デフォルトs</p>
+<p>日本語訳: Use ジョブs.&lt;ジョブ_id&gt;.デフォルトs to create a map of デフォルト settings that will apply to all ステップs in the ジョブ. 次のことができます also set デフォルト settings for the entire ワークフロー. 詳細については, see デフォルトs.</p>
+<p></p>
+<p>日本語訳: 〜する場合、 more than one デフォルト setting is defined with the same name, GitHub uses the most specific デフォルト setting. 例えば、 a デフォルト setting defined in a ジョブ will override a デフォルト setting that has the same name defined in a ワークフロー.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.デフォルトs.run</p>
+<p>日本語訳: Use ジョブs.&lt;ジョブ_id&gt;.デフォルトs.run to provide デフォルト shell and working-directory to all run ステップs in the ジョブ.</p>
+<p></p>
+<p>日本語訳: 次のことができます provide デフォルト shell and working-directory options for all run ステップs in a ジョブ. 次のことができます also set デフォルト settings for run for the entire ワークフロー. 詳細については, see デフォルトs.run.</p>
+<p></p>
+<p>日本語訳: These can be overridden at the ジョブs.&lt;ジョブ_id&gt;.デフォルトs.run and ジョブs.&lt;ジョブ_id&gt;.ステップs[*].run levels.</p>
+<p></p>
+<p>日本語訳: 〜する場合、 more than one デフォルト setting is defined with the same name, GitHub uses the most specific デフォルト setting. 例えば、 a デフォルト setting defined in a ジョブ will override a デフォルト setting that has the same name defined in a ワークフロー.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.デフォルトs.run.shell</p>
+<p>日本語訳: Use shell to define the shell for a ステップ. This keyword can reference several コンテキストs. 詳細については, see Contexts.</p>
+<p></p>
+<p>日本語訳: Supported platform	shell parameter	Description	Command run internally</p>
+<p>日本語訳: Linux / macOS	unspecified	The デフォルト shell on non-Windows platforms. 注意: this runs a different command to when bash is specified explicitly. If bash is not found in the path, this is treated as sh.	bash -e {0}</p>
+<p>日本語訳: All	bash	The デフォルト shell on non-Windows platforms with a fallback to sh. 〜する場合、 specifying a bash shell on Windows, the bash shell included with Git for Windows is used.	bash --noprofile --norc -eo pipefail {0}</p>
+<p>日本語訳: All	pwsh	The PowerShell Core. GitHub appends the extension .ps1 to your script name.	pwsh -command &quot;. &#x27;{0}&#x27;&quot;</p>
+<p>日本語訳: All	python	Executes the python command.	python {0}</p>
+<p>日本語訳: Linux / macOS	sh	The fallback behavior for non-Windows platforms if no shell is provided and bash is not found in the path.	sh -e {0}</p>
+<p>日本語訳: Windows	cmd	GitHub appends the extension .cmd to your script name and substitutes for {0}.	%ComSpec% /D /E:ON /V:OFF /S /C &quot;CALL &quot;{0}&quot;&quot;.</p>
+<p>日本語訳: Windows	pwsh	This is the デフォルト shell used on Windows. The PowerShell Core. GitHub appends the extension .ps1 to your script name. もし r self-hosted Windows runner does not have PowerShell Core installed, then PowerShell Desktop is used instead.	pwsh -command &quot;. &#x27;{0}&#x27;&quot;.</p>
+<p>日本語訳: Windows	powershell	The PowerShell Desktop. GitHub appends the extension .ps1 to your script name.	powershell -command &quot;. &#x27;{0}&#x27;&quot;.</p>
+<p>日本語訳: 〜する場合、 more than one デフォルト setting is defined with the same name, GitHub uses the most specific デフォルト setting. 例えば、 a デフォルト setting defined in a ジョブ will override a デフォルト setting that has the same name defined in a ワークフロー.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.デフォルトs.run.working-directory</p>
+<p>日本語訳: Use working-directory to define the working directory for the shell for a ステップ. This keyword can reference several コンテキストs. 詳細については, see Contexts.</p>
+<p></p>
+<p>日本語訳: ヒント</p>
+<p></p>
+<p>日本語訳: Ensure the working-directory you assign exists on the runner before you run your shell in it. 〜する場合、 more than one デフォルト setting is defined with the same name, GitHub uses the most specific デフォルト setting. 例えば、 a デフォルト setting defined in a ジョブ will override a デフォルト setting that has the same name defined in a ワークフロー.</p>
+<p></p>
+<pre><code>Example: Setting default run step options for a job</code></pre>
+<pre><code>jobs:</code></pre>
+<pre><code>  job1:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    defaults:</code></pre>
+<pre><code>      run:</code></pre>
+<pre><code>        shell: bash</code></pre>
+<pre><code>        working-directory: ./scripts</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.ステップs</p>
+<p>日本語訳: A ジョブ contains a sequence of tasks called ステップs. Steps can run commands, run setup tasks, or run an action in your repository, a public repository, or an action published in a Docker registry. Not all ステップs run actions, but all actions run as a ステップ. Each ステップ runs in its own process in the runner environment and has access to the workspace and filesystem. Because ステップs run in their own process, changes to environment variables are not preserved between ステップs. GitHub provides built-in ステップs to set up and complete a ジョブ.</p>
+<p></p>
+<p>日本語訳: GitHub only displays the first 1,000 checks, however, you can run an unlimited number of ステップs as long as you are within the ワークフロー usage limits. 詳細については, see Billing and usage for GitHub-hosted runners and Actions limits for self-hosted runner usage limits.</p>
+<p></p>
+<p>日本語訳: Example of ジョブs.&lt;ジョブ_id&gt;.ステップs</p>
+<pre><code>name: Greeting from Mona</code></pre>
+<p></p>
+<pre><code>on: push</code></pre>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  my-job:</code></pre>
+<pre><code>    name: My Job</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - name: Print a greeting</code></pre>
+<pre><code>        env:</code></pre>
+<pre><code>          MY_VAR: Hi there! My name is</code></pre>
+<pre><code>          FIRST_NAME: Mona</code></pre>
+<pre><code>          MIDDLE_NAME: The</code></pre>
+<pre><code>          LAST_NAME: Octocat</code></pre>
+<pre><code>        run: |</code></pre>
+<pre><code>          echo $MY_VAR $FIRST_NAME $MIDDLE_NAME $LAST_NAME.</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.ステップs[*].id</p>
+<p>日本語訳: A unique identifier for the ステップ. 次のことができます use the id to reference the ステップ in コンテキストs. 詳細については, see Contexts reference.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.ステップs[*].if</p>
+<p>日本語訳: 次のことができます use the if conditional to prイベント a ステップ from running unless a condition is met. 次のことができます use any supported コンテキスト and 式 to create a conditional. 詳細については on which コンテキストs are supported in this key, see Contexts reference.</p>
+<p></p>
+<pre><code>When you use expressions in an if conditional, you can, optionally, omit the ${{ }} expression syntax because GitHub Actions automatically evaluates the if conditional as an expression. However, this exception does not apply everywhere.</code></pre>
+<p></p>
+<pre><code>You must always use the ${{ }} expression syntax or escape with &#x27;&#x27;, &quot;&quot;, or () when the expression starts with !, since ! is reserved notation in YAML format. For example:</code></pre>
+<p></p>
+<pre><code>if: ${{ ! startsWith(github.ref, &#x27;refs/tags/&#x27;) }}</code></pre>
+<p>日本語訳: 詳細については, see Evaluate 式s in ワークフローs and actions.</p>
+<p></p>
+<pre><code>Example: Using contexts</code></pre>
+<p>日本語訳: This ステップ only runs when the イベント type is a pull_request and the イベント action is unassigned.</p>
+<p></p>
+<pre><code>steps:</code></pre>
+<pre><code>  - name: My first step</code></pre>
+<pre><code>    if: ${{ github.event_name == &#x27;pull_request&#x27; &amp;&amp; github.event.action == &#x27;unassigned&#x27; }}</code></pre>
+<pre><code>    run: echo This event is a pull request that had an assignee removed.</code></pre>
+<pre><code>Example: Using status check functions</code></pre>
+<p>日本語訳: The my backup ステップ only runs when the previous ステップ of a ジョブ fails. 詳細については, see Evaluate 式s in ワークフローs and actions.</p>
+<p></p>
+<pre><code>steps:</code></pre>
+<pre><code>  - name: My first step</code></pre>
+<pre><code>    uses: octo-org/action-name@main</code></pre>
+<pre><code>  - name: My backup step</code></pre>
+<pre><code>    if: ${{ failure() }}</code></pre>
+<pre><code>    uses: actions/heroku@1.0.0</code></pre>
+<pre><code>Example: Using secrets</code></pre>
+<p>日本語訳: Secrets cannot be directly referenced in if: conditionals. Instead, consider setting secrets as ジョブ-level environment variables, then referencing the environment variables to conditionally run ステップs in the ジョブ.</p>
+<p></p>
+<pre><code>If a secret has not been set, the return value of an expression referencing the secret (such as ${{ secrets.SuperSecret }} in the example) will be an empty string.</code></pre>
+<p></p>
+<pre><code>name: Run a step if a secret has been set</code></pre>
+<pre><code>on: push</code></pre>
+<pre><code>jobs:</code></pre>
+<pre><code>  my-jobname:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    env:</code></pre>
+<pre><code>      super_secret: ${{ secrets.SuperSecret }}</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - if: ${{ env.super_secret != &#x27;&#x27; }}</code></pre>
+<pre><code>        run: echo &#x27;This step will only run if the secret has a value set.&#x27;</code></pre>
+<pre><code>      - if: ${{ env.super_secret == &#x27;&#x27; }}</code></pre>
+<pre><code>        run: echo &#x27;This step will only run if the secret does not have a value set.&#x27;</code></pre>
+<p>日本語訳: 詳細については, see Contexts reference and Using secrets in GitHub Actions.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.ステップs[*].name</p>
+<p>日本語訳: A name for your ステップ to display on GitHub.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.ステップs[*].uses</p>
+<p>日本語訳: Selects an action to run as part of a ステップ in your ジョブ. An action is a reusable unit of code. 次のことができます use an action defined in the same repository as the ワークフロー, a public repository, or in a published Docker container image.</p>
+<p></p>
+<p>日本語訳: We strongly recommend that you include the version of the action you are using by specifying a Git ref, SHA, or Docker タグ. もし  don&#x27;t specify a version, it could break your ワークフローs or cause unexpected behavior when the action owner publishes an update.</p>
+<p></p>
+<p>日本語訳: Using the commit SHA of a released action version is the safest for stability and security.</p>
+<p>日本語訳: If the action publishes major version タグs, you should expect to receive critical fixes and security patches while still retaining compatibility. 注意: this behavior is at the discretion of the action&#x27;s author.</p>
+<p>日本語訳: Using the デフォルト ブランチ of an action may be convenient, but if someone releases a new major version with a breaking change, your ワークフロー could break.</p>
+<p>日本語訳: Some actions require inputs that you must set using the with keyword. Review the action&#x27;s README file to determine the inputs required.</p>
+<p></p>
+<p>日本語訳: Actions are either JavaScript files or Docker containers. If the action you&#x27;re using is a Docker container you must run the ジョブ in a Linux environment. For more details, see runs-on.</p>
+<p></p>
+<pre><code>Example: Using versioned actions</code></pre>
+<pre><code>steps:</code></pre>
+<pre><code>  # Reference a specific commit</code></pre>
+<pre><code>  - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3</code></pre>
+<pre><code>  # Reference the major version of a release</code></pre>
+<pre><code>  - uses: actions/checkout@v6</code></pre>
+<pre><code>  # Reference a specific version</code></pre>
+<pre><code>  - uses: actions/checkout@v6.2.0</code></pre>
+<pre><code>  # Reference a branch</code></pre>
+<pre><code>  - uses: actions/checkout@main</code></pre>
+<pre><code>Example: Using a public action</code></pre>
+<p>日本語訳: {owner}/{repo}@{ref}</p>
+<p></p>
+<p>日本語訳: 次のことができます specify a ブランチ, ref, or SHA in a public GitHub repository.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  my_first_job:</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - name: My first step</code></pre>
+<pre><code>        # Uses the default branch of a public repository</code></pre>
+<pre><code>        uses: actions/heroku@main</code></pre>
+<pre><code>      - name: My second step</code></pre>
+<pre><code>        # Uses a specific version tag of a public repository</code></pre>
+<pre><code>        uses: actions/aws@v2.0.1</code></pre>
+<pre><code>Example: Using a public action in a subdirectory</code></pre>
+<p>日本語訳: {owner}/{repo}/{path}@{ref}</p>
+<p></p>
+<p>日本語訳: A subdirectory in a public GitHub repository at a specific ブランチ, ref, or SHA.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  my_first_job:</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - name: My first step</code></pre>
+<pre><code>        uses: actions/aws/ec2@main</code></pre>
+<pre><code>Example: Using an action in the same repository as the workflow</code></pre>
+<p>日本語訳: ./path/to/dir</p>
+<p></p>
+<p>日本語訳: The path to the directory that contains the action in your ワークフロー&#x27;s repository. You must check out your repository before using the action.</p>
+<p></p>
+<p>日本語訳: Example repository file structure:</p>
+<p></p>
+<p>日本語訳: |-- hello-world (repository)</p>
+<p>日本語訳: |   |__ .github</p>
+<p>日本語訳: |       └── ワークフローs</p>
+<p>日本語訳: |           └── my-first-ワークフロー.yml</p>
+<p>日本語訳: |       └── actions</p>
+<p>日本語訳: |           |__ hello-world-action</p>
+<p>日本語訳: |               └── action.yml</p>
+<p>日本語訳: The path is relative (./) to the デフォルト working directory (github.workspace, $GITHUB_WORKSPACE). If the action checks out the repository to a location different than the ワークフロー, the relative path used for local actions must be updated.</p>
+<p></p>
+<p>日本語訳: Example ワークフロー file:</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  my_first_job:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      # This step checks out a copy of your repository.</code></pre>
+<pre><code>      - name: My first step - check out repository</code></pre>
+<pre><code>        uses: actions/checkout@v6</code></pre>
+<pre><code>      # This step references the directory that contains the action.</code></pre>
+<pre><code>      - name: Use local hello-world-action</code></pre>
+<pre><code>        uses: ./.github/actions/hello-world-action</code></pre>
+<pre><code>Example: Using a Docker Hub action</code></pre>
+<pre><code>docker://{image}:{tag}</code></pre>
+<p></p>
+<p>日本語訳: A Docker image published on Docker Hub.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  my_first_job:</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - name: My first step</code></pre>
+<pre><code>        uses: docker://alpine:3.8</code></pre>
+<pre><code>Example: Using the GitHub Packages Container registry</code></pre>
+<pre><code>docker://{host}/{image}:{tag}</code></pre>
+<p></p>
+<p>日本語訳: A public Docker image in the GitHub Packages Container registry.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  my_first_job:</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - name: My first step</code></pre>
+<pre><code>        uses: docker://ghcr.io/OWNER/IMAGE_NAME</code></pre>
+<pre><code>Example: Using a Docker public registry action</code></pre>
+<pre><code>docker://{host}/{image}:{tag}</code></pre>
+<p></p>
+<p>日本語訳: A Docker image in a public registry. This example uses the Google Container Registry at gcr.io.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  my_first_job:</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - name: My first step</code></pre>
+<pre><code>        uses: docker://gcr.io/cloud-builders/gradle</code></pre>
+<pre><code>Example: Using an action inside a different private repository than the workflow</code></pre>
+<p>日本語訳: If the action is in an internal repository, or in a private repository configured to allow access from your ワークフロー&#x27;s repository, you can reference the action directly. 詳細については, see Managing GitHub Actions settings for a repository and Managing GitHub Actions settings for a repository.</p>
+<p></p>
+<p>日本語訳: If the action isn&#x27;t in a repository configured to allow access, you need to check out the repository and reference the action locally. Generate a personal access token and add the token as a secret. The following example shows this method for referencing an action. 詳細については, see Managing your personal access tokens and Using secrets in GitHub Actions.</p>
+<p></p>
+<p>日本語訳: Replace PERSONAL_ACCESS_TOKEN in the example with the name of your secret.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  my_first_job:</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - name: Check out repository</code></pre>
+<pre><code>        uses: actions/checkout@v6</code></pre>
+<pre><code>        with:</code></pre>
+<pre><code>          repository: octocat/my-private-repo</code></pre>
+<pre><code>          ref: v1.0</code></pre>
+<pre><code>          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}</code></pre>
+<pre><code>          path: ./.github/actions/my-private-repo</code></pre>
+<pre><code>      - name: Run my action</code></pre>
+<pre><code>        uses: ./.github/actions/my-private-repo/my-action</code></pre>
+<p>日本語訳: Alternatively, use a GitHub App instead of a personal access token in order to ensure your ワークフロー continues to run even if the personal access token owner leaves. 詳細については, see Making authenticated API requests with a GitHub App in a GitHub Actions ワークフロー.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.ステップs[*].run</p>
+<p>日本語訳: Runs command-line programs that do not exceed 21,000 characters using the operating system&#x27;s shell. もし  do not provide a name, the ステップ name will デフォルト to the text specified in the run command.</p>
+<p></p>
+<p>日本語訳: Commands run using non-login shells by デフォルト. 次のことができます choose a different shell and customize the shell used to run commands. 詳細については, see ジョブs.&lt;ジョブ_id&gt;.ステップs[*].shell.</p>
+<p></p>
+<p>日本語訳: Each run keyword represents a new process and shell in the runner environment. 〜する場合、 you provide multi-line commands, each line runs in the same shell. For example:</p>
+<p></p>
+<p>日本語訳: A single-line command:</p>
+<p></p>
+<pre><code>- name: Install Dependencies</code></pre>
+<pre><code>  run: npm install</code></pre>
+<p>日本語訳: A multi-line command:</p>
+<p></p>
+<pre><code>- name: Clean install dependencies and build</code></pre>
+<pre><code>  run: |</code></pre>
+<pre><code>    npm ci</code></pre>
+<pre><code>    npm run build</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.ステップs[*].working-directory</p>
+<p>日本語訳: Using the working-directory keyword, you can specify the working directory of where to run the command.</p>
+<p></p>
+<pre><code>- name: Clean temp directory</code></pre>
+<pre><code>  run: rm -rf *</code></pre>
+<pre><code>  working-directory: ./temp</code></pre>
+<p>日本語訳: Alternatively, you can specify a デフォルト working directory for all run ステップs in a ジョブ, or for all run ステップs in the entire ワークフロー. 詳細については, see デフォルトs.run.working-directory and ジョブs.&lt;ジョブ_id&gt;.デフォルトs.run.working-directory.</p>
+<p></p>
+<p>日本語訳: 次のことができます also use a run ステップ to run a script. 詳細については, see Adding scripts to your ワークフロー.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.ステップs[*].shell</p>
+<p>日本語訳: 次のことができます override the デフォルト shell settings in the runner&#x27;s operating system and the ジョブ&#x27;s デフォルト using the shell keyword. 次のことができます use built-in shell keywords, or you can define a custom set of shell options. The shell command that is run internally executes a temporary file that contains the commands specified in the run keyword.</p>
+<p></p>
+<p>日本語訳: Supported platform	shell parameter	Description	Command run internally</p>
+<p>日本語訳: Linux / macOS	unspecified	The デフォルト shell on non-Windows platforms. 注意: this runs a different command to when bash is specified explicitly. If bash is not found in the path, this is treated as sh.	bash -e {0}</p>
+<p>日本語訳: All	bash	The デフォルト shell on non-Windows platforms with a fallback to sh. 〜する場合、 specifying a bash shell on Windows, the bash shell included with Git for Windows is used.	bash --noprofile --norc -eo pipefail {0}</p>
+<p>日本語訳: All	pwsh	The PowerShell Core. GitHub appends the extension .ps1 to your script name.	pwsh -command &quot;. &#x27;{0}&#x27;&quot;</p>
+<p>日本語訳: All	python	Executes the python command.	python {0}</p>
+<p>日本語訳: Linux / macOS	sh	The fallback behavior for non-Windows platforms if no shell is provided and bash is not found in the path.	sh -e {0}</p>
+<p>日本語訳: Windows	cmd	GitHub appends the extension .cmd to your script name and substitutes for {0}.	%ComSpec% /D /E:ON /V:OFF /S /C &quot;CALL &quot;{0}&quot;&quot;.</p>
+<p>日本語訳: Windows	pwsh	This is the デフォルト shell used on Windows. The PowerShell Core. GitHub appends the extension .ps1 to your script name. もし r self-hosted Windows runner does not have PowerShell Core installed, then PowerShell Desktop is used instead.	pwsh -command &quot;. &#x27;{0}&#x27;&quot;.</p>
+<p>日本語訳: Windows	powershell	The PowerShell Desktop. GitHub appends the extension .ps1 to your script name.	powershell -command &quot;. &#x27;{0}&#x27;&quot;.</p>
+<p>日本語訳: Alternatively, you can specify a デフォルト shell for all run ステップs in a ジョブ, or for all run ステップs in the entire ワークフロー. 詳細については, see デフォルトs.run.shell and ジョブs.&lt;ジョブ_id&gt;.デフォルトs.run.shell.</p>
+<p></p>
+<pre><code>Example: Running a command using Bash</code></pre>
+<pre><code>steps:</code></pre>
+<pre><code>  - name: Display the path</code></pre>
+<pre><code>    shell: bash</code></pre>
+<pre><code>    run: echo $PATH</code></pre>
+<pre><code>Example: Running a command using Windows cmd</code></pre>
+<pre><code>steps:</code></pre>
+<pre><code>  - name: Display the path</code></pre>
+<pre><code>    shell: cmd</code></pre>
+<pre><code>    run: echo %PATH%</code></pre>
+<pre><code>Example: Running a command using PowerShell Core</code></pre>
+<pre><code>steps:</code></pre>
+<pre><code>  - name: Display the path</code></pre>
+<pre><code>    shell: pwsh</code></pre>
+<pre><code>    run: echo ${env:PATH}</code></pre>
+<pre><code>Example: Using PowerShell Desktop to run a command</code></pre>
+<pre><code>steps:</code></pre>
+<pre><code>  - name: Display the path</code></pre>
+<pre><code>    shell: powershell</code></pre>
+<pre><code>    run: echo ${env:PATH}</code></pre>
+<pre><code>Example: Running an inline Python script</code></pre>
+<pre><code>steps:</code></pre>
+<pre><code>  - name: Display the path</code></pre>
+<pre><code>    shell: python</code></pre>
+<pre><code>    run: |</code></pre>
+<pre><code>      import os</code></pre>
+<pre><code>      print(os.environ[&#x27;PATH&#x27;])</code></pre>
+<p>日本語訳: Custom shell</p>
+<p>日本語訳: 次のことができます set the shell value to a template string using command [options] {0} [more_options]. GitHub interprets the first whitespace-delimited word of the string as the command, and inserts the file name for the temporary script at {0}.</p>
+<p></p>
+<p>日本語訳: For example:</p>
+<p></p>
+<pre><code>steps:</code></pre>
+<pre><code>  - name: Display the environment variables and their values</code></pre>
+<pre><code>    shell: perl {0}</code></pre>
+<pre><code>    run: |</code></pre>
+<pre><code>      print %ENV</code></pre>
+<p>日本語訳: The command used, perl in this example, must be installed on the runner.</p>
+<p></p>
+<p>日本語訳: For information about the software included on GitHub-hosted runners, see GitHub-hosted runners.</p>
+<p></p>
+<p>日本語訳: Exit codes and error action preference</p>
+<p>日本語訳: For built-in shell keywords, we provide the following デフォルトs that are executed by GitHub-hosted runners. You should use these guidelines when running shell scripts.</p>
+<p></p>
+<p>日本語訳: bash/sh:</p>
+<p></p>
+<p>日本語訳: By デフォルト, fail-fast behavior is enforced using set -e for both sh and bash. 〜する場合、 shell: bash is specified, -o pipefail is also applied to enforce early exit from pipelines that generate a non-zero exit status.</p>
+<p>日本語訳: 次のことができます take full control over shell parameters by providing a template string to the shell options. 例えば、 bash {0}.</p>
+<p>日本語訳: sh-like shells exit with the exit code of the last command executed in a script, which is also the デフォルト behavior for actions. The runner will report the status of the ステップ as fail/succeed based on this exit code.</p>
+<p>日本語訳: powershell/pwsh</p>
+<p></p>
+<p>日本語訳: Fail-fast behavior when possible. For pwsh and powershell built-in shell, we will prepend $ErrorActionPreference = &#x27;stop&#x27; to script contents.</p>
+<p>日本語訳: We append if ((Test-Path -LiteralPath variable:\LASTEXITCODE)) { exit $LASTEXITCODE } to powershell scripts so action statuses reflect the script&#x27;s last exit code.</p>
+<p>日本語訳: Users can always opt out by not using the built-in shell, and providing a custom shell option like: pwsh -File {0}, or powershell -Command &quot;&amp; &#x27;{0}&#x27;&quot;, depending on need.</p>
+<pre><code>cmd</code></pre>
+<p></p>
+<p>日本語訳: There doesn&#x27;t seem to be a way to fully opt into fail-fast behavior other than writing your script to check each error code and respond accordingly. Because we can&#x27;t actually provide that behavior by デフォルト, you need to write this behavior into your script.</p>
+<p>日本語訳: cmd.exe will exit with the error level of the last program it executed, and it will return the error code to the runner. This behavior is internally consistent with the previous sh and pwsh デフォルト behavior and is the cmd.exe デフォルト, so this behavior remains intact.</p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.ステップs[*].with</p>
+<p>日本語訳: A map of the input parameters defined by the action. Each input parameter is a key/value pair. Input parameters are set as environment variables. The variable is prefixed with INPUT_ and converted to upper case.</p>
+<p></p>
+<p>日本語訳: Input parameters defined for a Docker container must use args. 詳細については, see ジョブs.&lt;ジョブ_id&gt;.ステップs[*].with.args.</p>
+<p></p>
+<p>日本語訳: Example of ジョブs.&lt;ジョブ_id&gt;.ステップs[*].with</p>
+<p>日本語訳: Defines the three input parameters (first_name, middle_name, and last_name) defined by the hello_world action. These input variables will be accessible to the hello-world action as INPUT_FIRST_NAME, INPUT_MIDDLE_NAME, and INPUT_LAST_NAME environment variables.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  my_first_job:</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - name: My first step</code></pre>
+<pre><code>        uses: actions/hello_world@main</code></pre>
+<pre><code>        with:</code></pre>
+<pre><code>          first_name: Mona</code></pre>
+<pre><code>          middle_name: The</code></pre>
+<pre><code>          last_name: Octocat</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.ステップs[*].with.args</p>
+<p>日本語訳: A string that defines the inputs for a Docker container. GitHub passes the args to the container&#x27;s ENTRYPOINT when the container starts up. An array of strings is not supported by this parameter. A single argument that includes spaces should be surrounded by double quotes &quot;&quot;.</p>
+<p></p>
+<p>日本語訳: Example of ジョブs.&lt;ジョブ_id&gt;.ステップs[*].with.args</p>
+<pre><code>steps:</code></pre>
+<pre><code>  - name: Explain why this job ran</code></pre>
+<pre><code>    uses: octo-org/action-name@main</code></pre>
+<pre><code>    with:</code></pre>
+<pre><code>      entrypoint: /bin/echo</code></pre>
+<pre><code>      args: The ${{ github.event_name }} event triggered this step.</code></pre>
+<p>日本語訳: The args are used in place of the CMD instruction in a Dockerfile. もし  use CMD in your Dockerfile, use the guidelines ordered by preference:</p>
+<p></p>
+<p>日本語訳: Document required arguments in the action&#x27;s README and omit them from the CMD instruction.</p>
+<p>日本語訳: Use デフォルトs that allow using the action without specifying any args.</p>
+<p>日本語訳: If the action exposes a --help flag, or something similar, use that as the デフォルト to make your action self-documenting.</p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.ステップs[*].with.entrypoint</p>
+<p>日本語訳: Overrides the Docker ENTRYPOINT in the Dockerfile, or sets it if one wasn&#x27;t already specified. Unlike the Docker ENTRYPOINT instruction which has a shell and exec form, entrypoint keyword accepts only a single string defining the executable to be run.</p>
+<p></p>
+<p>日本語訳: Example of ジョブs.&lt;ジョブ_id&gt;.ステップs[*].with.entrypoint</p>
+<pre><code>steps:</code></pre>
+<pre><code>  - name: Run a custom command</code></pre>
+<pre><code>    uses: octo-org/action-name@main</code></pre>
+<pre><code>    with:</code></pre>
+<pre><code>      entrypoint: /a/different/executable</code></pre>
+<p>日本語訳: The entrypoint keyword is meant to be used with Docker container actions, but you can also use it with JavaScript actions that don&#x27;t define any inputs.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.ステップs[*].env</p>
+<p>日本語訳: Sets variables for ステップs to use in the runner environment. 次のことができます also set variables for the entire ワークフロー or a ジョブ. 詳細については, see env and ジョブs.&lt;ジョブ_id&gt;.env.</p>
+<p></p>
+<p>日本語訳: 〜する場合、 more than one environment variable is defined with the same name, GitHub uses the most specific variable. 例えば、 an environment variable defined in a ステップ will override ジョブ and ワークフロー environment variables with the same name, while the ステップ executes. An environment variable defined for a ジョブ will override a ワークフロー variable with the same name, while the ジョブ executes.</p>
+<p></p>
+<p>日本語訳: Public actions may specify expected variables in the README file. もし  are setting a secret or sensitive value, such as a password or token, you must set secrets using the secrets コンテキスト. 詳細については, see Contexts reference.</p>
+<p></p>
+<p>日本語訳: Example of ジョブs.&lt;ジョブ_id&gt;.ステップs[*].env</p>
+<pre><code>steps:</code></pre>
+<pre><code>  - name: My first action</code></pre>
+<pre><code>    env:</code></pre>
+<pre><code>      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}</code></pre>
+<pre><code>      FIRST_NAME: Mona</code></pre>
+<pre><code>      LAST_NAME: Octocat</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.ステップs[*].continue-on-error</p>
+<p>日本語訳: Prイベントs a ジョブ from failing when a ステップ fails. Set to true to allow a ジョブ to pass when this ステップ fails.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.ステップs[*].timeout-minutes</p>
+<p>日本語訳: The maximum number of minutes to run the ステップ before killing the process. Maximum: 360 for both GitHub-hosted and self-hosted runners.</p>
+<p></p>
+<p>日本語訳: Fractional values are not supported. timeout-minutes must be a positive integer.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.timeout-minutes</p>
+<p>日本語訳: The maximum number of minutes to let a ジョブ run before GitHub automatically cancels it. Default: 360</p>
+<p></p>
+<p>日本語訳: If the timeout exceeds the ジョブ execution time limit for the runner, the ジョブ will be canceled when the execution time limit is met instead. 詳細については about ジョブ execution time limits, see Billing and usage for GitHub-hosted runners and Actions limits for self-hosted runner usage limits.</p>
+<p></p>
+<p>日本語訳: メモ</p>
+<p></p>
+<p>日本語訳: The GITHUB_TOKEN expires when a ジョブ finishes or after a maximum of 24 hours. For self-hosted runners, the token may be the limiting factor if the ジョブ timeout is greater than 24 hours. 詳細については on the GITHUB_TOKEN, see Use GITHUB_TOKEN for authentication in ワークフローs.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.strategy</p>
+<p>日本語訳: Use ジョブs.&lt;ジョブ_id&gt;.strategy to use a matrix strategy for your ジョブs. A matrix strategy lets you use variables in a single ジョブ definition to automatically create multiple ジョブ runs that are based on the combinations of the variables. 例えば、 you can use a matrix strategy to test your code in multiple versions of a language or on multiple operating systems. 詳細については, see Running variations of ジョブs in a ワークフロー.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.strategy.matrix</p>
+<p>日本語訳: Use ジョブs.&lt;ジョブ_id&gt;.strategy.matrix to define a matrix of different ジョブ configurations. 詳細については, see Running variations of ジョブs in a ワークフロー.</p>
+<p></p>
+<p>日本語訳: A matrix will generate a maximum of 256 ジョブs per ワークフロー run. This limit applies to both GitHub-hosted and self-hosted runners.</p>
+<p></p>
+<p>日本語訳: The variables that you define become properties in the matrix コンテキスト, and you can reference the property in other areas of your ワークフロー file. In this example, you can use matrix.version and matrix.os to access the current value of version and os that the ジョブ is using. 詳細については, see Contexts reference.</p>
+<p></p>
+<p>日本語訳: By デフォルト, GitHub will maximize the number of ジョブs run in parallel depending on runner availability. The order of the variables in the matrix determines the order in which the ジョブs are created. The first variable you define will be the first ジョブ that is created in your ワークフロー run.</p>
+<p></p>
+<p>日本語訳: Using a single-dimension matrix</p>
+<p>日本語訳: The following ワークフロー defines the variable version with the values [10, 12, 14]. The ワークフロー will run three ジョブs, one for each value in the variable. Each ジョブ will access the version value through the matrix.version コンテキスト and pass the value as node-version to the actions/setup-node action.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  example_matrix:</code></pre>
+<pre><code>    strategy:</code></pre>
+<pre><code>      matrix:</code></pre>
+<pre><code>        version: [10, 12, 14]</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - uses: actions/setup-node@v4</code></pre>
+<pre><code>        with:</code></pre>
+<pre><code>          node-version: ${{ matrix.version }}</code></pre>
+<p>日本語訳: Using a multi-dimensional matrix</p>
+<p>日本語訳: Specify multiple variables to create a multi-dimensional matrix. A ジョブ will run for each possible combination of the variables.</p>
+<p></p>
+<p>日本語訳: 例えば、 the following ワークフロー specifies two variables:</p>
+<p></p>
+<p>日本語訳: Two operating systems specified in the os variable</p>
+<p>日本語訳: Three Node.js versions specified in the version variable</p>
+<p>日本語訳: The ワークフロー will run six ジョブs, one for each combination of the os and version variables. Each ジョブ will set the runs-on value to the current os value and will pass the current version value to the actions/setup-node action.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  example_matrix:</code></pre>
+<pre><code>    strategy:</code></pre>
+<pre><code>      matrix:</code></pre>
+<pre><code>        os: [ubuntu-22.04, ubuntu-24.04]</code></pre>
+<pre><code>        version: [10, 12, 14]</code></pre>
+<pre><code>    runs-on: ${{ matrix.os }}</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - uses: actions/setup-node@v4</code></pre>
+<pre><code>        with:</code></pre>
+<pre><code>          node-version: ${{ matrix.version }}</code></pre>
+<p>日本語訳: A variable configuration in a matrix can be an array of objects. 例えば、 the following matrix produces 4 ジョブs with corresponding コンテキストs.</p>
+<p></p>
+<pre><code>matrix:</code></pre>
+<pre><code>  os:</code></pre>
+<pre><code>    - ubuntu-latest</code></pre>
+<pre><code>    - macos-latest</code></pre>
+<pre><code>  node:</code></pre>
+<pre><code>    - version: 14</code></pre>
+<pre><code>    - version: 20</code></pre>
+<pre><code>      env: NODE_OPTIONS=--openssl-legacy-provider</code></pre>
+<p>日本語訳: Each ジョブ in the matrix will have its own combination of os and node values, as shown below.</p>
+<p></p>
+<pre><code>- matrix.os: ubuntu-latest</code></pre>
+<pre><code>  matrix.node.version: 14</code></pre>
+<pre><code>- matrix.os: ubuntu-latest</code></pre>
+<pre><code>  matrix.node.version: 20</code></pre>
+<pre><code>  matrix.node.env: NODE_OPTIONS=--openssl-legacy-provider</code></pre>
+<pre><code>- matrix.os: macos-latest</code></pre>
+<pre><code>  matrix.node.version: 14</code></pre>
+<pre><code>- matrix.os: macos-latest</code></pre>
+<pre><code>  matrix.node.version: 20</code></pre>
+<pre><code>  matrix.node.env: NODE_OPTIONS=--openssl-legacy-provider</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.strategy.matrix.include</p>
+<p>日本語訳: For each object in the include list, the key:value pairs in the object will be added to each of the matrix combinations if none of the key:value pairs overwrite any of the original matrix values. If the object cannot be added to any of the matrix combinations, a new matrix combination will be created instead. 注意: the original matrix values will not be overwritten, but added matrix values can be overwritten.</p>
+<p></p>
+<pre><code>Example: Expanding configurations</code></pre>
+<p>日本語訳: 例えば、 the following ワークフロー will run four ジョブs, one for each combination of os and node. 〜する場合、 the ジョブ for the os value of windows-latest and node value of 16 runs, an additional variable called npm with the value of 6 will be included in the ジョブ.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  example_matrix:</code></pre>
+<pre><code>    strategy:</code></pre>
+<pre><code>      matrix:</code></pre>
+<pre><code>        os: [windows-latest, ubuntu-latest]</code></pre>
+<pre><code>        node: [14, 16]</code></pre>
+<pre><code>        include:</code></pre>
+<pre><code>          - os: windows-latest</code></pre>
+<pre><code>            node: 16</code></pre>
+<pre><code>            npm: 6</code></pre>
+<pre><code>    runs-on: ${{ matrix.os }}</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - uses: actions/setup-node@v4</code></pre>
+<pre><code>        with:</code></pre>
+<pre><code>          node-version: ${{ matrix.node }}</code></pre>
+<pre><code>      - if: ${{ matrix.npm }}</code></pre>
+<pre><code>        run: npm install -g npm@${{ matrix.npm }}</code></pre>
+<pre><code>      - run: npm --version</code></pre>
+<pre><code>Example: Adding configurations</code></pre>
+<p>日本語訳: 例えば、 this matrix will run 10 ジョブs, one for each combination of os and version in the matrix, plus a ジョブ for the os value of windows-latest and version value of 17.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  example_matrix:</code></pre>
+<pre><code>    strategy:</code></pre>
+<pre><code>      matrix:</code></pre>
+<pre><code>        os: [macos-latest, windows-latest, ubuntu-latest]</code></pre>
+<pre><code>        version: [12, 14, 16]</code></pre>
+<pre><code>        include:</code></pre>
+<pre><code>          - os: windows-latest</code></pre>
+<pre><code>            version: 17</code></pre>
+<p>日本語訳: もし  don&#x27;t specify any matrix variables, all configurations under include will run. 例えば、 the following ワークフロー would run two ジョブs, one for each include entry. This lets you take advanタグe of the matrix strategy without having a fully populated matrix.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  includes_only:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    strategy:</code></pre>
+<pre><code>      matrix:</code></pre>
+<pre><code>        include:</code></pre>
+<pre><code>          - site: &quot;production&quot;</code></pre>
+<pre><code>            datacenter: &quot;site-a&quot;</code></pre>
+<pre><code>          - site: &quot;staging&quot;</code></pre>
+<pre><code>            datacenter: &quot;site-b&quot;</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.strategy.matrix.exclude</p>
+<p>日本語訳: An excluded configuration only has to be a partial match for it to be excluded.</p>
+<p></p>
+<p>日本語訳: All include combinations are processed after exclude. This allows you to use include to add back combinations that were previously excluded.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.strategy.fail-fast</p>
+<p>日本語訳: 次のことができます control how ジョブ failures are handled with ジョブs.&lt;ジョブ_id&gt;.strategy.fail-fast and ジョブs.&lt;ジョブ_id&gt;.continue-on-error.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.strategy.fail-fast applies to the entire matrix. If ジョブs.&lt;ジョブ_id&gt;.strategy.fail-fast is set to true or its 式 evaluates to true, GitHub will cancel all in-progress and queued ジョブs in the matrix if any ジョブ in the matrix fails. This property デフォルトs to true.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.continue-on-error applies to a single ジョブ. If ジョブs.&lt;ジョブ_id&gt;.continue-on-error is true, other ジョブs in the matrix will continue running even if the ジョブ with ジョブs.&lt;ジョブ_id&gt;.continue-on-error: true fails.</p>
+<p></p>
+<p>日本語訳: 次のことができます use ジョブs.&lt;ジョブ_id&gt;.strategy.fail-fast and ジョブs.&lt;ジョブ_id&gt;.continue-on-error together. 例えば、 the following ワークフロー will start four ジョブs. For each ジョブ, continue-on-error is determined by the value of matrix.experimental. If any of the ジョブs with continue-on-error: false fail, all ジョブs that are in progress or queued will be cancelled. If the ジョブ with continue-on-error: true fails, the other ジョブs will not be affected.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  test:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    continue-on-error: ${{ matrix.experimental }}</code></pre>
+<pre><code>    strategy:</code></pre>
+<pre><code>      fail-fast: true</code></pre>
+<pre><code>      matrix:</code></pre>
+<pre><code>        version: [6, 7, 8]</code></pre>
+<pre><code>        experimental: [false]</code></pre>
+<pre><code>        include:</code></pre>
+<pre><code>          - version: 9</code></pre>
+<pre><code>            experimental: true</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.strategy.max-parallel</p>
+<p>日本語訳: By デフォルト, GitHub will maximize the number of ジョブs run in parallel depending on runner availability.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.continue-on-error</p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.continue-on-error applies to a single ジョブ. If ジョブs.&lt;ジョブ_id&gt;.continue-on-error is true, other ジョブs in the matrix will continue running even if the ジョブ with ジョブs.&lt;ジョブ_id&gt;.continue-on-error: true fails.</p>
+<p></p>
+<p>日本語訳: Prイベントs a ワークフロー run from failing when a ジョブ fails. Set to true to allow a ワークフロー run to pass when this ジョブ fails.</p>
+<p></p>
+<pre><code>Example: Preventing a specific failing matrix job from failing a workflow run</code></pre>
+<p>日本語訳: 次のことができます allow specific ジョブs in a ジョブ matrix to fail without failing the ワークフロー run. 例えば、 if you wanted to only allow an experimental ジョブ with node set to 15 to fail without failing the ワークフロー run.</p>
+<p></p>
+<pre><code>runs-on: ${{ matrix.os }}</code></pre>
+<pre><code>continue-on-error: ${{ matrix.experimental }}</code></pre>
+<pre><code>strategy:</code></pre>
+<pre><code>  fail-fast: false</code></pre>
+<pre><code>  matrix:</code></pre>
+<pre><code>    node: [13, 14]</code></pre>
+<pre><code>    os: [macos-latest, ubuntu-latest]</code></pre>
+<pre><code>    experimental: [false]</code></pre>
+<pre><code>    include:</code></pre>
+<pre><code>      - node: 15</code></pre>
+<pre><code>        os: ubuntu-latest</code></pre>
+<pre><code>        experimental: true</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.container</p>
+<p>日本語訳: メモ</p>
+<p></p>
+<p>日本語訳: もし r ワークフローs use Docker container actions, ジョブ containers, or service containers, then you must use a Linux runner:</p>
+<p></p>
+<p>日本語訳: もし  are using GitHub-hosted runners, you must use an Ubuntu runner.</p>
+<p>日本語訳: もし  are using self-hosted runners, you must use a Linux machine as your runner and Docker must be installed.</p>
+<p>日本語訳: Use ジョブs.&lt;ジョブ_id&gt;.container to create a container to run any ステップs in a ジョブ that don&#x27;t already specify a container. もし  have ステップs that use both script and container actions, the container actions will run as sibling containers on the same network with the same volume mounts.</p>
+<p></p>
+<p>日本語訳: もし  do not set a container, all ステップs will run directly on the host specified by runs-on unless a ステップ refers to an action configured to run in a container.</p>
+<p></p>
+<p>日本語訳: メモ</p>
+<p></p>
+<p>日本語訳: The デフォルト shell for run ステップs inside a container is sh instead of bash. This can be overridden with ジョブs.&lt;ジョブ_id&gt;.デフォルトs.run or ジョブs.&lt;ジョブ_id&gt;.ステップs[*].shell.</p>
+<p></p>
+<pre><code>Example: Running a job within a container</code></pre>
+<pre><code>YAML</code></pre>
+<pre><code>name: CI</code></pre>
+<pre><code>on:</code></pre>
+<pre><code>  push:</code></pre>
+<pre><code>    branches: [ main ]</code></pre>
+<pre><code>jobs:</code></pre>
+<pre><code>  container-test-job:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    container:</code></pre>
+<pre><code>      image: node:18</code></pre>
+<pre><code>      env:</code></pre>
+<pre><code>        NODE_ENV: development</code></pre>
+<pre><code>      ports:</code></pre>
+<pre><code>        - 80</code></pre>
+<pre><code>      volumes:</code></pre>
+<pre><code>        - my_docker_volume:/volume_mount</code></pre>
+<pre><code>      options: --cpus 1</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - name: Check for dockerenv file</code></pre>
+<pre><code>        run: (ls /.dockerenv &amp;&amp; echo Found dockerenv) || (echo No dockerenv)</code></pre>
+<p>日本語訳: 〜する場合、 you only specify a container image, you can omit the image keyword.</p>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  container-test-job:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    container: node:18</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.container.image</p>
+<p>日本語訳: Use ジョブs.&lt;ジョブ_id&gt;.container.image to define the Docker image to use as the container to run the action. The value can be the Docker Hub image name or a registry name.</p>
+<p></p>
+<p>日本語訳: メモ</p>
+<p></p>
+<p>日本語訳: Docker Hub normally imposes rate limits on both push and pull operations which will affect ジョブs on self-hosted runners. However, GitHub-hosted runners are not subject to these limits based on an agreement between GitHub and Docker.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.container.credentials</p>
+<p>日本語訳: If the image&#x27;s container registry requires authentication to pull the image, you can use ジョブs.&lt;ジョブ_id&gt;.container.credentials to set a map of the username and password. The credentials are the same values that you would provide to the docker login command.</p>
+<p></p>
+<pre><code>Example: Defining credentials for a container registry</code></pre>
+<pre><code>container:</code></pre>
+<pre><code>  image: ghcr.io/owner/image</code></pre>
+<pre><code>  credentials:</code></pre>
+<pre><code>     username: ${{ github.actor }}</code></pre>
+<pre><code>     password: ${{ secrets.github_token }}</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.container.env</p>
+<p>日本語訳: Use ジョブs.&lt;ジョブ_id&gt;.container.env to set a map of environment variables in the container.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.container.ports</p>
+<p>日本語訳: Use ジョブs.&lt;ジョブ_id&gt;.container.ports to set an array of ports to expose on the container.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.container.volumes</p>
+<p>日本語訳: Use ジョブs.&lt;ジョブ_id&gt;.container.volumes to set an array of volumes for the container to use. 次のことができます use volumes to share data between services or other ステップs in a ジョブ. 次のことができます specify named Docker volumes, anonymous Docker volumes, or bind mounts on the host.</p>
+<p></p>
+<p>日本語訳: 〜するには specify a volume, you specify the source and destination path:</p>
+<p></p>
+<p>日本語訳: &lt;source&gt;:&lt;destinationPath&gt;.</p>
+<p></p>
+<p>日本語訳: The &lt;source&gt; is a volume name or an absolute path on the host machine, and &lt;destinationPath&gt; is an absolute path in the container.</p>
+<p></p>
+<pre><code>Example: Mounting volumes in a container</code></pre>
+<pre><code>volumes:</code></pre>
+<pre><code>  - my_docker_volume:/volume_mount</code></pre>
+<pre><code>  - /data/my_data</code></pre>
+<pre><code>  - /source/directory:/destination/directory</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.container.options</p>
+<p>日本語訳: Use ジョブs.&lt;ジョブ_id&gt;.container.options to configure additional Docker container resource options. For a list of options, see docker create options.</p>
+<p></p>
+<p>日本語訳: 警告</p>
+<p></p>
+<p>日本語訳: The --network and --entrypoint options are not supported.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.services</p>
+<p>日本語訳: メモ</p>
+<p></p>
+<p>日本語訳: もし r ワークフローs use Docker container actions, ジョブ containers, or service containers, then you must use a Linux runner:</p>
+<p></p>
+<p>日本語訳: もし  are using GitHub-hosted runners, you must use an Ubuntu runner.</p>
+<p>日本語訳: もし  are using self-hosted runners, you must use a Linux machine as your runner and Docker must be installed.</p>
+<p>日本語訳: Used to host service containers for a ジョブ in a ワークフロー. Service containers are useful for creating databases or cache services like Redis. The runner automatically creates a Docker network and manages the life cycle of the service containers.</p>
+<p></p>
+<p>日本語訳: もし  configure your ジョブ to run in a container, or your ステップ uses container actions, you don&#x27;t need to map ports to access the service or action. Docker automatically exposes all ports between containers on the same Docker user-defined bridge network. 次のことができます directly reference the service container by its hostname. The hostname is automatically mapped to the label name you configure for the service in the ワークフロー.</p>
+<p></p>
+<p>日本語訳: もし  configure the ジョブ to run directly on the runner machine and your ステップ doesn&#x27;t use a container action, you must map any required Docker service container ports to the Docker host (the runner machine). 次のことができます access the service container using localhost and the mapped port.</p>
+<p></p>
+<p>日本語訳: 詳細については about the differences between networking service containers, see Communicating with Docker service containers.</p>
+<p></p>
+<pre><code>Example: Using localhost</code></pre>
+<pre><code>This example creates two services: nginx and redis. When you specify the container port but not the host port, the container port is randomly assigned to a free port on the host. GitHub sets the assigned host port in the ${{job.services.&lt;service_name&gt;.ports}} context. In this example, you can access the service host ports using the ${{ job.services.nginx.ports[&#x27;80&#x27;] }} and ${{ job.services.redis.ports[&#x27;6379&#x27;] }} contexts.</code></pre>
+<p></p>
+<pre><code>services:</code></pre>
+<pre><code>  nginx:</code></pre>
+<pre><code>    image: nginx</code></pre>
+<pre><code>    # Map port 8080 on the Docker host to port 80 on the nginx container</code></pre>
+<pre><code>    ports:</code></pre>
+<pre><code>      - 8080:80</code></pre>
+<pre><code>  redis:</code></pre>
+<pre><code>    image: redis</code></pre>
+<pre><code>    # Map random free TCP port on Docker host to port 6379 on redis container</code></pre>
+<pre><code>    ports:</code></pre>
+<pre><code>      - 6379/tcp</code></pre>
+<pre><code>steps:</code></pre>
+<pre><code>  - run: |</code></pre>
+<pre><code>      echo &quot;Redis available on 127.0.0.1:${{ job.services.redis.ports[&#x27;6379&#x27;] }}&quot;</code></pre>
+<pre><code>      echo &quot;Nginx available on 127.0.0.1:${{ job.services.nginx.ports[&#x27;80&#x27;] }}&quot;</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.services.&lt;service_id&gt;.image</p>
+<p>日本語訳: The Docker image to use as the service container to run the action. The value can be the Docker Hub image name or a registry name.</p>
+<p></p>
+<p>日本語訳: If ジョブs.&lt;ジョブ_id&gt;.services.&lt;service_id&gt;.image is assigned an empty string, the service will not start. 次のことができます use this to set up conditional services, similar to the following example.</p>
+<p></p>
+<pre><code>services:</code></pre>
+<pre><code>  nginx:</code></pre>
+<pre><code>    image: ${{ options.nginx == true &amp;&amp; &#x27;nginx&#x27; || &#x27;&#x27; }}</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.services.&lt;service_id&gt;.credentials</p>
+<p>日本語訳: If the image&#x27;s container registry requires authentication to pull the image, you can use ジョブs.&lt;ジョブ_id&gt;.container.credentials to set a map of the username and password. The credentials are the same values that you would provide to the docker login command.</p>
+<p></p>
+<p>日本語訳: Example of ジョブs.&lt;ジョブ_id&gt;.services.&lt;service_id&gt;.credentials</p>
+<pre><code>services:</code></pre>
+<pre><code>  myservice1:</code></pre>
+<pre><code>    image: ghcr.io/owner/myservice1</code></pre>
+<pre><code>    credentials:</code></pre>
+<pre><code>      username: ${{ github.actor }}</code></pre>
+<pre><code>      password: ${{ secrets.github_token }}</code></pre>
+<pre><code>  myservice2:</code></pre>
+<pre><code>    image: dockerhub_org/myservice2</code></pre>
+<pre><code>    credentials:</code></pre>
+<pre><code>      username: ${{ secrets.DOCKER_USER }}</code></pre>
+<pre><code>      password: ${{ secrets.DOCKER_PASSWORD }}</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.services.&lt;service_id&gt;.env</p>
+<p>日本語訳: Sets a map of environment variables in the service container.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.services.&lt;service_id&gt;.ports</p>
+<p>日本語訳: Sets an array of ports to expose on the service container.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.services.&lt;service_id&gt;.volumes</p>
+<p>日本語訳: Sets an array of volumes for the service container to use. 次のことができます use volumes to share data between services or other ステップs in a ジョブ. 次のことができます specify named Docker volumes, anonymous Docker volumes, or bind mounts on the host.</p>
+<p></p>
+<p>日本語訳: 〜するには specify a volume, you specify the source and destination path:</p>
+<p></p>
+<p>日本語訳: &lt;source&gt;:&lt;destinationPath&gt;.</p>
+<p></p>
+<p>日本語訳: The &lt;source&gt; is a volume name or an absolute path on the host machine, and &lt;destinationPath&gt; is an absolute path in the container.</p>
+<p></p>
+<p>日本語訳: Example of ジョブs.&lt;ジョブ_id&gt;.services.&lt;service_id&gt;.volumes</p>
+<pre><code>volumes:</code></pre>
+<pre><code>  - my_docker_volume:/volume_mount</code></pre>
+<pre><code>  - /data/my_data</code></pre>
+<pre><code>  - /source/directory:/destination/directory</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.services.&lt;service_id&gt;.options</p>
+<p>日本語訳: Additional Docker container resource options. For a list of options, see docker create options.</p>
+<p></p>
+<p>日本語訳: 警告</p>
+<p></p>
+<p>日本語訳: The --network option is not supported.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.services.&lt;service_id&gt;.command</p>
+<p>日本語訳: Overrides the Docker image&#x27;s デフォルト command (CMD). The value is passed as arguments after the image name in the docker create command. もし  also specify entrypoint, command provides the arguments to that entrypoint.</p>
+<p></p>
+<p>日本語訳: Example of ジョブs.&lt;ジョブ_id&gt;.services.&lt;service_id&gt;.command</p>
+<pre><code>services:</code></pre>
+<pre><code>  mysql:</code></pre>
+<pre><code>    image: mysql:8</code></pre>
+<pre><code>    command: --sql_mode=STRICT_TRANS_TABLES --max_allowed_packet=512M</code></pre>
+<pre><code>    env:</code></pre>
+<pre><code>      MYSQL_ROOT_PASSWORD: test</code></pre>
+<pre><code>    ports:</code></pre>
+<pre><code>      - 3306:3306</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.services.&lt;service_id&gt;.entrypoint</p>
+<p>日本語訳: Overrides the Docker image&#x27;s デフォルト ENTRYPOINT. The value is a single string defining the executable to run. Use this when you need to replace the image&#x27;s entrypoint entirely. 次のことができます combine entrypoint with command to pass arguments to the custom entrypoint.</p>
+<p></p>
+<p>日本語訳: Example of ジョブs.&lt;ジョブ_id&gt;.services.&lt;service_id&gt;.entrypoint</p>
+<pre><code>services:</code></pre>
+<pre><code>  etcd:</code></pre>
+<pre><code>    image: quay.io/coreos/etcd:v3.5.17</code></pre>
+<pre><code>    entrypoint: etcd</code></pre>
+<pre><code>    command: &gt;-</code></pre>
+<pre><code>      --listen-client-urls http://0.0.0.0:2379</code></pre>
+<pre><code>      --advertise-client-urls http://0.0.0.0:2379</code></pre>
+<pre><code>    ports:</code></pre>
+<pre><code>      - 2379:2379</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.uses</p>
+<p>日本語訳: The location and version of a reusable ワークフロー file to run as a ジョブ. Use one of the following syntaxes:</p>
+<p></p>
+<p>日本語訳: {owner}/{repo}/.github/ワークフローs/{filename}@{ref} for reusable ワークフローs in public and private repositories.</p>
+<p>日本語訳: ./.github/ワークフローs/{filename} for reusable ワークフローs in the same repository.</p>
+<p>日本語訳: In the first option, {ref} can be a SHA, a release タグ, or a ブランチ name. If a release タグ and a ブランチ have the same name, the release タグ takes precedence over the ブランチ name. Using the commit SHA is the safest option for stability and security. 詳細については, see Secure use reference.</p>
+<p></p>
+<p>日本語訳: もし  use the second syntax option (without {owner}/{repo} and @{ref}) the called ワークフロー is from the same commit as the caller ワークフロー. Ref prefixes such as refs/heads and refs/タグs are not allowed. 次のことができますnot use コンテキストs or 式s in this keyword.</p>
+<p></p>
+<p>日本語訳: Example of ジョブs.&lt;ジョブ_id&gt;.uses</p>
+<pre><code>jobs:</code></pre>
+<pre><code>  call-workflow-1-in-local-repo:</code></pre>
+<pre><code>    uses: octo-org/this-repo/.github/workflows/workflow-1.yml@172239021f7ba04fe7327647b213799853a9eb89</code></pre>
+<pre><code>  call-workflow-2-in-local-repo:</code></pre>
+<pre><code>    uses: ./.github/workflows/workflow-2.yml</code></pre>
+<pre><code>  call-workflow-in-another-repo:</code></pre>
+<pre><code>    uses: octo-org/another-repo/.github/workflows/workflow.yml@v1</code></pre>
+<p>日本語訳: 詳細については, see Reuse ワークフローs.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.with</p>
+<p>日本語訳: 〜する場合、 a ジョブ is used to call a reusable ワークフロー, you can use with to provide a map of inputs that are passed to the called ワークフロー.</p>
+<p></p>
+<p>日本語訳: Any inputs that you pass must match the input specifications defined in the called ワークフロー.</p>
+<p></p>
+<p>日本語訳: Unlike ジョブs.&lt;ジョブ_id&gt;.ステップs[*].with, the inputs you pass with ジョブs.&lt;ジョブ_id&gt;.with are not available as environment variables in the called ワークフロー. Instead, you can reference the inputs by using the inputs コンテキスト.</p>
+<p></p>
+<p>日本語訳: Example of ジョブs.&lt;ジョブ_id&gt;.with</p>
+<pre><code>jobs:</code></pre>
+<pre><code>  call-workflow:</code></pre>
+<pre><code>    uses: octo-org/example-repo/.github/workflows/called-workflow.yml@main</code></pre>
+<pre><code>    with:</code></pre>
+<pre><code>      username: mona</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.with.&lt;input_id&gt;</p>
+<p>日本語訳: A pair consisting of a string identifier for the input and the value of the input. The identifier must match the name of an input defined by on.ワークフロー_call.inputs.&lt;inputs_id&gt; in the called ワークフロー. The data type of the value must match the type defined by on.ワークフロー_call.inputs.&lt;input_id&gt;.type in the called ワークフロー.</p>
+<p></p>
+<p>日本語訳: Allowed 式 コンテキストs: github, and needs.</p>
+<p></p>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.secrets</p>
+<p>日本語訳: 〜する場合、 a ジョブ is used to call a reusable ワークフロー, you can use secrets to provide a map of secrets that are passed to the called ワークフロー.</p>
+<p></p>
+<p>日本語訳: Any secrets that you pass must match the names defined in the called ワークフロー.</p>
+<p></p>
+<p>日本語訳: Example of ジョブs.&lt;ジョブ_id&gt;.secrets</p>
+<pre><code>jobs:</code></pre>
+<pre><code>  call-workflow:</code></pre>
+<pre><code>    uses: octo-org/example-repo/.github/workflows/called-workflow.yml@main</code></pre>
+<pre><code>    secrets:</code></pre>
+<pre><code>      access-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.secrets.inherit</p>
+<p>日本語訳: Use the inherit keyword to pass all the calling ワークフロー&#x27;s secrets to the called ワークフロー. This includes all secrets the calling ワークフロー has access to, namely organization, repository, and environment secrets. The inherit keyword can be used to pass secrets across repositories within the same organization, or across organizations within the same enterprise.</p>
+<p></p>
+<p>日本語訳: Example of ジョブs.&lt;ジョブ_id&gt;.secrets.inherit</p>
+<pre><code>on:</code></pre>
+<pre><code>  workflow_dispatch:</code></pre>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  pass-secrets-to-workflow:</code></pre>
+<pre><code>    uses: ./.github/workflows/called-workflow.yml</code></pre>
+<pre><code>    secrets: inherit</code></pre>
+<pre><code>on:</code></pre>
+<pre><code>  workflow_call:</code></pre>
+<p></p>
+<pre><code>jobs:</code></pre>
+<pre><code>  pass-secret-to-action:</code></pre>
+<pre><code>    runs-on: ubuntu-latest</code></pre>
+<pre><code>    steps:</code></pre>
+<pre><code>      - name: Use a repo or org secret from the calling workflow.</code></pre>
+<pre><code>        run: echo ${{ secrets.CALLING_WORKFLOW_SECRET }}</code></pre>
+<p>日本語訳: ジョブs.&lt;ジョブ_id&gt;.secrets.&lt;secret_id&gt;</p>
+<p>日本語訳: A pair consisting of a string identifier for the secret and the value of the secret. The identifier must match the name of a secret defined by on.ワークフロー_call.secrets.&lt;secret_id&gt; in the called ワークフロー.</p>
+<p></p>
+<p>日本語訳: Allowed 式 コンテキストs: github, needs, and secrets.</p>
+<p></p>
+<p>日本語訳: Filter pattern cheat sheet</p>
+<p>日本語訳: 次のことができます use special characters in path, ブランチ, and タグ フィルターs.</p>
+<p></p>
+<p>日本語訳: *: Matches zero or more characters, but does not match the / character. 例えば、 Octo* matches Octocat.</p>
+<p>日本語訳: **: Matches zero or more of any character.</p>
+<p>日本語訳: ?: Matches zero or one of the preceding character.</p>
+<p>日本語訳: +: Matches one or more of the preceding character.</p>
+<p>日本語訳: [] Matches one alphanumeric character listed in the brackets or included in ranges. Ranges can only include a-z, A-Z, and 0-9. 例えば、 the range[0-9a-z] matches any digit or lowercase letter. 例えば、 [CB]at matches Cat or Bat and [1-2]00 matches 100 and 200.</p>
+<p>日本語訳: !: At the start of a pattern makes it negate previous positive patterns. It has no special meaning if not the first character.</p>
+<p>日本語訳: The characters *, [, and ! are special characters in YAML. もし  start a pattern with *, [, or !, you must enclose the pattern in quotes. Also, if you use a flow sequence with a pattern containing [ and/or ], the pattern must be enclosed in quotes.</p>
+<p></p>
+<p>日本語訳: # Valid</p>
+<pre><code>paths:</code></pre>
+<pre><code>  - &#x27;**/README.md&#x27;</code></pre>
+<p></p>
+<p>日本語訳: # Invalid - creates a parse error that</p>
+<p>日本語訳: # prイベントs your ワークフロー from running.</p>
+<pre><code>paths:</code></pre>
+<pre><code>  - **/README.md</code></pre>
+<p></p>
+<p>日本語訳: # Valid</p>
+<pre><code>branches: [ main, &#x27;release/v[0-9].[0-9]&#x27; ]</code></pre>
+<p></p>
+<p>日本語訳: # Invalid - creates a parse error</p>
+<pre><code>branches: [ main, release/v[0-9].[0-9] ]</code></pre>
+<p>日本語訳: 詳細については about ブランチ, タグ, and path フィルター syntax, see on.&lt;push&gt;.&lt;ブランチes|タグs&gt;, on.&lt;pull_request&gt;.&lt;ブランチes|タグs&gt;, and on.&lt;push|pull_request&gt;.paths.</p>
+<p></p>
+<p>日本語訳: ブランチとタグに一致させるパターン</p>
+<p>日本語訳: Pattern	Description	Example matches</p>
+<p>日本語訳: feature/*	The * wildcard matches any character, but does not match slash (/).	feature/my-ブランチ</p>
+<p></p>
+<p>日本語訳: feature/your-ブランチ</p>
+<p>日本語訳: feature/**	The ** wildcard matches any character including slash (/) in ブランチ and タグ names.	feature/beta-a/my-ブランチ</p>
+<p></p>
+<p>日本語訳: feature/your-ブランチ</p>
+<p></p>
+<p>日本語訳: feature/mona/the/octocat</p>
+<pre><code>main</code></pre>
+<p></p>
+<p>日本語訳: releases/mona-the-octocat	Matches the exact name of a ブランチ or タグ name.	main</p>
+<p></p>
+<p>日本語訳: releases/mona-the-octocat</p>
+<p>日本語訳: &#x27;*&#x27;	Matches all ブランチ and タグ names that don&#x27;t contain a slash (/). The * character is a special character in YAML. 〜する場合、 you start a pattern with *, you must use quotes.	main</p>
+<p></p>
+<pre><code>releases</code></pre>
+<p>日本語訳: &#x27;**&#x27;	Matches all ブランチ and タグ names. This is the デフォルト behavior when you don&#x27;t use a ブランチes or タグs フィルター.	all/the/ブランチes</p>
+<p></p>
+<p>日本語訳: every/タグ</p>
+<p>日本語訳: &#x27;*feature&#x27;	The * character is a special character in YAML. 〜する場合、 you start a pattern with *, you must use quotes.	mona-feature</p>
+<p></p>
+<pre><code>feature</code></pre>
+<p></p>
+<pre><code>ver-10-feature</code></pre>
+<p>日本語訳: v2*	Matches ブランチ and タグ names that start with v2.	v2</p>
+<p></p>
+<pre><code>v2.0</code></pre>
+<p></p>
+<pre><code>v2.9</code></pre>
+<p>日本語訳: v[12].[0-9]+.[0-9]+	Matches all semantic versioning ブランチes and タグs with major version 1 or 2.	v1.10.1</p>
+<p></p>
+<pre><code>v2.0.0</code></pre>
+<p>日本語訳: ファイルパスに一致させるパターン</p>
+<p>日本語訳: Path patterns must match the whole path, and start from the repository&#x27;s root.</p>
+<p></p>
+<p>日本語訳: パターン	一致内容の説明	一致例</p>
+<p>日本語訳: &#x27;*&#x27;	The * wildcard matches any character, but does not match slash (/). The * character is a special character in YAML. 〜する場合、 you start a pattern with *, you must use quotes.	README.md</p>
+<p></p>
+<pre><code>server.rb</code></pre>
+<p>日本語訳: &#x27;*.jsx?&#x27;	The ? character matches zero or one of the preceding character.	page.js</p>
+<p></p>
+<pre><code>page.jsx</code></pre>
+<p>日本語訳: &#x27;**&#x27;	The ** wildcard matches any character including slash (/). This is the デフォルト behavior when you don&#x27;t use a path フィルター.	all/the/files.md</p>
+<p>日本語訳: &#x27;*.js&#x27;	The * wildcard matches any character, but does not match slash (/). Matches all .js files at the root of the repository.	app.js</p>
+<p></p>
+<pre><code>index.js</code></pre>
+<p>日本語訳: &#x27;**.js&#x27;	Matches all .js files in the repository.	index.js</p>
+<p></p>
+<p>日本語訳: js/index.js</p>
+<p></p>
+<p>日本語訳: src/js/app.js</p>
+<p>日本語訳: docs/*	All files within the root of the docs directory only, at the root of the repository.	docs/README.md</p>
+<p></p>
+<p>日本語訳: docs/file.txt</p>
+<p>日本語訳: docs/**	Any files in the docs directory and its subdirectories at the root of the repository.	docs/README.md</p>
+<p></p>
+<p>日本語訳: docs/mona/octocat.txt</p>
+<p>日本語訳: docs/**/*.md	A file with a .md suffix anywhere in the docs directory.	docs/README.md</p>
+<p></p>
+<p>日本語訳: docs/mona/hello-world.md</p>
+<p></p>
+<p>日本語訳: docs/a/markdown/file.md</p>
+<p>日本語訳: &#x27;**/docs/**&#x27;	Any files in a docs directory anywhere in the repository.	docs/hello.md</p>
+<p></p>
+<p>日本語訳: dir/docs/my-file.txt</p>
+<p></p>
+<p>日本語訳: space/docs/plan/space.doc</p>
+<p>日本語訳: &#x27;**/README.md&#x27;	A README.md file anywhere in the repository.	README.md</p>
+<p></p>
+<p>日本語訳: js/README.md</p>
+<p>日本語訳: &#x27;**/*src/**&#x27;	Any file in a folder with a src suffix anywhere in the repository.	a/src/app.js</p>
+<p></p>
+<p>日本語訳: my-src/code/js/app.js</p>
+<p>日本語訳: &#x27;**/*-post.md&#x27;	A file with the suffix -post.md anywhere in the repository.	my-post.md</p>
+<p></p>
+<p>日本語訳: path/their-post.md</p>
+<p>日本語訳: &#x27;**/migrate-*.sql&#x27;	A file with the prefix migrate- and suffix .sql anywhere in the repository.	migrate-10909.sql</p>
+<p></p>
+<p>日本語訳: db/migrate-v1.0.sql</p>
+<p></p>
+<p>日本語訳: db/sept/migrate-v1.sql</p>
+<p>日本語訳: &#x27;*.md&#x27;</p>
+<p></p>
+<p>日本語訳: &#x27;!README.md&#x27;	Using an exclamation mark (!) in front of a pattern negates it. 〜する場合、 a file matches a pattern and also matches a negative pattern defined later in the file, the file will not be included.	hello.md</p>
+<p></p>
+<p>日本語訳: 一致しない例</p>
+<p></p>
+<pre><code>README.md</code></pre>
+<p></p>
+<p>日本語訳: docs/hello.md</p>
+<p>日本語訳: &#x27;*.md&#x27;</p>
+<p></p>
+<p>日本語訳: &#x27;!README.md&#x27;</p>
+<p></p>
+<p>日本語訳: README*	Patterns are checked sequentially. A pattern that negates a previous pattern will re-include file paths.	hello.md</p>
+<p></p>
+<pre><code>README.md</code></pre>
+<p></p>
+<pre><code>README.doc</code></pre>
+<p>日本語訳: ヘルプとサポート</p>
+</body>
+</html>
